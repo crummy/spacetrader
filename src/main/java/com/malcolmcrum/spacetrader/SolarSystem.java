@@ -10,7 +10,7 @@ import static com.malcolmcrum.spacetrader.Utils.RandomEnum;
  * Created by Malcolm on 8/28/2015.
  */
 public class SolarSystem {
-    private final Vector2i location;
+    private Vector2i location;
     private final String name;
     private final TechLevel techLevel;
     private final Politics politics;
@@ -33,7 +33,7 @@ public class SolarSystem {
         do {
             p = RandomEnum(Politics.class);
             t = RandomEnum(TechLevel.class);
-        } while (t.isBefore(p.getMinTechLevel()) && t.isBeyond(p.getMaxTechLevel()));
+        } while (t.isBefore(p.getMinTechLevel()) || t.isBeyond(p.getMaxTechLevel()));
         politics = p;
         techLevel = t;
 
@@ -76,7 +76,7 @@ public class SolarSystem {
 
             int quantity = ((9 + GetRandom(5)) - techLevel.erasBetween(item.getTechLevelForTopProduction())) * (1 + size.getMultiplier());
 
-            // Cap robots and narcots due to potential for easy profits
+            // Cap robots and narcotics due to potential for easy profits
             if (item == TradeItem.Robots || item == TradeItem.Narcotics) {
                 int difficultyValue = difficulty.getValue();
                 quantity = ((quantity * (5 - difficultyValue)) / (6 - difficultyValue)) + 1;
@@ -98,7 +98,6 @@ public class SolarSystem {
             }
 
             quantity = quantity - GetRandom(10) + GetRandom(10);
-
             if (quantity < 0) {
                 quantity = 0;
             }
@@ -135,6 +134,38 @@ public class SolarSystem {
 
     public void setSpecialEvent(SpecialEvent specialEvent) {
         this.specialEvent = specialEvent;
+    }
+
+    public void setLocation(Vector2i location) {
+        this.location = location;
+    }
+
+    public int getWormholeDestination() {
+        return wormholeDestination;
+    }
+
+    Crew getMercenary() {
+        return mercenary;
+    }
+
+    public Politics getPolitics() {
+        return politics;
+    }
+
+    public TechLevel getTechLevel() {
+        return techLevel;
+    }
+
+    public boolean isVisited() {
+        return visited;
+    }
+
+    public int getTradeResetCountdown() {
+        return tradeResetCountdown;
+    }
+
+    public Map<TradeItem, Integer> getTradeItems() {
+        return tradeItems;
     }
 
     enum SpecialResource {

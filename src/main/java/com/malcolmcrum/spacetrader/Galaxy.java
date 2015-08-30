@@ -1,33 +1,33 @@
 package com.malcolmcrum.spacetrader;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.*;
 
 import static com.malcolmcrum.spacetrader.Utils.GetRandom;
 
 /**
+ * Galaxy generator - basically sets up SolarSystems.
  * Created by Malcolm on 8/28/2015.
  */
 public class Galaxy {
-    private static final int MAX_SOLAR_SYSTEM = 120;
+    private static final Logger logger = LoggerFactory.getLogger(Galaxy.class);
+
+    private static final int MAX_SOLAR_SYSTEMS = 120;
     private static final int MAX_WORM_HOLES = 6;
-    private static final int CLOSE_DISTANCE = 13;
-    private static final int MIN_DISTANCE = 6;
-    private static final int GALAXY_WIDTH = 150;
-    private static final int GALAXY_HEIGHT = 110;
+    static final int CLOSE_DISTANCE = 13;
+    static final int MIN_DISTANCE = 6;
+    static final int GALAXY_WIDTH = 150;
+    static final int GALAXY_HEIGHT = 110;
     private static final int MAX_CREW_MEMBER = 31;
 
-    private final List<SolarSystem> solarSystems = new ArrayList<>();
+    final List<SolarSystem> solarSystems = new ArrayList<>(MAX_SOLAR_SYSTEMS);
 
     public Galaxy(Difficulty difficulty) {
-        for (int i = 0; i < MAX_SOLAR_SYSTEM; ++i) {
-            Vector2i systemLocation = generateLocation(i);
-            SolarSystem system = new SolarSystem(systemLocation, i, difficulty);
-            solarSystems.add(system);
-        }
+        addSolarSystems(difficulty);
 
-        Collections.shuffle(solarSystems, new Random());
-
-        addWormholes();
+        shuffleSystems();
 
         addMercenaries();
 
@@ -44,7 +44,7 @@ public class Galaxy {
 
     private void addSpecialEvents() {
         findSystem("Acamar").setSpecialEvent(SolarSystem.SpecialEvent.MonsterKilled);
-        findSystem("Barata").setSpecialEvent(SolarSystem.SpecialEvent.FlyBaratas);
+        findSystem("Baratas").setSpecialEvent(SolarSystem.SpecialEvent.FlyBaratas);
         findSystem("Melina").setSpecialEvent(SolarSystem.SpecialEvent.FlyMelina);
         findSystem("Regulas").setSpecialEvent(SolarSystem.SpecialEvent.FlyRegulas);
         findSystem("Zalkon").setSpecialEvent(SolarSystem.SpecialEvent.DragonflyDestroyed);
@@ -59,58 +59,69 @@ public class Galaxy {
                                         .stream()
                                         .filter(sys -> sys.getName().equals(name))
                                         .findFirst();
-        if (system.isPresent()) {
-            return system.get();
-        } else {
-            return null;
-        }
+        return system.get();
     }
 
     private void addMercenaries() {
-        int i = 1; // skip commander
-        while (i < MAX_CREW_MEMBER) {
+        int i = 1; // skip captain
+        while (i < MAX_CREW_MEMBER - 1) {
             Crew mercenary = Crew.getCrew(i);
-            int selectedSystemIndex = GetRandom(MAX_SOLAR_SYSTEM);
+            int selectedSystemIndex = GetRandom(MAX_SOLAR_SYSTEMS - 1);
             SolarSystem system = solarSystems.get(selectedSystemIndex);
 
+            // One mercenary per system.
             if (system.hasMercenary()) continue;
+
+            // Kravat is a special system, which gets a custom mercenary.
             if (system.getName().equals("Kravat")) continue;
 
             system.addMercenary(mercenary);
 
             ++i;
         }
+        findSystem("Kravat").addMercenary(Crew.Zeethibal);
     }
 
-    private void addWormholes() {
-        for (int i = 0; i < MAX_WORM_HOLES; ++i) {
-            int A, B;
-            do {
-                A = GetRandom(MAX_SOLAR_SYSTEM);
-                B = GetRandom(MAX_SOLAR_SYSTEM);
-            } while (A == B || solarSystems.get(A).hasWormhole() || solarSystems.get(B).hasWormhole());
-            solarSystems.get(A).addWormhole(B);
-            solarSystems.get(B).addWormhole(A);
+    private void shuffleSystems() {
+        for (int i = 0; i < MAX_SOLAR_SYSTEMS; ++i) {
+            int j = GetRandom(MAX_SOLAR_SYSTEMS - 1);
+            if (solarSystems.get(j).hasWormhole()) {
+                continue;
+            }
+            Vector2i tempLocation = solarSystems.get(i).getLocation();
+            solarSystems.get(i).setLocation(solarSystems.get(j).getLocation());
+            solarSystems.get(j).setLocation(tempLocation);
         }
     }
 
-    private Vector2i generateLocation(int index) {
-        Vector2i systemLocation = new Vector2i();
-        if (index == 0) {
-            // Place the first system somewhere in the center [and other wormhole systems?]
-            systemLocation.x = ((CLOSE_DISTANCE >> 1) - GetRandom(CLOSE_DISTANCE)) + ((GALAXY_WIDTH * (1 + 2*(index%3)))/6);
-            systemLocation.y = ((CLOSE_DISTANCE >> 1) - GetRandom(CLOSE_DISTANCE)) + ((GALAXY_HEIGHT * (index < 3 ? 1 : 3))/4);
-        } else {
-            boolean neighbourTooClose, neighbourFound;
-            do {
+
+    private void addSolarSystems(Difficulty difficulty) {
+        int i = 0;
+        while (i < MAX_SOLAR_SYSTEMS) {
+            Vector2i systemLocation = new Vector2i();
+            if (i < MAX_WORM_HOLES) {
+                // I'm not totally sure what this math is doing.
+                systemLocation.x = ((CLOSE_DISTANCE >> 1) - GetRandom(CLOSE_DISTANCE)) + ((GALAXY_WIDTH * (1 + 2*(i%3)))/6);
+                systemLocation.y = ((CLOSE_DISTANCE >> 1) - GetRandom(CLOSE_DISTANCE)) + ((GALAXY_HEIGHT * (i < 3 ? 1 : 3))/4);
+            } else {
                 systemLocation.x = 1 + GetRandom(GALAXY_WIDTH - 2);
                 systemLocation.y = 1 + GetRandom(GALAXY_HEIGHT - 2);
+            }
+
+            if (i >= MAX_WORM_HOLES) {
+                // Do we not care about max/min distance for systems with wormholes?
                 int nearestSystemDistance = nearestSystemDistance(systemLocation);
-                neighbourTooClose = nearestSystemDistance < MIN_DISTANCE;
-                neighbourFound = nearestSystemDistance < CLOSE_DISTANCE;
-            } while (!neighbourFound || neighbourTooClose);
+                if (Math.pow(nearestSystemDistance, 2) <= Math.pow(MIN_DISTANCE+1, 2)) continue;
+                if (nearestSystemDistance >= CLOSE_DISTANCE) continue;
+            }
+
+            SolarSystem system = new SolarSystem(systemLocation, i, difficulty);
+            if (i < MAX_WORM_HOLES) {
+                system.addWormhole(i);
+            }
+            solarSystems.add(system);
+            ++i;
         }
-        return systemLocation;
     }
 
     private int nearestSystemDistance(Vector2i point) {
