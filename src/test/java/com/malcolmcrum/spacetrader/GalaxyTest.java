@@ -22,15 +22,15 @@ public class GalaxyTest
 
     @Test
     public void verifySpecialEvents() {
-        assertTrue(systemHasEvent("Acamar", SolarSystem.SpecialEvent.MonsterKilled));
-        assertTrue(systemHasEvent("Baratas", SolarSystem.SpecialEvent.FlyBaratas));
-        assertTrue(systemHasEvent("Melina", SolarSystem.SpecialEvent.FlyMelina));
-        assertTrue(systemHasEvent("Regulas", SolarSystem.SpecialEvent.FlyRegulas));
-        assertTrue(systemHasEvent("Zalkon", SolarSystem.SpecialEvent.DragonflyDestroyed));
-        assertTrue(systemHasEvent("Japori", SolarSystem.SpecialEvent.MedicineDelivery));
-        assertTrue(systemHasEvent("Utopia", SolarSystem.SpecialEvent.MoonForSale));
-        assertTrue(systemHasEvent("Devidia", SolarSystem.SpecialEvent.JarekGetsOut));
-        assertTrue(systemHasEvent("Kravat", SolarSystem.SpecialEvent.WildGetsOut));
+        assertEquals(SolarSystem.Acamar.getSpecialEvent(), SolarSystem.SpecialEvent.MonsterKilled);
+        assertEquals(SolarSystem.Baratas.getSpecialEvent(), SolarSystem.SpecialEvent.FlyBaratas);
+        assertEquals(SolarSystem.Melina.getSpecialEvent(), SolarSystem.SpecialEvent.FlyMelina);
+        assertEquals(SolarSystem.Regulas.getSpecialEvent(), SolarSystem.SpecialEvent.FlyRegulas);
+        assertEquals(SolarSystem.Zalkon.getSpecialEvent(), SolarSystem.SpecialEvent.DragonflyDestroyed);
+        assertEquals(SolarSystem.Japori.getSpecialEvent(), SolarSystem.SpecialEvent.MedicineDelivery);
+        assertEquals(SolarSystem.Utopia.getSpecialEvent(), SolarSystem.SpecialEvent.MoonForSale);
+        assertEquals(SolarSystem.Devidia.getSpecialEvent(), SolarSystem.SpecialEvent.JarekGetsOut);
+        assertEquals(SolarSystem.Kravat.getSpecialEvent(), SolarSystem.SpecialEvent.WildGetsOut);
     }
 
     @Test
@@ -40,13 +40,12 @@ public class GalaxyTest
                 assertTrue(memberExistsOnOneSystemOnly(member));
             }
         }
-        SolarSystem kravat = galaxy.findSystem("Kravat");
-        assertTrue(kravat.getMercenary() == Crew.Zeethibal);
+        assertTrue(SolarSystem.Kravat.getMercenary() == Crew.Zeethibal);
     }
 
     @Test
     public void systemsWithinBounds() {
-        for (SolarSystem system : galaxy.solarSystems) {
+        for (SolarSystem system : SolarSystem.values()) {
             Vector2i location = system.getLocation();
             assertTrue(location.x > 0);
             assertTrue(location.x < Galaxy.GALAXY_WIDTH);
@@ -57,9 +56,9 @@ public class GalaxyTest
 
     @Test
     public void noSystemTooClose() {
-        for (SolarSystem system : galaxy.solarSystems) {
+        for (SolarSystem system : SolarSystem.values()) {
             double minDistance = Integer.MAX_VALUE;
-            for (SolarSystem otherSystem : galaxy.solarSystems) {
+            for (SolarSystem otherSystem : SolarSystem.values()) {
                 if (system != otherSystem) {
                     double distance = Vector2i.Distance(system.getLocation(), otherSystem.getLocation());
                     if (distance < minDistance) {
@@ -73,9 +72,9 @@ public class GalaxyTest
 
     @Test
     public void allSystemsHaveNeighbours() {
-        for (SolarSystem system : galaxy.solarSystems) {
+        for (SolarSystem system : SolarSystem.values()) {
             double closestDistance = Integer.MAX_VALUE;
-            for (SolarSystem otherSystem : galaxy.solarSystems) {
+            for (SolarSystem otherSystem : SolarSystem.values()) {
                 if (system != otherSystem) {
                     double distance = Vector2i.Distance(system.getLocation(), otherSystem.getLocation());
                     if (distance < closestDistance) {
@@ -89,7 +88,7 @@ public class GalaxyTest
 
     @Test
     public void politicsAndTechLevelCompatible() {
-        for (SolarSystem system : galaxy.solarSystems) {
+        for (SolarSystem system : SolarSystem.values()) {
             Politics politics = system.getPolitics();
             TechLevel techLevel = system.getTechLevel();
             assertFalse(techLevel.isBeyond(politics.getMaxTechLevel()));
@@ -100,12 +99,11 @@ public class GalaxyTest
 
     @Test
     public void systemAttributes() {
-        SolarSystem firstSystem = galaxy.solarSystems.get(0);
-        assertSame(firstSystem.getName(), "Acamar");
-        assertEquals(firstSystem.getTradeResetCountdown(), 0);
-        assertFalse(firstSystem.isVisited());
+        assertSame(SolarSystem.Acamar.getName(), "Acamar");
+        assertEquals(SolarSystem.Acamar.getTradeResetCountdown(), 0);
+        assertFalse(SolarSystem.Acamar.isVisited());
 
-        Map<TradeItem, Integer> tradeItems = firstSystem.getTradeItems();
+        Map<TradeItem, Integer> tradeItems = SolarSystem.Acamar.getTradeItems();
         for (TradeItem item : TradeItem.values()) {
             assertTrue(tradeItems.containsKey(item));
         }
@@ -121,9 +119,9 @@ public class GalaxyTest
                 assertTrue(occurrencesOfEvent == 1);
             }
         }
-        assertEquals(galaxy.findSystem("Gemulon").getSpecialEvent(), SolarSystem.SpecialEvent.GemulonRescued);
-        assertEquals(galaxy.findSystem("Daled").getSpecialEvent(), SolarSystem.SpecialEvent.GemulonInvaded);
-        assertEquals(galaxy.findSystem("Nix").getSpecialEvent(), SolarSystem.SpecialEvent.ReactorDelivered);
+        assertEquals(SolarSystem.Gemulon.getSpecialEvent(), SolarSystem.SpecialEvent.GemulonRescued);
+        assertEquals(SolarSystem.Daled.getSpecialEvent(), SolarSystem.SpecialEvent.GemulonInvaded);
+        assertEquals(SolarSystem.Nix.getSpecialEvent(), SolarSystem.SpecialEvent.ReactorDelivered);
     }
 
     @Test
@@ -136,24 +134,24 @@ public class GalaxyTest
         }
     }
 
-    private long systemsWithEvent(SolarSystem.SpecialEvent event) {
-        return galaxy.solarSystems.stream()
-                .filter(system -> system.getSpecialEvent() == event)
-                .count();
+    private int systemsWithEvent(SolarSystem.SpecialEvent event) {
+        int count = 0;
+        for (SolarSystem system : SolarSystem.values()) {
+            if (system.getSpecialEvent() == event) {
+                ++count;
+            }
+        }
+        return count;
     }
 
     private boolean memberExistsOnOneSystemOnly(Crew member) {
-        return galaxy.solarSystems.stream()
-                .filter(system -> system.getMercenary() == member)
-                .count() == 1;
-    }
-
-    private boolean systemHasEvent(String name, SolarSystem.SpecialEvent event) {
-        return galaxy.solarSystems.stream()
-                .filter(system -> system.getName().equals(name))
-                .findFirst()
-                .get()
-                .getSpecialEvent() == event;
+        int count = 0;
+        for (SolarSystem system : SolarSystem.values()) {
+            if (system.getMercenary() == member) {
+                ++count;
+            }
+        }
+        return count == 1;
     }
 
 }
