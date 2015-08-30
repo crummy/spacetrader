@@ -10,6 +10,8 @@ import static com.malcolmcrum.spacetrader.Utils.RandomEnum;
  * Created by Malcolm on 8/28/2015.
  */
 public class SolarSystem {
+    private static final int COST_MOON = 500000;
+
     private Vector2i location;
     private final String name;
     private final TechLevel techLevel;
@@ -21,7 +23,7 @@ public class SolarSystem {
     private int tradeResetCountdown;
     private boolean visited;
     private SpecialEvent specialEvent;
-    private int wormholeDestination;
+    private SolarSystem wormholeDestination;
     private Crew mercenary;
 
     public SolarSystem(Vector2i location, int index, Difficulty difficulty) {
@@ -53,13 +55,13 @@ public class SolarSystem {
         specialEvent = null;
         tradeResetCountdown = 0;
         visited = false;
-        wormholeDestination = -1;
+        wormholeDestination = null;
 
         tradeItems = initializeTradeItems(difficulty);
     }
 
     public boolean hasWormhole() {
-        return wormholeDestination != -1;
+        return wormholeDestination != null;
     }
 
     private Map<TradeItem, Integer> initializeTradeItems(Difficulty difficulty) {
@@ -107,7 +109,7 @@ public class SolarSystem {
         return items;
     }
 
-    public void addWormhole(int destination) {
+    public void addWormhole(SolarSystem destination) {
         wormholeDestination = destination;
     }
 
@@ -133,6 +135,7 @@ public class SolarSystem {
     }
 
     public void setSpecialEvent(SpecialEvent specialEvent) {
+        assert(this.specialEvent == null);
         this.specialEvent = specialEvent;
     }
 
@@ -140,7 +143,7 @@ public class SolarSystem {
         this.location = location;
     }
 
-    public int getWormholeDestination() {
+    public SolarSystem getWormholeDestination() {
         return wormholeDestination;
     }
 
@@ -228,42 +231,74 @@ public class SolarSystem {
     }
 
     public enum SpecialEvent {
-        DragonflyDestroyed,
-        WeirdShip,
-        LightningShip,
-        MonsterKilled,
-        MedicineDelivery,
-        Retirement,
-        MoonForSale,
-        SkillIncrease,
-        MerchantPrince,
-        EraseRecord,
-        TribbleBuyer,
-        SpaceMonster,
-        Dragonfly,
-        CargoForSale,
-        LightningShield,
-        JaporiDisease,
-        LotteryWinner,
-        ArtifactDelivery,
-        AlienArtifact,
-        AmbassadorJarek,
-        AlienInvasion,
-        GemulonInvaded,
-        FuelCompactor,
-        DangerousExperiment,
-        JonathanWild,
-        MorgansReactor,
-        InstallMorgansLaser,
-        ScarabStolen,
-        UpgradeHull,
-        ScarabDestroyed,
-        ReactorDelivered,
-        JarekGetsOut,
-        GemulonRescued,
-        DisasterAverted,
-        ExperimentFailed,
-        FlyBaratas, FlyMelina, FlyRegulas, WildGetsOut
+        DragonflyDestroyed("Dragonfly Destroyed", "MISSING_STRING", 0, 0, true, true),
+        WeirdShip("Weird Ship", "MISSING_STRING", 0, 0, true, true),
+        LightningShip("Lightning Ship", "MISSING_STRING", 0, 0, true, true),
+        StrangeShip("Strange Ship", "MISSING_STRING", 0, 0, true, true),
+        MonsterKilled("Monster Killed", "MISSING_STRING", -15000, 0, true, true),
+        MedicineDelivery("Medicine Delivery", "MISSING_STRING", 0, 0, true, true),
+        Retirement("Retirement", "MISSING_STRING", 0, 0, false, true),
+        MoonForSale("Moon For Sale", "MISSING_STRING", COST_MOON, 4, false),
+        SkillIncrease("Skill Increase", "MISSING_STRING", 3000, 3, false),
+        MerchantPrince("Merchant Prince", "MISSING_STRING", 1000, 1, false),
+        EraseRecord("Erase Record", "MISSING_STRING", 5000, 3, false),
+        TribbleBuyer("Tribble Buyer", "MISSING_STRING", 0, 3, false),
+        SpaceMonster("Space Monster", "MISSING_STRING", 0, 1, true),
+        Dragonfly("Dragonfly", "MISSING_STRING", 0, 1, true),
+        CargoForSale("Cargo For Sale", "MISSING_STRING", 1000, 3, false),
+        LightningShield("Lightning Shield", "MISSING_STRING", 0, 0, false),
+        JaporiDisease("Japori Disease", "MISSING_STRING", 0, 1, false),
+        LotteryWinner("Lottery Winner", "MISSING_STRING", -1000, 0, true),
+        ArtifactDelivery("Artifact Delivery", "MISSING_STRING", -20000, 0, true),
+        AlienArtifact("Alien Artifact", "MISSING_STRING", 0, 1, false),
+        AmbassadorJarek("Ambassador Jarek", "MISSING_STRING", 0, 1, false),
+        AlienInvasion("Alien Invasion", "MISSING_STRING", 0, 0, true),
+        GemulonInvaded("Gemulon Invaded", "MISSING_STRING", 0, 0, true),
+        FuelCompactor("Fuel Compactor", "MISSING_STRING", 0, 0, false),
+        DangerousExperiment("Dangerous Experiment", "MISSING_STRING", 0, 0, true),
+        JonathanWild("Jonathan Wild", "MISSING_STRING", 0, 1, false),
+        MorgansReactor("Morgan's Reactor", "MISSING_STRING", 0, 0, false),
+        InstallMorgansLaser("Install Morgan's Laser", "MISSING_STRING", 0, 0, false),
+        ScarabStolen("Scarab Stolen", "MISSING_STRING", 0, 1, true),
+        UpgradeHull("Upgrade Hull", "MISSING_STRING", 0, 0, false),
+        ScarabDestroyed("Scarab Destroyed", "MISSING_STRING", 0, 0, true, true),
+        ReactorDelivered("Reactor Delivered", "MISSING_STRING", 0, 0, true, true),
+        JarekGetsOut("Jarek Gets Out", "MISSING_STRING", 0, 0, true, true),
+        GemulonRescued("Gemulon Rescued", "MISSING_STRING", 0, 0, true, true),
+        DisasterAverted("Disaster Averted", "MISSING_STRING", 0, 0, true, true),
+        ExperimentFailed("Experiment Failed", "MISSING_STRING", 0, 0, true, true),
+        FlyBaratas("", "MISSING_STRING", 0, 0, false, true),
+        FlyMelina("", "MISSING_STRING", 0, 0, false, true),
+        FlyRegulas("", "MISSING_STRING", 0, 0, false, true),
+        WildGetsOut("", "MISSING_STRING", 0, 0, false, true);
+
+        private final String title;
+        private final String text;
+        private final int price;
+        private int occurrence;
+        private final boolean justAMessage;
+        private final boolean fixedLocation;
+
+        SpecialEvent(String title, String text, int price, int occurrence, boolean justAMessage) {
+            this(title, text, price, occurrence, justAMessage, false);
+        }
+
+        SpecialEvent(String title, String text, int price, int occurrence, boolean justAMessage, boolean fixedLocation) {
+            this.title = title;
+            this.text = text;
+            this.price = price;
+            this.occurrence = occurrence;
+            this.justAMessage = justAMessage;
+            this.fixedLocation = fixedLocation;
+        }
+
+        public void setOccurrence(int occurrence) {
+            this.occurrence = occurrence;
+        }
+
+        public boolean hasFixedLocation() {
+            return fixedLocation;
+        }
     }
 
     public static String[] names = {

@@ -3,7 +3,7 @@ package com.malcolmcrum.spacetrader;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -40,11 +40,7 @@ public class GalaxyTest
                 assertTrue(memberExistsOnOneSystemOnly(member));
             }
         }
-        SolarSystem kravat = galaxy.solarSystems
-                .stream()
-                .filter(sys -> sys.getName().equals("Kravat"))
-                .findFirst()
-                .get();
+        SolarSystem kravat = galaxy.findSystem("Kravat");
         assertTrue(kravat.getMercenary() == Crew.Zeethibal);
     }
 
@@ -115,6 +111,37 @@ public class GalaxyTest
         }
     }
 
+    @Test
+    public void specialEvents() {
+        for (SolarSystem.SpecialEvent event : SolarSystem.SpecialEvent.values()) {
+            long occurrencesOfEvent = systemsWithEvent(event);
+            if (event == SolarSystem.SpecialEvent.ScarabDestroyed || event == SolarSystem.SpecialEvent.ScarabStolen) {
+                assertTrue(occurrencesOfEvent == 0 || occurrencesOfEvent == 1);
+            } else {
+                assertTrue(occurrencesOfEvent == 1);
+            }
+        }
+        assertEquals(galaxy.findSystem("Gemulon").getSpecialEvent(), SolarSystem.SpecialEvent.GemulonRescued);
+        assertEquals(galaxy.findSystem("Daled").getSpecialEvent(), SolarSystem.SpecialEvent.GemulonInvaded);
+        assertEquals(galaxy.findSystem("Nix").getSpecialEvent(), SolarSystem.SpecialEvent.ReactorDelivered);
+    }
+
+    @Test
+    public void testWormholes() {
+        List<SolarSystem> wormholeSystems = galaxy.getSystemsWithWormholes();
+        for (SolarSystem system : wormholeSystems) {
+            SolarSystem destination = system.getWormholeDestination();
+            assertTrue(destination != system);
+            assertTrue(destination != null);
+        }
+    }
+
+    private long systemsWithEvent(SolarSystem.SpecialEvent event) {
+        return galaxy.solarSystems.stream()
+                .filter(system -> system.getSpecialEvent() == event)
+                .count();
+    }
+
     private boolean memberExistsOnOneSystemOnly(Crew member) {
         return galaxy.solarSystems.stream()
                 .filter(system -> system.getMercenary() == member)
@@ -128,4 +155,5 @@ public class GalaxyTest
                 .get()
                 .getSpecialEvent() == event;
     }
+
 }

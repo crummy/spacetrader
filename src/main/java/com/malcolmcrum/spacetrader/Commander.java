@@ -91,5 +91,7 @@ public class Commander {
         alreadyPaidForNewspaper = false;
         canSuperWarp = false;
         gameLoaded = false;
+
+        //findStartingPlanet();
     }
 }

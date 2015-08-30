@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.malcolmcrum.spacetrader.Utils.GetRandom;
 
@@ -33,13 +34,150 @@ public class Galaxy {
 
         addSpecialEvents();
 
-        addScarabWormhole();
+        boolean scarabEndpointExists = addScarabWormhole();
 
-        // TODO: More events
+        addReactorQuest();
+
+        addArtifactDeliveryQuest();
+
+        addGemulonInvasion();
+
+        addExperimentQuest();
+
+        addScatteredSpecialEvents(scarabEndpointExists);
     }
 
-    private void addScarabWormhole() {
-        // TODO
+    private void addScatteredSpecialEvents(boolean scarabEndpointExists) {
+        for (SolarSystem.SpecialEvent event : SolarSystem.SpecialEvent.values()) {
+            if (event.hasFixedLocation()) {
+                continue;
+            }
+            boolean keepLooking = true;
+            while (keepLooking) {
+                int randomSystemIndex = 1 + GetRandom(MAX_SOLAR_SYSTEMS - 1);
+                SolarSystem system = solarSystems.get(randomSystemIndex);
+                if (system.getSpecialEvent() == null
+                        && (scarabEndpointExists || event != SolarSystem.SpecialEvent.ScarabStolen)) {
+                    system.setSpecialEvent(event);
+                    keepLooking = false;
+                }
+            }
+        }
+    }
+
+    private void addExperimentQuest() {
+        int d = 999;
+        int k = -1;
+        SolarSystem daledSystem = findSystem("Daled");
+        for (int i = 0; i < MAX_SOLAR_SYSTEMS; ++i) {
+            SolarSystem system = solarSystems.get(i);
+            int j = (int)Vector2i.Distance(daledSystem.getLocation(), system.getLocation());
+            if (j >= 70
+                    && j < d
+                    && system.getSpecialEvent() == null) {
+                k = i;
+                d = j;
+            }
+        }
+        boolean foundSystemForExperiment = (k >= 0);
+        if (foundSystemForExperiment) {
+            solarSystems.get(k).setSpecialEvent(SolarSystem.SpecialEvent.DangerousExperiment);
+            daledSystem.setSpecialEvent(SolarSystem.SpecialEvent.ExperimentFailed);
+        }
+    }
+
+    private void addGemulonInvasion() {
+        int d = 999;
+        int k = -1;
+        SolarSystem gemulonSystem = findSystem("Gemulon");
+        for (int i = 0; i < MAX_SOLAR_SYSTEMS; ++i) {
+            SolarSystem system = solarSystems.get(i);
+            int j = (int)Vector2i.Distance(gemulonSystem.getLocation(), system.getLocation());
+            if (j >= 70
+                    && j < d
+                    && system.getSpecialEvent() == null
+                    && !solarSystems.get(k).getName().equals("Daled")
+                    && !solarSystems.get(k).getName().equals("Gemulon")) {
+                k = i;
+                d = j;
+            }
+        }
+        boolean foundSystemForInvasionWarning = (k >= 0);
+        if (foundSystemForInvasionWarning) {
+            solarSystems.get(k).setSpecialEvent(SolarSystem.SpecialEvent.AlienInvasion);
+            gemulonSystem.setSpecialEvent(SolarSystem.SpecialEvent.GemulonRescued);
+        }
+    }
+
+    private void addReactorQuest() {
+        int d = 999;
+        int k = -1;
+        SolarSystem nixSystem = findSystem("Nix");
+        for (int i = 0; i < MAX_SOLAR_SYSTEMS; ++i) {
+            SolarSystem system = solarSystems.get(i);
+            int j = (int)Vector2i.Distance(nixSystem.getLocation(), system.getLocation());
+            if (j >= 70
+                    && j < d
+                    && system.getSpecialEvent() == null
+                    && !system.getName().equals("Gemulon")
+                    && !system.getName().equals("Daled")) {
+                k = i;
+                d = j;
+            }
+        }
+        boolean foundLocationForReactor = (k >= 0);
+        if (foundLocationForReactor) {
+            solarSystems.get(k).setSpecialEvent(SolarSystem.SpecialEvent.MorgansReactor);
+            nixSystem.setSpecialEvent(SolarSystem.SpecialEvent.ReactorDelivered);
+        }
+    }
+
+    private void addArtifactDeliveryQuest() {
+        int i = 0;
+        while (i < MAX_SOLAR_SYSTEMS) {
+            int d = 1 + (GetRandom(MAX_SOLAR_SYSTEMS + 1));
+            SolarSystem system = solarSystems.get(d);
+            if (system.getSpecialEvent() == null
+                    && system.getTechLevel() == TechLevel.HiTech
+                    && !system.getName().equals("Gemulon")
+                    && !system.getName().equals("Daled")) {
+                system.setSpecialEvent(SolarSystem.SpecialEvent.ArtifactDelivery);
+                break;
+            }
+            ++i;
+        }
+        boolean didNotFindSystemForArtifactQuest = (i >= MAX_SOLAR_SYSTEMS);
+        if (didNotFindSystemForArtifactQuest) {
+            SolarSystem.SpecialEvent.AlienArtifact.setOccurrence(0);
+        }
+    }
+
+    /**
+     * Finds a wormhole that points to a system without a specialEvent,
+     * and puts the Scarab event at the destination.
+     * If none is found, then there is no Scarab quest.
+     * @return True if the destination was found.
+     */
+    private boolean addScarabWormhole() {
+        List<SolarSystem> wormholeSystems = getSystemsWithWormholes();
+        Collections.shuffle(wormholeSystems);
+        for (SolarSystem system : wormholeSystems) {
+            if (system.getSpecialEvent() == null
+                    && system.getName().equals("Daled")
+                    && system.getName().equals("Nix")
+                    && system.getName().equals("Gemulon")) {
+                SolarSystem scarabSystem = system.getWormholeDestination();
+                scarabSystem.setSpecialEvent(SolarSystem.SpecialEvent.ScarabDestroyed);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    List<SolarSystem> getSystemsWithWormholes() {
+        return solarSystems.stream()
+                .filter(SolarSystem::hasWormhole)
+                .collect(Collectors.toList());
     }
 
     private void addSpecialEvents() {
@@ -54,7 +192,7 @@ public class Galaxy {
         findSystem("Kravat").setSpecialEvent(SolarSystem.SpecialEvent.WildGetsOut);
     }
 
-    private SolarSystem findSystem(String name) {
+    SolarSystem findSystem(String name) {
         Optional<SolarSystem> system = solarSystems
                                         .stream()
                                         .filter(sys -> sys.getName().equals(name))
@@ -79,7 +217,7 @@ public class Galaxy {
 
             ++i;
         }
-        findSystem("Kravat").addMercenary(Crew.Zeethibal);
+        findSystem("Kravat").addMercenary(Crew.Zeethibal); // TODO: Should this actually be system #255?
     }
 
     private void shuffleSystems() {
@@ -117,7 +255,7 @@ public class Galaxy {
 
             SolarSystem system = new SolarSystem(systemLocation, i, difficulty);
             if (i < MAX_WORM_HOLES) {
-                system.addWormhole(i);
+                system.addWormhole(system);
             }
             solarSystems.add(system);
             ++i;
