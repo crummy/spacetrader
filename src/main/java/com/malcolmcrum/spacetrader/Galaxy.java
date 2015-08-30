@@ -46,19 +46,27 @@ public class Galaxy {
         addScatteredSpecialEvents(scarabEndpointExists);
     }
 
-    // TODO: INFINITE LOOP HERE
     private void addScatteredSpecialEvents(boolean scarabEndpointExists) {
+        logger.info("SCATTERING EVENTS");
         for (SolarSystem.SpecialEvent event : SolarSystem.SpecialEvent.values()) {
+            logger.info("Adding event " + event.getTitle());
             if (event.hasFixedLocation()) {
+                logger.trace("  Event has fixed location; no need to scatter it.");
                 continue;
             }
-            boolean keepLooking = true;
-            while (keepLooking) {
-                SolarSystem system = RandomEnum(SolarSystem.class, 1);
-                if (system.getSpecialEvent() == null
-                        && (scarabEndpointExists || event != SolarSystem.SpecialEvent.ScarabStolen)) {
-                    system.setSpecialEvent(event);
-                    keepLooking = false;
+            for (int occurrence = 0; occurrence < event.getOccurrence(); ++occurrence) {
+                boolean keepLooking = true;
+                while (keepLooking) {
+                    SolarSystem system = RandomEnum(SolarSystem.class, 1);
+                    if (system.getSpecialEvent() == null) {
+                        if (scarabEndpointExists || event != SolarSystem.SpecialEvent.ScarabStolen) {
+                            system.setSpecialEvent(event);
+                            logger.trace("  Attached event to system: " + system.getName());
+                        } else {
+                            logger.trace("  Skipping - Scarab event but no Scarab endpoint exists.");
+                        }
+                        keepLooking = false;
+                    }
                 }
             }
         }

@@ -419,6 +419,14 @@ public enum SolarSystem {
         public boolean hasFixedLocation() {
             return fixedLocation;
         }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public int getOccurrence() {
+            return occurrence;
+        }
     }
 
     public static String[] names = {
