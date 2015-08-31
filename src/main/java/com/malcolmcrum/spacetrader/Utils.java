@@ -12,8 +12,14 @@ public class Utils {
         return GetRandom(0, upper);
     }
 
+    /**
+     * Return random value between lower and upper, including lower and excluding upper
+     * @param lower Lower bound
+     * @param upper Upper bound
+     * @return Random value in range
+     */
     public static int GetRandom(int lower, int upper) {
-        return rand.nextInt((upper - lower) + 1) + lower;
+        return rand.nextInt(upper - lower) + lower;
     }
 
     // thanks http://stackoverflow.com/a/14257525/281657

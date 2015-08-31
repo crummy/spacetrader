@@ -14,10 +14,10 @@ public class Game {
         }
 
         galaxy = new Galaxy(Difficulty.Beginner);
-        commander = new Commander(commanderName, galaxy.getStartSystem());
         ship = new Ship(ShipType.Gnat);
         ship.addWeapon(Weapon.PulseLaser);
         ship.addCrew(Crew.Captain);
+        commander = new Commander(commanderName, galaxy.getStartSystem(ship.type));
     }
 
 

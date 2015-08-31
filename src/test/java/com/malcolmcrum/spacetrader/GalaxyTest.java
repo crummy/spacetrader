@@ -21,14 +21,14 @@ public class GalaxyTest
     }
 
     @Test
-    public void verifySpecialEvents() {
+    public void fixedSpecialEvents() {
         assertEquals(SolarSystem.Acamar.getSpecialEvent(), SolarSystem.SpecialEvent.MonsterKilled);
         assertEquals(SolarSystem.Baratas.getSpecialEvent(), SolarSystem.SpecialEvent.FlyBaratas);
         assertEquals(SolarSystem.Melina.getSpecialEvent(), SolarSystem.SpecialEvent.FlyMelina);
         assertEquals(SolarSystem.Regulas.getSpecialEvent(), SolarSystem.SpecialEvent.FlyRegulas);
         assertEquals(SolarSystem.Zalkon.getSpecialEvent(), SolarSystem.SpecialEvent.DragonflyDestroyed);
         assertEquals(SolarSystem.Japori.getSpecialEvent(), SolarSystem.SpecialEvent.MedicineDelivery);
-        assertEquals(SolarSystem.Utopia.getSpecialEvent(), SolarSystem.SpecialEvent.MoonForSale);
+        assertEquals(SolarSystem.Utopia.getSpecialEvent(), SolarSystem.SpecialEvent.Retirement);
         assertEquals(SolarSystem.Devidia.getSpecialEvent(), SolarSystem.SpecialEvent.JarekGetsOut);
         assertEquals(SolarSystem.Kravat.getSpecialEvent(), SolarSystem.SpecialEvent.WildGetsOut);
     }
@@ -44,7 +44,7 @@ public class GalaxyTest
     }
 
     @Test
-    public void systemsWithinBounds() {
+    public void systemsWithinGalaxyBounds() {
         for (SolarSystem system : SolarSystem.values()) {
             Vector2i location = system.getLocation();
             assertTrue(location.x > 0);
@@ -105,7 +105,7 @@ public class GalaxyTest
 
         Map<TradeItem, Integer> tradeItems = SolarSystem.Acamar.getTradeItems();
         for (TradeItem item : TradeItem.values()) {
-            assertTrue(tradeItems.containsKey(item));
+            assertTrue("item: " + item, tradeItems.containsKey(item));
         }
     }
 
@@ -113,25 +113,43 @@ public class GalaxyTest
     public void specialEvents() {
         for (SolarSystem.SpecialEvent event : SolarSystem.SpecialEvent.values()) {
             long occurrencesOfEvent = systemsWithEvent(event);
-            if (event == SolarSystem.SpecialEvent.ScarabDestroyed || event == SolarSystem.SpecialEvent.ScarabStolen) {
-                assertTrue(occurrencesOfEvent == 0 || occurrencesOfEvent == 1);
+            if (event == SolarSystem.SpecialEvent.ScarabDestroyed
+                    || event == SolarSystem.SpecialEvent.ScarabStolen
+                    || event == SolarSystem.SpecialEvent.ArtifactDelivery
+                    || event == SolarSystem.SpecialEvent.AlienInvasion
+                    || event == SolarSystem.SpecialEvent.DangerousExperiment
+                    || event == SolarSystem.SpecialEvent.MorgansReactor) {
+                assertTrue("Event: " + event + "(" + occurrencesOfEvent + ")",
+                        occurrencesOfEvent == 0 || occurrencesOfEvent == 1);
             } else {
-                assertTrue(occurrencesOfEvent == 1);
+                assertTrue("Event: " + event + "(" + occurrencesOfEvent + ")",
+                        occurrencesOfEvent == event.getOccurrence() || event.hasFixedLocation());
             }
         }
         assertEquals(SolarSystem.Gemulon.getSpecialEvent(), SolarSystem.SpecialEvent.GemulonRescued);
-        assertEquals(SolarSystem.Daled.getSpecialEvent(), SolarSystem.SpecialEvent.GemulonInvaded);
+        assertEquals(SolarSystem.Daled.getSpecialEvent(), SolarSystem.SpecialEvent.ExperimentFailed);
         assertEquals(SolarSystem.Nix.getSpecialEvent(), SolarSystem.SpecialEvent.ReactorDelivered);
     }
 
     @Test
     public void testWormholes() {
         List<SolarSystem> wormholeSystems = galaxy.getSystemsWithWormholes();
+        assertSame(wormholeSystems.size(), Galaxy.MAX_WORM_HOLES);
         for (SolarSystem system : wormholeSystems) {
             SolarSystem destination = system.getWormholeDestination();
-            assertTrue(destination != system);
-            assertTrue(destination != null);
+            assertTrue(system + "'s wormhole points to itself!", destination != system);
+            assertTrue(system + "'s wormhole points nowhere!", destination != null);
         }
+
+        SolarSystem first = wormholeSystems.get(0);
+        int jumps = 0;
+        for (SolarSystem system = first.getWormholeDestination(); system != first; system = system.getWormholeDestination()) {
+            ++jumps;
+            if (jumps > wormholeSystems.size()) {
+                break;
+            }
+        }
+        assertTrue("Wormhole connections are fubar!", jumps == wormholeSystems.size() - 1);
     }
 
     private int systemsWithEvent(SolarSystem.SpecialEvent event) {

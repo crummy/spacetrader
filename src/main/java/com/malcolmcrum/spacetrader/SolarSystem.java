@@ -184,15 +184,15 @@ public enum SolarSystem {
         return wormholeDestination != null;
     }
 
-    public Map<TradeItem, Integer> initializeTradeItems(Difficulty difficulty) {
-        Map<TradeItem, Integer> items = new HashMap<>();
+    public void initializeTradeItems(Difficulty difficulty) {
+        tradeItems.clear();
         for (TradeItem item : TradeItem.values()) {
             boolean bannedItem = (item == TradeItem.Narcotics && !politics.getDrugsOK()) ||
                                  (item == TradeItem.Firearms && !politics.getFirearmsOK());
             boolean itemTooAdvanced = item.getTechLevelRequiredForProduction().isBeyond(techLevel);
 
             if (bannedItem || itemTooAdvanced) {
-                items.put(item, 0);
+                tradeItems.put(item, 0);
                 continue;
             }
 
@@ -224,12 +224,11 @@ public enum SolarSystem {
                 quantity = 0;
             }
 
-            items.put(item, quantity);
+            tradeItems.put(item, quantity);
         }
-        return items;
     }
 
-    public void addWormhole(SolarSystem destination) {
+    public void setWormhole(SolarSystem destination) {
         wormholeDestination = destination;
     }
 
@@ -352,9 +351,9 @@ public enum SolarSystem {
 
     public enum SpecialEvent {
         DragonflyDestroyed("Dragonfly Destroyed", "MISSING_STRING", 0, 0, true, true),
-        WeirdShip("Weird Ship", "MISSING_STRING", 0, 0, true, true),
-        LightningShip("Lightning Ship", "MISSING_STRING", 0, 0, true, true),
-        StrangeShip("Strange Ship", "MISSING_STRING", 0, 0, true, true),
+        FlyBaratas("Weird Ship", "MISSING_STRING", 0, 0, true, true),
+        FlyMelina("Lightning Ship", "MISSING_STRING", 0, 0, true, true),
+        FlyRegulas("Strange Ship", "MISSING_STRING", 0, 0, true, true),
         MonsterKilled("Monster Killed", "MISSING_STRING", -15000, 0, true, true),
         MedicineDelivery("Medicine Delivery", "MISSING_STRING", 0, 0, true, true),
         Retirement("Retirement", "MISSING_STRING", 0, 0, false, true),
@@ -387,10 +386,7 @@ public enum SolarSystem {
         GemulonRescued("Gemulon Rescued", "MISSING_STRING", 0, 0, true, true),
         DisasterAverted("Disaster Averted", "MISSING_STRING", 0, 0, true, true),
         ExperimentFailed("Experiment Failed", "MISSING_STRING", 0, 0, true, true),
-        FlyBaratas("", "MISSING_STRING", 0, 0, false, true),
-        FlyMelina("", "MISSING_STRING", 0, 0, false, true),
-        FlyRegulas("", "MISSING_STRING", 0, 0, false, true),
-        WildGetsOut("", "MISSING_STRING", 0, 0, false, true);
+        WildGetsOut("Wild Gets Out", "MISSING_STRING", 0, 0, true, true);
 
         private final String title;
         private final String text;
@@ -428,9 +424,5 @@ public enum SolarSystem {
             return occurrence;
         }
     }
-
-    public static String[] names = {
-
-    };
 
 }

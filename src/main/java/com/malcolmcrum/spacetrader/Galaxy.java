@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.malcolmcrum.spacetrader.Utils.GetRandom;
 import static com.malcolmcrum.spacetrader.Utils.RandomEnum;
@@ -16,22 +15,22 @@ import static com.malcolmcrum.spacetrader.Utils.RandomEnum;
 public class Galaxy {
     private static final Logger logger = LoggerFactory.getLogger(Galaxy.class);
 
-    private static final int MAX_SOLAR_SYSTEMS = 120;
-    private static final int MAX_WORM_HOLES = 6;
-    static final int CLOSE_DISTANCE = 13;
-    static final int MIN_DISTANCE = 6;
+    static final int MAX_WORM_HOLES = 6;
+    static final int CLOSE_DISTANCE = 13;   // Each system should have another system within this range
+    static final int MIN_DISTANCE = 6;      // No system should have another system this close
     static final int GALAXY_WIDTH = 150;
     static final int GALAXY_HEIGHT = 110;
-    private static final int MAX_CREW_MEMBER = 31;
 
     public Galaxy(Difficulty difficulty) {
         addSolarSystems(difficulty);
 
         shuffleSystems();
 
+        addWormholes();
+
         addMercenaries();
 
-        addSpecialEvents();
+        addFixedSpecialEvents();
 
         boolean scarabEndpointExists = addScarabWormhole();
 
@@ -51,7 +50,7 @@ public class Galaxy {
         for (SolarSystem.SpecialEvent event : SolarSystem.SpecialEvent.values()) {
             logger.info("Adding event " + event.getTitle());
             if (event.hasFixedLocation()) {
-                logger.trace("  Event has fixed location; no need to scatter it.");
+                logger.info("  Event has fixed location; no need to scatter it.");
                 continue;
             }
             for (int occurrence = 0; occurrence < event.getOccurrence(); ++occurrence) {
@@ -61,9 +60,9 @@ public class Galaxy {
                     if (system.getSpecialEvent() == null) {
                         if (scarabEndpointExists || event != SolarSystem.SpecialEvent.ScarabStolen) {
                             system.setSpecialEvent(event);
-                            logger.trace("  Attached event to system: " + system.getName());
+                            logger.info("  Attached event to system: " + system.getName());
                         } else {
-                            logger.trace("  Skipping - Scarab event but no Scarab endpoint exists.");
+                            logger.info("  Skipping - Scarab event but no Scarab endpoint exists.");
                         }
                         keepLooking = false;
                     }
@@ -189,7 +188,7 @@ public class Galaxy {
     }
 
     List<SolarSystem> getSystemsWithWormholes() {
-        ArrayList<SolarSystem> wormholeSystems = new ArrayList<>();
+        List<SolarSystem> wormholeSystems = new ArrayList<>();
         for (SolarSystem system : SolarSystem.values()) {
             if (system.hasWormhole()) {
                 wormholeSystems.add(system);
@@ -198,14 +197,14 @@ public class Galaxy {
         return wormholeSystems;
     }
 
-    private void addSpecialEvents() {
+    private void addFixedSpecialEvents() {
         SolarSystem.Acamar.setSpecialEvent(SolarSystem.SpecialEvent.MonsterKilled);
         SolarSystem.Baratas.setSpecialEvent(SolarSystem.SpecialEvent.FlyBaratas);
         SolarSystem.Melina.setSpecialEvent(SolarSystem.SpecialEvent.FlyMelina);
         SolarSystem.Regulas.setSpecialEvent(SolarSystem.SpecialEvent.FlyRegulas);
         SolarSystem.Zalkon.setSpecialEvent(SolarSystem.SpecialEvent.DragonflyDestroyed);
         SolarSystem.Japori.setSpecialEvent(SolarSystem.SpecialEvent.MedicineDelivery);
-        SolarSystem.Utopia.setSpecialEvent(SolarSystem.SpecialEvent.MoonForSale);
+        SolarSystem.Utopia.setSpecialEvent(SolarSystem.SpecialEvent.Retirement);
         SolarSystem.Devidia.setSpecialEvent(SolarSystem.SpecialEvent.JarekGetsOut);
         SolarSystem.Kravat.setSpecialEvent(SolarSystem.SpecialEvent.WildGetsOut);
     }
@@ -222,7 +221,6 @@ public class Galaxy {
             }
             system.addMercenary(crew);
         }
-        SolarSystem.Kravat.addMercenary(Crew.Zeethibal); // TODO: Should this actually be system #255?
     }
 
     /**
@@ -240,6 +238,23 @@ public class Galaxy {
         }
     }
 
+    private void addWormholes() {
+        SolarSystem initialSystem = RandomEnum(SolarSystem.class);
+        SolarSystem source = initialSystem;
+        SolarSystem destination;
+
+        for (int i = 0; i < MAX_WORM_HOLES - 1; ++i) {
+            do {
+                destination = RandomEnum(SolarSystem.class);
+            } while (destination.hasWormhole());
+            source.setWormhole(destination);
+            logger.info("Pointed wormhole from " + source + " to " + destination);
+            source = destination;
+        }
+        source.setWormhole(initialSystem);
+        logger.info("Pointed wormhole from " + source + " to " + initialSystem);
+    }
+
 
     private void addSolarSystems(Difficulty difficulty) {
         int count = 0;
@@ -252,7 +267,6 @@ public class Galaxy {
                     // I'm not totally sure what this math is doing.
                     location.x = ((CLOSE_DISTANCE >> 1) - GetRandom(CLOSE_DISTANCE)) + ((GALAXY_WIDTH * (1 + 2 * (count % 3))) / 6);
                     location.y = ((CLOSE_DISTANCE >> 1) - GetRandom(CLOSE_DISTANCE)) + ((GALAXY_HEIGHT * (count < 3 ? 1 : 3)) / 4);
-                    system.addWormhole(system);
                 } else {
                     location.x = 1 + GetRandom(GALAXY_WIDTH - 2);
                     location.y = 1 + GetRandom(GALAXY_HEIGHT - 2);
@@ -283,7 +297,31 @@ public class Galaxy {
         return nearestDistance;
     }
 
-    public SolarSystem getStartSystem() {
-        return SolarSystem.Acamar;
+    public SolarSystem getStartSystem(ShipType ship) {
+        SolarSystem system;
+        boolean threeNearbySystems, noSpecialEvent, atLeastAgricultural, beforeHiTech;
+
+        do {
+            system = RandomEnum(SolarSystem.class);
+
+            atLeastAgricultural = system.getTechLevel().isBeyond(TechLevel.Preagricultural);
+
+            beforeHiTech = system.getTechLevel().isBefore(TechLevel.HiTech);
+
+            noSpecialEvent = (system.getSpecialEvent() == null);
+
+            int neighboursInRange = 0;
+            for (SolarSystem nearbySystem : SolarSystem.values()) {
+                if (nearbySystem == system) {
+                    continue;
+                }
+                int distanceToNeighbour = (int)Vector2i.Distance(system.getLocation(), nearbySystem.getLocation());
+                if (distanceToNeighbour <= ship.getFuelTanks()) {
+                    ++neighboursInRange;
+                }
+            }
+            threeNearbySystems = (neighboursInRange >= 3);
+        } while(!threeNearbySystems || !noSpecialEvent || !atLeastAgricultural || !beforeHiTech);
+        return system;
     }
 }
