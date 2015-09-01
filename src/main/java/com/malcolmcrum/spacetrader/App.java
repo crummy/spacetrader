@@ -15,6 +15,6 @@ public class App
         Logger logger = LoggerFactory.getLogger(App.class);
         logger.info("Initializing Space Trader");
         Game game = new Game();
-        game.startNewGame("");
+        game.startNewGame("Billy Bob", 5, 5, 5, 5, Difficulty.Normal);
     }
 }

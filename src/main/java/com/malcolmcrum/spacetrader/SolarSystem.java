@@ -1,5 +1,8 @@
 package com.malcolmcrum.spacetrader;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -132,6 +135,8 @@ public enum SolarSystem {
     Zuul("Zuul");            // From the first Ghostbusters movie
 
     private static final int COST_MOON = 500000;
+    private static final Logger logger = LoggerFactory.getLogger(SolarSystem.class);
+
 
     private Vector2i location;
     private final String name;
@@ -254,7 +259,9 @@ public enum SolarSystem {
     }
 
     public void setSpecialEvent(SpecialEvent specialEvent) {
-        assert(this.specialEvent == null);
+        if (hasSpecialEvent() && this.specialEvent != specialEvent) {
+            logger.error("Tried to add " + specialEvent + " but already have event " + this.specialEvent);
+        }
         this.specialEvent = specialEvent;
     }
 
@@ -288,6 +295,14 @@ public enum SolarSystem {
 
     public Map<TradeItem, Integer> getTradeItems() {
         return tradeItems;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public boolean hasSpecialEvent() {
+        return specialEvent != null;
     }
 
     enum SpecialResource {
@@ -334,18 +349,29 @@ public enum SolarSystem {
 
     enum Status {
         None("under no particular pressure"),
-        War("at war"),
-        Plague("ravaged by a plague"),
-        Drought("suffering from a drought"),
-        Boredom("suffering from extreme boredom"),
-        Cold("suffering from a cold spell"),
-        Crops("suffering from a crop failure"),
-        Workers("lacking enough workers");
+        War("Strife and War", "at war"),
+        Plague("Plague Outbreaks", "ravaged by a plague"),
+        Drought("Severe Drought", "suffering from a drought"),
+        Boredom("Terrible Boredom", "suffering from extreme boredom"),
+        Cold("Cold Weather", "suffering from a cold spell"),
+        Crops("Crop Failures", "suffering from a crop failure"),
+        Workers("Labor Shortages", "lacking enough workers");
 
-        private String name;
+        private final String description; // used for reporting status
+        private final String title; // used for newspaper headlines
 
-        Status(String name) {
-            this.name = name;
+        Status(String description) {
+            this.description = description;
+            this.title = "UNUSED_TEXT"; // hopefully you never see this.
+        }
+
+        Status(String title, String description) {
+            this.title = title;
+            this.description = description;
+        }
+
+        public String getTitle() {
+            return title;
         }
     }
 

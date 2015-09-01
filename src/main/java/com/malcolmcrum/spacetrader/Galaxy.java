@@ -50,14 +50,14 @@ public class Galaxy {
         for (SolarSystem.SpecialEvent event : SolarSystem.SpecialEvent.values()) {
             logger.info("Adding event " + event.getTitle());
             if (event.hasFixedLocation()) {
-                logger.info("  Event has fixed location; no need to scatter it.");
+                logger.info("  NotableEvent has fixed location; no need to scatter it.");
                 continue;
             }
             for (int occurrence = 0; occurrence < event.getOccurrence(); ++occurrence) {
                 boolean keepLooking = true;
                 while (keepLooking) {
                     SolarSystem system = RandomEnum(SolarSystem.class, 1);
-                    if (system.getSpecialEvent() == null) {
+                    if (!system.hasSpecialEvent()) {
                         if (scarabEndpointExists || event != SolarSystem.SpecialEvent.ScarabStolen) {
                             system.setSpecialEvent(event);
                             logger.info("  Attached event to system: " + system.getName());
@@ -82,7 +82,7 @@ public class Galaxy {
             int distanceToDaled = (int)Vector2i.Distance(system.getLocation(), SolarSystem.Daled.getLocation());
             if (distanceToDaled >= 70
                     && distanceToDaled < minDistance
-                    && system.getSpecialEvent() == null) {
+                    && !system.hasSpecialEvent()) {
                 foundSystem = system;
                 minDistance = distanceToDaled;
             }
@@ -102,7 +102,7 @@ public class Galaxy {
             int distanceToGemulon = (int)Vector2i.Distance(system.getLocation(), SolarSystem.Gemulon.getLocation());
             if (distanceToGemulon >= 70
                     && distanceToGemulon < minDistance
-                    && system.getSpecialEvent() == null
+                    && !system.hasSpecialEvent()
                     && system != SolarSystem.Daled
                     && system != SolarSystem.Gemulon) {
                 foundSystem = system;
@@ -124,7 +124,7 @@ public class Galaxy {
             int distanceToNix = (int)Vector2i.Distance(system.getLocation(), SolarSystem.Nix.getLocation());
             if (distanceToNix >= 70
                     && distanceToNix < minDistance
-                    && system.getSpecialEvent() == null
+                    && !system.hasSpecialEvent()
                     && system != SolarSystem.Daled
                     && system != SolarSystem.Gemulon) {
                 foundSystem = system;
@@ -149,7 +149,7 @@ public class Galaxy {
         Collections.shuffle(shuffledSystems);
 
         for (SolarSystem system : shuffledSystems) {
-            if (system.getSpecialEvent() == null
+            if (!system.hasSpecialEvent()
                     && system.getTechLevel() == TechLevel.HiTech
                     && system != SolarSystem.Daled
                     && system != SolarSystem.Gemulon) {
@@ -175,7 +175,7 @@ public class Galaxy {
         List<SolarSystem> wormholeSystems = getSystemsWithWormholes();
         Collections.shuffle(wormholeSystems);
         for (SolarSystem system : wormholeSystems) {
-            if (system.getSpecialEvent() == null
+            if (!system.hasSpecialEvent()
                     && system.getName().equals("Daled")
                     && system.getName().equals("Nix")
                     && system.getName().equals("Gemulon")) {
@@ -297,6 +297,13 @@ public class Galaxy {
         return nearestDistance;
     }
 
+    /**
+     * Finds the perfect star system: one with at least three systems in range of
+     * current ship, with no special event, at least agricultural tech level, but not
+     * hitech.
+     * @param ship Current ship, used for range calculations of other planets
+     * @return A goldilock system in the galaxy.
+     */
     public SolarSystem getStartSystem(ShipType ship) {
         SolarSystem system;
         boolean threeNearbySystems, noSpecialEvent, atLeastAgricultural, beforeHiTech;
@@ -308,7 +315,7 @@ public class Galaxy {
 
             beforeHiTech = system.getTechLevel().isBefore(TechLevel.HiTech);
 
-            noSpecialEvent = (system.getSpecialEvent() == null);
+            noSpecialEvent = !system.hasSpecialEvent();
 
             int neighboursInRange = 0;
             for (SolarSystem nearbySystem : SolarSystem.values()) {

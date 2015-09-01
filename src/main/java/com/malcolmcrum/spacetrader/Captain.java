@@ -6,14 +6,15 @@ import java.util.Map;
 /**
  * Created by Malcolm on 8/28/2015.
  */
-public class Commander {
+public class Captain {
     private static final int CHANCE_OF_A_VERY_RARE_ENCOUNTER = 5;
+    private static final int VILLAIN_SCORE = -30;
+    private static final int HERO_SCORE = 75;
 
     private String name;
     private int credits;
     private int debt;
     private int days;
-    private SolarSystem currentSystem;
     private int policeKills;
     private int traderKills;
     private int pirateKills;
@@ -35,7 +36,7 @@ public class Commander {
     private int jarekStatus;
     private int invasionStatus;
     private int experimentStatus;
-    private int fabricRipProbability = 0;
+    private int fabricRipProbability;
     private boolean possibleToGoThroughRip;
     private boolean arrivedViaWormhole;
     private int veryRareEncounter;
@@ -49,14 +50,14 @@ public class Commander {
     private boolean canSuperWarp;
     private boolean gameLoaded;
 
-    public Commander(String name, SolarSystem currentSystem) {
+    public Captain(String name) {
         this.name = name;
         credits = 1000;
         debt = 0;
         days = 0;
-        this.currentSystem = currentSystem;
         policeKills = 0;
         traderKills = 0;
+        pirateKills = 0;
         policeRecordScore = 0;
         reputationScore = 0;
         monsterStatus = 0;
@@ -93,5 +94,33 @@ public class Commander {
         gameLoaded = false;
 
         //findStartingPlanet();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getMonsterStatus() {
+        return monsterStatus;
+    }
+
+    public int getScarabStatus() {
+        return scarabStatus;
+    }
+
+    public int getDragonflyStatus() {
+        return dragonflyStatus;
+    }
+
+    public int getPoliceRecordScore() {
+        return policeRecordScore;
+    }
+
+    public boolean isVillainous() {
+        return policeRecordScore <= VILLAIN_SCORE;
+    }
+
+    public boolean isHeroic() {
+        return policeRecordScore == HERO_SCORE;
     }
 }

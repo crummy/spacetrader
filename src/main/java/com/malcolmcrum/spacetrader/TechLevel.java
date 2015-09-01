@@ -38,4 +38,8 @@ public enum TechLevel {
     public int erasBetween(TechLevel otherLevel) {
         return Math.abs(era - otherLevel.era);
     }
+
+    public int getEra() {
+        return era;
+    }
 }

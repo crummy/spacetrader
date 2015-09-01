@@ -36,11 +36,13 @@ public class GalaxyTest
     @Test
     public void verifyMercenaries() {
         for (Crew member : Crew.values()) {
-            if (member != Crew.Captain) {
-                assertTrue(memberExistsOnOneSystemOnly(member));
+            int count = systemsWithCrewmember(member);
+            if (member == Crew.Captain || member == Crew.Zeethibal) {
+                assertTrue(member + " found on " + count + " systems", count == 0);
+            } else {
+                assertTrue(member + " found on " + count + " systems", count == 1);
             }
         }
-        assertTrue(SolarSystem.Kravat.getMercenary() == Crew.Zeethibal);
     }
 
     @Test
@@ -119,10 +121,10 @@ public class GalaxyTest
                     || event == SolarSystem.SpecialEvent.AlienInvasion
                     || event == SolarSystem.SpecialEvent.DangerousExperiment
                     || event == SolarSystem.SpecialEvent.MorgansReactor) {
-                assertTrue("Event: " + event + "(" + occurrencesOfEvent + ")",
+                assertTrue("NotableEvent: " + event + "(" + occurrencesOfEvent + ")",
                         occurrencesOfEvent == 0 || occurrencesOfEvent == 1);
             } else {
-                assertTrue("Event: " + event + "(" + occurrencesOfEvent + ")",
+                assertTrue("NotableEvent: " + event + "(" + occurrencesOfEvent + ")",
                         occurrencesOfEvent == event.getOccurrence() || event.hasFixedLocation());
             }
         }
@@ -136,6 +138,7 @@ public class GalaxyTest
         List<SolarSystem> wormholeSystems = galaxy.getSystemsWithWormholes();
         assertSame(wormholeSystems.size(), Galaxy.MAX_WORM_HOLES);
         for (SolarSystem system : wormholeSystems) {
+            assertTrue(system.hasWormhole());
             SolarSystem destination = system.getWormholeDestination();
             assertTrue(system + "'s wormhole points to itself!", destination != system);
             assertTrue(system + "'s wormhole points nowhere!", destination != null);
@@ -152,6 +155,14 @@ public class GalaxyTest
         assertTrue("Wormhole connections are fubar!", jumps == wormholeSystems.size() - 1);
     }
 
+    @Test
+    public void testGetStartSystem() throws Exception {
+        SolarSystem system = galaxy.getStartSystem(ShipType.Beetle);
+        assertFalse(system.hasSpecialEvent());
+        assertFalse(system.getTechLevel() == TechLevel.Agricultural);
+        assertFalse(system.getTechLevel() == TechLevel.HiTech);
+    }
+
     private int systemsWithEvent(SolarSystem.SpecialEvent event) {
         int count = 0;
         for (SolarSystem system : SolarSystem.values()) {
@@ -162,14 +173,13 @@ public class GalaxyTest
         return count;
     }
 
-    private boolean memberExistsOnOneSystemOnly(Crew member) {
+    private int systemsWithCrewmember(Crew member) {
         int count = 0;
         for (SolarSystem system : SolarSystem.values()) {
             if (system.getMercenary() == member) {
                 ++count;
             }
         }
-        return count == 1;
+        return count;
     }
-
 }
