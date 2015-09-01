@@ -134,7 +134,7 @@ public enum SolarSystem {
     Zalkon("Zalkon"),
     Zuul("Zuul");            // From the first Ghostbusters movie
 
-    private static final int COST_MOON = 500000;
+    static final int COST_MOON = 500000;
     private static final Logger logger = LoggerFactory.getLogger(SolarSystem.class);
 
 
@@ -303,6 +303,10 @@ public enum SolarSystem {
 
     public boolean hasSpecialEvent() {
         return specialEvent != null;
+    }
+
+    public void setVisited() {
+        visited = true;
     }
 
     enum SpecialResource {

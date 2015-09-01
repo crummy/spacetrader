@@ -50,6 +50,8 @@ public class Captain {
     private boolean canSuperWarp;
     private boolean gameLoaded;
 
+    private boolean isInsured;
+
     public Captain(String name) {
         this.name = name;
         credits = 1000;
@@ -93,7 +95,7 @@ public class Captain {
         canSuperWarp = false;
         gameLoaded = false;
 
-        //findStartingPlanet();
+        isInsured = false;
     }
 
     public String getName() {
@@ -122,5 +124,49 @@ public class Captain {
 
     public boolean isHeroic() {
         return policeRecordScore == HERO_SCORE;
+    }
+
+    public int getJaporiDiseaseStatus() {
+        return japoriDiseaseStatus;
+    }
+
+    public boolean getArtifactOnBoard() {
+        return artifactOnBoard;
+    }
+
+    public int getJarekStatus() {
+        return jarekStatus;
+    }
+
+    public int getInvasionStatus() {
+        return invasionStatus;
+    }
+
+    public int getExperimentStatus() {
+        return experimentStatus;
+    }
+
+    public boolean isAlreadyPaidForNewspaper() {
+        return alreadyPaidForNewspaper;
+    }
+
+    public int getCredits() {
+        return credits;
+    }
+
+    public boolean hasInsurance() {
+        return isInsured;
+    }
+
+    public int getNoClaim() {
+        return noClaim;
+    }
+
+    public boolean hasBoughtMoon() {
+        return moonBought;
+    }
+
+    public int getDebt() {
+        return debt;
     }
 }

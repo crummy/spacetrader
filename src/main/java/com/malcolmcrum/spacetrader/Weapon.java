@@ -22,4 +22,12 @@ public enum Weapon {
         this.techLevel = techLevel;
         this.chance = chance;
     }
+
+    public int getSellPrice() {
+        return (2 * price) / 3;
+    }
+
+    public int getPrice() {
+        return price;
+    }
 }

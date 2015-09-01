@@ -13,12 +13,13 @@ public class NewsTest {
 
     @Test
     public void testGetNewspaper() {
-        News news = new News(); // ahah what a silly line
-        Ship ship = new Ship(ShipType.Beetle);
+        Game game = new Game();
+        News news = new News(game); // ahah what a silly line
+        Ship ship = new Ship(ShipType.Beetle, game);
         Captain captain = new Captain("Bob");
         news.addNotableEvent(News.NotableEvent.ArrivalViaSingularity);
         news.addSpecialEvent(SolarSystem.SpecialEvent.MedicineDelivery);
-        List<String> paper = news.getNewspaper(SolarSystem.Acamar, captain, Difficulty.Normal, ship);
+        List<String> paper = news.getNewspaper();
 
         boolean paperContainsSingularityHeadline = false;
         boolean paperContainsMedicineHeadline = false;
@@ -33,7 +34,7 @@ public class NewsTest {
         assertTrue("singularity headline should exist", paperContainsSingularityHeadline);
 
         news.resetNewsEvents();
-        paper = news.getNewspaper(SolarSystem.Acamar, captain, Difficulty.Normal, ship);
+        paper = news.getNewspaper();
 
         paperContainsSingularityHeadline = false;
         paperContainsMedicineHeadline = false;

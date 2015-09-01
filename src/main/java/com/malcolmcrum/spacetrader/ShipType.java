@@ -106,6 +106,18 @@ public enum ShipType {
         return hullStrength;
     }
 
+    public int getPrice() {
+        return price;
+    }
+
+    public int getRepairCost() {
+        return repairCost;
+    }
+
+    public int getCostToFillFuelTank() {
+        return costToFillFuelTank;
+    }
+
     enum Size {
         Tiny,
         Small,

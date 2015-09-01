@@ -14,8 +14,10 @@ public class News {
 
     final private List<NotableEvent> notableEvents;
     final private List<SolarSystem.SpecialEvent> specialEvents;
+    final private Game game;
 
-    public News() {
+    public News(Game game) {
+        this.game = game;
         notableEvents = new ArrayList<>();
         specialEvents = new ArrayList<>();
     }
@@ -33,7 +35,9 @@ public class News {
         specialEvents.add(event);
     }
 
-    public List<String> getNewspaper(SolarSystem currentSystem, Captain captain, Difficulty difficulty, Ship ship) {
+    public List<String> getNewspaper() {
+        SolarSystem currentSystem = game.getCurrentSystem();
+        Captain captain = game.getCaptain();
         List<String> paper = new ArrayList<>();
 
         String masthead = generateTitle(currentSystem.getName(), currentSystem.getPolitics());
@@ -73,7 +77,7 @@ public class News {
             paper.add(captainHeadline);
         }
 
-        List<String> usefulHeadlines = getUsefulHeadlines(currentSystem, difficulty, ship);
+        List<String> usefulHeadlines = getUsefulHeadlines(currentSystem);
         paper.addAll(usefulHeadlines.stream().collect(Collectors.toList()));
 
         if (usefulHeadlines.size() == 0) {
@@ -84,7 +88,7 @@ public class News {
         return paper;
     }
 
-    private List<String> getUsefulHeadlines(SolarSystem currentSystem, Difficulty difficulty, Ship ship) {
+    private List<String> getUsefulHeadlines(SolarSystem currentSystem) {
         List<String> headlines = new ArrayList<>();
         for (SolarSystem system : SolarSystem.values()) {
             if (system == currentSystem) {
@@ -92,7 +96,7 @@ public class News {
             }
 
             int systemDistance = (int)Vector2i.Distance(currentSystem.getLocation(), system.getLocation());
-            boolean systemNear = (systemDistance <= ship.type.getFuelTanks());
+            boolean systemNear = (systemDistance <= game.getCurrentShip().type.getFuelTanks());
             boolean systemConnectedThroughWormhole = (currentSystem.getWormholeDestination() == system);
             if (systemNear || systemConnectedThroughWormhole) {
 
@@ -110,6 +114,7 @@ public class News {
                 // the system status is not none.
                 // I don't think that makes sense, so I do the system status check here.
                 // (See SystemInfoEvent.c:698 for the line I moved).
+                Difficulty difficulty = game.getDifficulty();
                 if (somethingGoingOn && GetRandom(100) <= USEFUL_STORY_PROBABILITY * system.getTechLevel().getEra() + 10 * (5 - difficulty.getValue())) {
                     int diceRoll = GetRandom(6);
                     switch (diceRoll) {
@@ -304,6 +309,10 @@ public class News {
     private String generateTitle(String name, Politics politics) {
         // TODO. SystemInfoEvent.c:439-462
         return "The Local Newspaper";
+    }
+
+    public int getPrice() {
+        return game.getDifficulty().getValue() + 1;
     }
 
     enum NotableEvent {

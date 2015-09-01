@@ -23,4 +23,8 @@ public enum Gadget {
         this.techLevel = techLevel;
         this.chance = chance;
     }
+
+    public int getSellPrice() {
+        return (2 * price) / 3;
+    }
 }

@@ -21,27 +21,21 @@ public class Galaxy {
     static final int GALAXY_WIDTH = 150;
     static final int GALAXY_HEIGHT = 110;
 
-    public Galaxy(Difficulty difficulty) {
-        addSolarSystems(difficulty);
+    private final Game game;
 
+    public Galaxy(Game game) {
+        this.game = game;
+
+        addSolarSystems();
         shuffleSystems();
-
         addWormholes();
-
         addMercenaries();
-
         addFixedSpecialEvents();
-
         boolean scarabEndpointExists = addScarabWormhole();
-
         addReactorQuest();
-
         addArtifactDeliveryQuest();
-
         addGemulonInvasion();
-
         addExperimentQuest();
-
         addScatteredSpecialEvents(scarabEndpointExists);
     }
 
@@ -256,7 +250,7 @@ public class Galaxy {
     }
 
 
-    private void addSolarSystems(Difficulty difficulty) {
+    private void addSolarSystems() {
         int count = 0;
         for (SolarSystem system : SolarSystem.values()) {
             Vector2i location = new Vector2i();
@@ -277,7 +271,7 @@ public class Galaxy {
             } while(count > MAX_WORM_HOLES && (neighbourTooClose || neighbourTooFar));
 
             system.setLocation(location);
-            system.initializeTradeItems(difficulty);
+            system.initializeTradeItems(game.getDifficulty());
             ++count;
         }
     }

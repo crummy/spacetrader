@@ -40,13 +40,17 @@ public enum Crew {
 
     private String name;
     private int index;
+
+    // skills
     private int pilot;
     private int fighter;
     private int trader;
     private int engineer;
 
+    private int dailyCost;
+
     Crew(int index, String name) {
-        this.index = index;
+        this.index = index; // TODO: Remove this?
         this.name = name;
         pilot = randomSkill();
         fighter = randomSkill();
@@ -66,4 +70,25 @@ public enum Crew {
     private int randomSkill() {
         return 1 + GetRandom(5) + GetRandom(6);
     }
+
+    public int getDailyCost() {
+        return dailyCost;
+    }
+
+    public int getPilotSkill() {
+        return pilot;
+    }
+
+    public int getFighterSkill() {
+        return fighter;
+    }
+
+    public int getTraderSkill() {
+        return trader;
+    }
+
+    public int getEngineerSkill() {
+        return engineer;
+    }
+
 }
