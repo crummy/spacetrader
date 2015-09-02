@@ -4,7 +4,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
@@ -46,12 +45,13 @@ public class GalaxyTest
 
     @Test
     public void verifyMercenaries() {
-        for (Crew member : Crew.values()) {
-            int count = systemsWithCrewmember(member);
-            if (member == Crew.Captain || member == Crew.Zeethibal) {
-                assertTrue(member + " found on " + count + " systems", count == 0);
+        for (int i = 0; i < Crew.getMaxCrew(); ++i) {
+            Crew.Name name = Crew.Name.values()[i];
+            int count = systemsWithMercenaryNamed(name);
+            if (i == 0 || i == Crew.getMaxCrew() - 1) { // captain or zeethibal
+                assertTrue(name + " found on " + count + " systems", count == 0);
             } else {
-                assertTrue(member + " found on " + count + " systems", count == 1);
+                assertTrue(name + " found on " + count + " systems", count == 1);
             }
         }
     }
@@ -167,9 +167,9 @@ public class GalaxyTest
                 .count();
     }
 
-    private int systemsWithCrewmember(Crew member) {
+    private int systemsWithMercenaryNamed(Crew.Name name) {
         return (int)galaxy.systems.stream()
-                .filter(s -> s.getMercenary() == member)
+                .filter(s -> s.getMercenary() != null && s.getMercenary().getName() == name)
                 .count();
     }
 }

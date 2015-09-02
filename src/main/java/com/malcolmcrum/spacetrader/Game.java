@@ -36,7 +36,7 @@ public class Game {
         news = new News(this);
         ship = new Ship(ShipType.Gnat, this);
         ship.addWeapon(Weapon.PulseLaser);
-        ship.addCrew(Crew.Captain);
+        ship.addCrew(new Crew(0));
         currentSystem = galaxy.getStartSystem(ship.type);
         captain = new Captain(commanderName);
 
