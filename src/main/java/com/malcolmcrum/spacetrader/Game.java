@@ -21,7 +21,7 @@ public class Game {
     Captain captain;
     Ship ship;
     SolarSystem currentSystem;
-    Difficulty difficulty;
+    Difficulty difficulty = Difficulty.Normal;
     News news;
     State state;
 
@@ -45,6 +45,10 @@ public class Game {
         }
 
         return true;
+    }
+
+    public List<SolarSystem> getSystems() {
+        return galaxy.systems;
     }
 
     public boolean travelToPlanet(SolarSystem destination) {

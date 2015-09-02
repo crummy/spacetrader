@@ -40,7 +40,7 @@ public class News {
         Captain captain = game.getCaptain();
         List<String> paper = new ArrayList<>();
 
-        String masthead = generateTitle(currentSystem.getName(), currentSystem.getPolitics());
+        String masthead = generateTitle(currentSystem.getName().getTitle(), currentSystem.getPolitics());
         paper.add(masthead);
 
         for (NotableEvent notableEvent : notableEvents) {
@@ -90,7 +90,7 @@ public class News {
 
     private List<String> getUsefulHeadlines(SolarSystem currentSystem) {
         List<String> headlines = new ArrayList<>();
-        for (SolarSystem system : SolarSystem.values()) {
+        for (SolarSystem system : game.getSystems()) {
             if (system == currentSystem) {
                 continue;
             }

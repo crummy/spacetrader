@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -17,20 +18,30 @@ public class GalaxyTest
 
     @BeforeClass
     public static void setUp() {
-        galaxy = new Galaxy(Difficulty.Normal);
+        Game game = new Game();
+        game.startNewGame("Bob", 5, 5, 5, 5, Difficulty.Normal);
+        galaxy = new Galaxy(game);
     }
 
     @Test
-    public void fixedSpecialEvents() {
-        assertEquals(SolarSystem.Acamar.getSpecialEvent(), SolarSystem.SpecialEvent.MonsterKilled);
-        assertEquals(SolarSystem.Baratas.getSpecialEvent(), SolarSystem.SpecialEvent.FlyBaratas);
-        assertEquals(SolarSystem.Melina.getSpecialEvent(), SolarSystem.SpecialEvent.FlyMelina);
-        assertEquals(SolarSystem.Regulas.getSpecialEvent(), SolarSystem.SpecialEvent.FlyRegulas);
-        assertEquals(SolarSystem.Zalkon.getSpecialEvent(), SolarSystem.SpecialEvent.DragonflyDestroyed);
-        assertEquals(SolarSystem.Japori.getSpecialEvent(), SolarSystem.SpecialEvent.MedicineDelivery);
-        assertEquals(SolarSystem.Utopia.getSpecialEvent(), SolarSystem.SpecialEvent.Retirement);
-        assertEquals(SolarSystem.Devidia.getSpecialEvent(), SolarSystem.SpecialEvent.JarekGetsOut);
-        assertEquals(SolarSystem.Kravat.getSpecialEvent(), SolarSystem.SpecialEvent.WildGetsOut);
+    public void testHardcodedSpecialEvents() {
+        for (SolarSystem system : galaxy.systems) {
+            // following are hardcoded directly
+            if (system.getName() == SolarSystem.Name.Acamar) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.MonsterKilled);
+            if (system.getName() == SolarSystem.Name.Baratas) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.FlyBaratas);
+            if (system.getName() == SolarSystem.Name.Melina) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.FlyMelina);
+            if (system.getName() == SolarSystem.Name.Regulas) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.FlyRegulas);
+            if (system.getName() == SolarSystem.Name.Zalkon) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.DragonflyDestroyed);
+            if (system.getName() == SolarSystem.Name.Japori) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.MedicineDelivery);
+            if (system.getName() == SolarSystem.Name.Utopia) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.Retirement);
+            if (system.getName() == SolarSystem.Name.Devidia) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.JarekGetsOut);
+            if (system.getName() == SolarSystem.Name.Kravat) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.WildGetsOut);
+
+            // following may in extreme circumstances (like a tiny galaxy) not exist?
+            if (system.getName() == SolarSystem.Name.Gemulon) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.GemulonRescued);
+            if (system.getName() == SolarSystem.Name.Daled) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.ExperimentFailed);
+            if (system.getName() == SolarSystem.Name.Nix) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.ReactorDelivered);
+        }
     }
 
     @Test
@@ -47,7 +58,7 @@ public class GalaxyTest
 
     @Test
     public void systemsWithinGalaxyBounds() {
-        for (SolarSystem system : SolarSystem.values()) {
+        for (SolarSystem system : galaxy.systems) {
             Vector2i location = system.getLocation();
             assertTrue(location.x > 0);
             assertTrue(location.x < Galaxy.GALAXY_WIDTH);
@@ -58,9 +69,9 @@ public class GalaxyTest
 
     @Test
     public void noSystemTooClose() {
-        for (SolarSystem system : SolarSystem.values()) {
+        for (SolarSystem system : galaxy.systems) {
             double minDistance = Integer.MAX_VALUE;
-            for (SolarSystem otherSystem : SolarSystem.values()) {
+            for (SolarSystem otherSystem : galaxy.systems) {
                 if (system != otherSystem) {
                     double distance = Vector2i.Distance(system.getLocation(), otherSystem.getLocation());
                     if (distance < minDistance) {
@@ -74,9 +85,9 @@ public class GalaxyTest
 
     @Test
     public void allSystemsHaveNeighbours() {
-        for (SolarSystem system : SolarSystem.values()) {
+        for (SolarSystem system : galaxy.systems) {
             double closestDistance = Integer.MAX_VALUE;
-            for (SolarSystem otherSystem : SolarSystem.values()) {
+            for (SolarSystem otherSystem : galaxy.systems) {
                 if (system != otherSystem) {
                     double distance = Vector2i.Distance(system.getLocation(), otherSystem.getLocation());
                     if (distance < closestDistance) {
@@ -90,7 +101,7 @@ public class GalaxyTest
 
     @Test
     public void politicsAndTechLevelCompatible() {
-        for (SolarSystem system : SolarSystem.values()) {
+        for (SolarSystem system : galaxy.systems) {
             Politics politics = system.getPolitics();
             TechLevel techLevel = system.getTechLevel();
             assertFalse(techLevel.isBeyond(politics.getMaxTechLevel()));
@@ -100,19 +111,7 @@ public class GalaxyTest
     }
 
     @Test
-    public void systemAttributes() {
-        assertSame(SolarSystem.Acamar.getName(), "Acamar");
-        assertEquals(SolarSystem.Acamar.getTradeResetCountdown(), 0);
-        assertFalse(SolarSystem.Acamar.isVisited());
-
-        Map<TradeItem, Integer> tradeItems = SolarSystem.Acamar.getTradeItems();
-        for (TradeItem item : TradeItem.values()) {
-            assertTrue("item: " + item, tradeItems.containsKey(item));
-        }
-    }
-
-    @Test
-    public void specialEvents() {
+    public void testRandomSpecialEvents() {
         for (SolarSystem.SpecialEvent event : SolarSystem.SpecialEvent.values()) {
             long occurrencesOfEvent = systemsWithEvent(event);
             if (event == SolarSystem.SpecialEvent.ScarabDestroyed
@@ -128,14 +127,13 @@ public class GalaxyTest
                         occurrencesOfEvent == event.getOccurrence() || event.hasFixedLocation());
             }
         }
-        assertEquals(SolarSystem.Gemulon.getSpecialEvent(), SolarSystem.SpecialEvent.GemulonRescued);
-        assertEquals(SolarSystem.Daled.getSpecialEvent(), SolarSystem.SpecialEvent.ExperimentFailed);
-        assertEquals(SolarSystem.Nix.getSpecialEvent(), SolarSystem.SpecialEvent.ReactorDelivered);
     }
 
     @Test
     public void testWormholes() {
-        List<SolarSystem> wormholeSystems = galaxy.getSystemsWithWormholes();
+        List<SolarSystem> wormholeSystems = galaxy.systems.stream()
+                .filter(SolarSystem::hasWormhole)
+                .collect(Collectors.toList());
         assertSame(wormholeSystems.size(), Galaxy.MAX_WORM_HOLES);
         for (SolarSystem system : wormholeSystems) {
             assertTrue(system.hasWormhole());
@@ -164,22 +162,14 @@ public class GalaxyTest
     }
 
     private int systemsWithEvent(SolarSystem.SpecialEvent event) {
-        int count = 0;
-        for (SolarSystem system : SolarSystem.values()) {
-            if (system.getSpecialEvent() == event) {
-                ++count;
-            }
-        }
-        return count;
+        return (int)galaxy.systems.stream()
+                .filter(s -> s.getSpecialEvent() == event)
+                .count();
     }
 
     private int systemsWithCrewmember(Crew member) {
-        int count = 0;
-        for (SolarSystem system : SolarSystem.values()) {
-            if (system.getMercenary() == member) {
-                ++count;
-            }
-        }
-        return count;
+        return (int)galaxy.systems.stream()
+                .filter(s -> s.getMercenary() == member)
+                .count();
     }
 }

@@ -14,9 +14,8 @@ public class NewsTest {
     @Test
     public void testGetNewspaper() {
         Game game = new Game();
+        game.startNewGame("Bob", 5, 5, 5, 5, Difficulty.Normal);
         News news = new News(game); // ahah what a silly line
-        Ship ship = new Ship(ShipType.Beetle, game);
-        Captain captain = new Captain("Bob");
         news.addNotableEvent(News.NotableEvent.ArrivalViaSingularity);
         news.addSpecialEvent(SolarSystem.SpecialEvent.MedicineDelivery);
         List<String> paper = news.getNewspaper();

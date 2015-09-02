@@ -12,134 +12,12 @@ import static com.malcolmcrum.spacetrader.Utils.RandomEnum;
 /**
  * Created by Malcolm on 8/28/2015.
  */
-public enum SolarSystem {
-    Acamar("Acamar"),
-    Adahn("Adahn"),        // The alternate personality for The Nameless One in "Planescape: Torment"
-    Aldea("Aldea"),
-    Andevian("Andevian"),
-    Antedi("Antedi"),
-    Balosnee("Balosnee"),
-    Baratas("Baratas"),
-    Brax("Brax"),            // One of the heroes in Master of Magic
-    Bretel("Bretel"),        // This is a Dutch device for keeping your pants up.
-    Calondia("Calondia"),
-    Campor("Campor"),
-    Capelle("Capelle"),        // The city I lived in while programming this game
-    Carzon("Carzon"),
-    Castor("Castor"),        // A Greek demi-god
-    Cestus("Cestus"),
-    Cheron("Cheron"),
-    Courteney("Courteney"),    // After Courteney Cox...
-    Daled("Daled"),
-    Damast("Damast"),
-    Davlos("Davlos"),
-    Deneb("Deneb"),
-    Deneva("Deneva"),
-    Devidia("Devidia"),
-    Draylon("Draylon"),
-    Drema("Drema"),
-    Endor("Endor"),
-    Esmee("Esmee"),        // One of the witches in Pratchett's Discworld
-    Exo("Exo"),
-    Ferris("Ferris"),        // Iron
-    Festen("Festen"),        // A great Scandinavian movie
-    Fourmi("Fourmi"),        // An ant, in French
-    Frolix("Frolix"),        // A solar system in one of Philip K. Dick's novels
-    Gemulon("Gemulon"),
-    Guinifer("Guinifer"),        // One way of writing the name of king Arthur's wife
-    Hades("Hades"),        // The underworld
-    Hamlet("Hamlet"),        // From Shakespeare
-    Helena("Helena"),        // Of Troy
-    Hulst("Hulst"),        // A Dutch plant
-    Iodine("Iodine"),        // An element
-    Iralius("Iralius"),
-    Janus("Janus"),        // A seldom encountered Dutch boy's name
-    Japori("Japori"),
-    Jarada("Jarada"),
-    Jason("Jason"),        // A Greek hero
-    Kaylon("Kaylon"),
-    Khefka("Khefka"),
-    Kira("Kira"),            // My dog's name
-    Klaatu("Klaatu"),        // From a classic SF movie
-    Klaestron("Klaestron"),
-    Korma("Korma"),        // An Indian sauce
-    Kravat("Kravat"),        // Interesting spelling of the French word for "tie"
-    Krios("Krios"),
-    Laertes("Laertes"),        // A king in a Greek tragedy
-    Largo("Largo"),
-    Lave("Lave"),            // The starting system in Elite
-    Ligon("Ligon"),
-    Lowry("Lowry"),        // The name of the "hero" in Terry Gilliam's "Brazil"
-    Magrat("Magrat"),        // The second of the witches in Pratchett's Discworld
-    Malcoria("Malcoria"),
-    Melina("Melina"),
-    Mentar("Mentar"),        // The Psilon home system in Master of Orion
-    Merik("Merik"),
-    Mintaka("Mintaka"),
-    Montor("Montor"),        // A city in Ultima III and Ultima VII part 2
-    Mordan("Mordan"),
-    Myrthe("Myrthe"),        // The name of my daughter
-    Nelvana("Nelvana"),
-    Nix("Nix"),            // An interesting spelling of a word meaning "nothing" in Dutch
-    Nyle("Nyle"),            // An interesting spelling of the great river
-    Odet("Odet"),
-    Og("Og"),            // The last of the witches in Pratchett's Discworld
-    Omega("Omega"),        // The end of it all
-    Omphalos("Omphalos"),        // Greek for navel
-    Orias("Orias"),
-    Othello("Othello"),        // From Shakespeare
-    Parade("Parade"),        // This word means the same in Dutch and in English
-    Penthara("Penthara"),
-    Picard("Picard"),        // The enigmatic captain from ST:TNG
-    Pollux("Pollux"),        // Brother of Castor
-    Quator("Quator"),
-    Rakhar("Rakhar"),
-    Ran("Ran"),            // A film by Akira Kurosawa
-    Regulas("Regulas"),
-    Relva("Relva"),
-    Rhymus("Rhymus"),
-    Rochani("Rochani"),
-    Rubicum("Rubicum"),        // The river Ceasar crossed to get into Rome
-    Rutia("Rutia"),
-    Sarpeidon("Sarpeidon"),
-    Sefalla("Sefalla"),
-    Seltrice("Seltrice"),
-    Sigma("Sigma"),
-    Sol("Sol"),            // That's our own solar system
-    Somari("Somari"),
-    Stakoron("Stakoron"),
-    Styris("Styris"),
-    Talani("Talani"),
-    Tamus("Tamus"),
-    Tantalos("Tantalos"),        // A king from a Greek tragedy
-    Tanuga("Tanuga"),
-    Tarchannen("Tarchannen"),
-    Terosa("Terosa"),
-    Thera("Thera"),        // A seldom encountered Dutch girl's name
-    Titan("Titan"),        // The largest moon of Jupiter
-    Torin("Torin"),        // A hero from Master of Magic
-    Triacus("Triacus"),
-    Turkana("Turkana"),
-    Tyrus("Tyrus"),
-    Umberlee("Umberlee"),        // A god from AD&D, which has a prominent role in Baldur's Gate
-    Utopia("Utopia"),        // The ultimate goal
-    Vadera("Vadera"),
-    Vagra("Vagra"),
-    Vandor("Vandor"),
-    Ventax("Ventax"),
-    Xenon("Xenon"),
-    Xerxes("Xerxes"),        // A Greek hero
-    Yew("Yew"),            // A city which is in almost all of the Ultima games
-    Yojimbo("Yojimbo"),        // A film by Akira Kurosawa
-    Zalkon("Zalkon"),
-    Zuul("Zuul");            // From the first Ghostbusters movie
-
+public class SolarSystem {
     static final int COST_MOON = 500000;
     private static final Logger logger = LoggerFactory.getLogger(SolarSystem.class);
 
-
     private Vector2i location;
-    private final String name;
+    private final Name name;
     private final TechLevel techLevel;
     private final Politics politics;
     private final SpecialResource specialResource;
@@ -152,8 +30,8 @@ public enum SolarSystem {
     private SolarSystem wormholeDestination;
     private Crew mercenary;
 
-    SolarSystem(String name) {
-        this.name = name;
+    SolarSystem(int index) {
+        name = Name.values()[index];
 
         TechLevel t;
         Politics p;
@@ -183,6 +61,10 @@ public enum SolarSystem {
         wormholeDestination = null;
 
         tradeItems = new HashMap<>();
+    }
+
+    public static int GetMaxSystems() {
+        return Name.values().length;
     }
 
     public boolean hasWormhole() {
@@ -241,7 +123,7 @@ public enum SolarSystem {
         return location;
     }
 
-    public String getName() {
+    public Name getName() {
         return name;
     }
 
@@ -351,8 +233,140 @@ public enum SolarSystem {
         }
     }
 
+    enum Name {
+        Acamar("Acamar"),
+        Adahn("Adahn"),        // The alternate personality for The Nameless One in "Planescape: Torment"
+        Aldea("Aldea"),
+        Andevian("Andevian"),
+        Antedi("Antedi"),
+        Balosnee("Balosnee"),
+        Baratas("Baratas"),
+        Brax("Brax"),            // One of the heroes in Master of Magic
+        Bretel("Bretel"),        // This is a Dutch device for keeping your pants up.
+        Calondia("Calondia"),
+        Campor("Campor"),
+        Capelle("Capelle"),        // The city I lived in while programming this game
+        Carzon("Carzon"),
+        Castor("Castor"),        // A Greek demi-god
+        Cestus("Cestus"),
+        Cheron("Cheron"),
+        Courteney("Courteney"),    // After Courteney Cox...
+        Daled("Daled"),
+        Damast("Damast"),
+        Davlos("Davlos"),
+        Deneb("Deneb"),
+        Deneva("Deneva"),
+        Devidia("Devidia"),
+        Draylon("Draylon"),
+        Drema("Drema"),
+        Endor("Endor"),
+        Esmee("Esmee"),        // One of the witches in Pratchett's Discworld
+        Exo("Exo"),
+        Ferris("Ferris"),        // Iron
+        Festen("Festen"),        // A great Scandinavian movie
+        Fourmi("Fourmi"),        // An ant, in French
+        Frolix("Frolix"),        // A solar system in one of Philip K. Dick's novels
+        Gemulon("Gemulon"),
+        Guinifer("Guinifer"),        // One way of writing the name of king Arthur's wife
+        Hades("Hades"),        // The underworld
+        Hamlet("Hamlet"),        // From Shakespeare
+        Helena("Helena"),        // Of Troy
+        Hulst("Hulst"),        // A Dutch plant
+        Iodine("Iodine"),        // An element
+        Iralius("Iralius"),
+        Janus("Janus"),        // A seldom encountered Dutch boy's name
+        Japori("Japori"),
+        Jarada("Jarada"),
+        Jason("Jason"),        // A Greek hero
+        Kaylon("Kaylon"),
+        Khefka("Khefka"),
+        Kira("Kira"),            // My dog's name
+        Klaatu("Klaatu"),        // From a classic SF movie
+        Klaestron("Klaestron"),
+        Korma("Korma"),        // An Indian sauce
+        Kravat("Kravat"),        // Interesting spelling of the French word for "tie"
+        Krios("Krios"),
+        Laertes("Laertes"),        // A king in a Greek tragedy
+        Largo("Largo"),
+        Lave("Lave"),            // The starting system in Elite
+        Ligon("Ligon"),
+        Lowry("Lowry"),        // The name of the "hero" in Terry Gilliam's "Brazil"
+        Magrat("Magrat"),        // The second of the witches in Pratchett's Discworld
+        Malcoria("Malcoria"),
+        Melina("Melina"),
+        Mentar("Mentar"),        // The Psilon home system in Master of Orion
+        Merik("Merik"),
+        Mintaka("Mintaka"),
+        Montor("Montor"),        // A city in Ultima III and Ultima VII part 2
+        Mordan("Mordan"),
+        Myrthe("Myrthe"),        // The name of my daughter
+        Nelvana("Nelvana"),
+        Nix("Nix"),            // An interesting spelling of a word meaning "nothing" in Dutch
+        Nyle("Nyle"),            // An interesting spelling of the great river
+        Odet("Odet"),
+        Og("Og"),            // The last of the witches in Pratchett's Discworld
+        Omega("Omega"),        // The end of it all
+        Omphalos("Omphalos"),        // Greek for navel
+        Orias("Orias"),
+        Othello("Othello"),        // From Shakespeare
+        Parade("Parade"),        // This word means the same in Dutch and in English
+        Penthara("Penthara"),
+        Picard("Picard"),        // The enigmatic captain from ST:TNG
+        Pollux("Pollux"),        // Brother of Castor
+        Quator("Quator"),
+        Rakhar("Rakhar"),
+        Ran("Ran"),            // A film by Akira Kurosawa
+        Regulas("Regulas"),
+        Relva("Relva"),
+        Rhymus("Rhymus"),
+        Rochani("Rochani"),
+        Rubicum("Rubicum"),        // The river Ceasar crossed to get into Rome
+        Rutia("Rutia"),
+        Sarpeidon("Sarpeidon"),
+        Sefalla("Sefalla"),
+        Seltrice("Seltrice"),
+        Sigma("Sigma"),
+        Sol("Sol"),            // That's our own solar system
+        Somari("Somari"),
+        Stakoron("Stakoron"),
+        Styris("Styris"),
+        Talani("Talani"),
+        Tamus("Tamus"),
+        Tantalos("Tantalos"),        // A king from a Greek tragedy
+        Tanuga("Tanuga"),
+        Tarchannen("Tarchannen"),
+        Terosa("Terosa"),
+        Thera("Thera"),        // A seldom encountered Dutch girl's name
+        Titan("Titan"),        // The largest moon of Jupiter
+        Torin("Torin"),        // A hero from Master of Magic
+        Triacus("Triacus"),
+        Turkana("Turkana"),
+        Tyrus("Tyrus"),
+        Umberlee("Umberlee"),        // A god from AD&D, which has a prominent role in Baldur's Gate
+        Utopia("Utopia"),        // The ultimate goal
+        Vadera("Vadera"),
+        Vagra("Vagra"),
+        Vandor("Vandor"),
+        Ventax("Ventax"),
+        Xenon("Xenon"),
+        Xerxes("Xerxes"),        // A Greek hero
+        Yew("Yew"),            // A city which is in almost all of the Ultima games
+        Yojimbo("Yojimbo"),        // A film by Akira Kurosawa
+        Zalkon("Zalkon"),
+        Zuul("Zuul");            // From the first Ghostbusters movie
+
+        private final String title;
+        Name(String title) {
+            this.title = title;
+        }
+
+        protected String getTitle() {
+            return title;
+        }
+    }
+
     enum Status {
-        None("under no particular pressure"),
+        None("UNUSED_TEXT", "under no particular pressure"),
         War("Strife and War", "at war"),
         Plague("Plague Outbreaks", "ravaged by a plague"),
         Drought("Severe Drought", "suffering from a drought"),
@@ -363,11 +377,6 @@ public enum SolarSystem {
 
         private final String description; // used for reporting status
         private final String title; // used for newspaper headlines
-
-        Status(String description) {
-            this.description = description;
-            this.title = "UNUSED_TEXT"; // hopefully you never see this.
-        }
 
         Status(String title, String description) {
             this.title = title;
@@ -436,10 +445,6 @@ public enum SolarSystem {
             this.occurrence = occurrence;
             this.justAMessage = justAMessage;
             this.fixedLocation = fixedLocation;
-        }
-
-        public void setOccurrence(int occurrence) {
-            this.occurrence = occurrence;
         }
 
         public boolean hasFixedLocation() {
