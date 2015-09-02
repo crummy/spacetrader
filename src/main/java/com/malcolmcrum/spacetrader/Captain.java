@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * Created by Malcolm on 8/28/2015.
  */
-public class Captain {
+public class Captain extends Crew {
     private static final int CHANCE_OF_A_VERY_RARE_ENCOUNTER = 5;
     private static final int VILLAIN_SCORE = -30;
     private static final int HERO_SCORE = 75;
@@ -53,6 +53,8 @@ public class Captain {
     private boolean isInsured;
 
     public Captain(String name) {
+        super(0);
+
         this.name = name;
         credits = 1000;
         debt = 0;
@@ -98,7 +100,7 @@ public class Captain {
         isInsured = false;
     }
 
-    public String getName() {
+    public String getCaptainName() {
         return name;
     }
 
