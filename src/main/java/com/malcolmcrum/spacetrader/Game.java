@@ -12,7 +12,7 @@ import java.util.List;
 public class Game {
     private static final Logger logger = LoggerFactory.getLogger(Game.class);
 
-    private static final int MAX_POINTS_PER_SKILL = 10;
+    static final int MAX_POINTS_PER_SKILL = 10;
     private static final int MAX_SKILL_POINTS_TOTAL = 20;
     private static final int MIN_POINTS_PER_SKILL = 1;
 
@@ -28,14 +28,14 @@ public class Game {
     private Japori japoriDiseaseStatus;
     private Reactor reactorStatus;
 
-    Galaxy galaxy;
-    Captain captain;
-    Ship ship;
-    SolarSystem currentSystem;
-    Difficulty difficulty = Difficulty.Normal;
-    News news;
-    State state;
-    RareEncounters rareEncounters;
+    private Galaxy galaxy;
+    private Captain captain;
+    private Ship ship;
+    private SolarSystem currentSystem;
+    private Difficulty difficulty = Difficulty.Normal;
+    private News news;
+    private State state;
+    private RareEncounters rareEncounters;
     private List<Alert> unreadAlerts;
 
     private GameState currentState;
@@ -99,47 +99,6 @@ public class Game {
         currentSystem = destination;
         state = State.InTransit;
         return true;
-    }
-
-    private void arrivalInSystem(SolarSystem system) {
-
-        SolarSystem.SpecialEvent systemEvent = currentSystem.getSpecialEvent();
-        if (systemEvent == SolarSystem.SpecialEvent.MonsterKilled && getMonsterStatus() == Monster.Destroyed) {
-            news.addSpecialEvent(SolarSystem.SpecialEvent.MonsterKilled);
-        } else if (systemEvent == SolarSystem.SpecialEvent.Dragonfly) {
-            news.addSpecialEvent(SolarSystem.SpecialEvent.Dragonfly);
-        } else if (systemEvent == SolarSystem.SpecialEvent.ScarabStolen) {
-            news.addSpecialEvent(SolarSystem.SpecialEvent.ScarabStolen);
-        } else if (systemEvent == SolarSystem.SpecialEvent.ScarabDestroyed && getScarabStatus() == Scarab.DestroyedUpgradeAvailable) {
-            news.addSpecialEvent(SolarSystem.SpecialEvent.ScarabDestroyed);
-        } else if (systemEvent == SolarSystem.SpecialEvent.FlyBaratas && getDragonflyStatus() == Dragonfly.GoToBaratas) {
-            news.addSpecialEvent(SolarSystem.SpecialEvent.FlyBaratas);
-        } else if (systemEvent == SolarSystem.SpecialEvent.FlyMelina && getDragonflyStatus() == Dragonfly.GoToMelina) {
-            news.addSpecialEvent(SolarSystem.SpecialEvent.FlyMelina);
-        } else if (systemEvent == SolarSystem.SpecialEvent.FlyRegulas && getDragonflyStatus() == Dragonfly.GoToRegulas) {
-            news.addSpecialEvent(SolarSystem.SpecialEvent.FlyRegulas);
-        } else if (systemEvent == SolarSystem.SpecialEvent.DragonflyDestroyed && getDragonflyStatus() == Dragonfly.Destroyed) {
-            news.addSpecialEvent(SolarSystem.SpecialEvent.DragonflyDestroyed);
-        } else if (systemEvent == SolarSystem.SpecialEvent.MedicineDelivery && captain.getJaporiDiseaseStatus() == 1) {
-            news.addSpecialEvent(SolarSystem.SpecialEvent.MedicineDelivery);
-        } else if (systemEvent == SolarSystem.SpecialEvent.ArtifactDelivery && captain.getArtifactOnBoard()) {
-            news.addSpecialEvent(SolarSystem.SpecialEvent.ArtifactDelivery);
-        } else if (systemEvent == SolarSystem.SpecialEvent.JaporiDisease && captain.getJaporiDiseaseStatus() == 0) {
-            news.addSpecialEvent(SolarSystem.SpecialEvent.JaporiDisease);
-        } else if (systemEvent == SolarSystem.SpecialEvent.JarekGetsOut && captain.getJarekStatus() == 1) {
-            news.addSpecialEvent(SolarSystem.SpecialEvent.JarekGetsOut);
-        } else if (systemEvent == SolarSystem.SpecialEvent.WildGetsOut) {
-            news.addSpecialEvent(SolarSystem.SpecialEvent.WildGetsOut);
-        } else if (systemEvent == SolarSystem.SpecialEvent.GemulonRescued && captain.getInvasionStatus() > 0 && captain.getInvasionStatus() < 8) {
-            news.addSpecialEvent(SolarSystem.SpecialEvent.GemulonRescued);
-        } else if (systemEvent == SolarSystem.SpecialEvent.AlienInvasion) {
-            news.addSpecialEvent(SolarSystem.SpecialEvent.AlienInvasion);
-        } else if (systemEvent == SolarSystem.SpecialEvent.DisasterAverted && captain.getExperimentStatus() > 0 && captain.getExperimentStatus() < 12) {
-            news.addSpecialEvent(SolarSystem.SpecialEvent.DisasterAverted);
-        } else if (systemEvent == SolarSystem.SpecialEvent.ExperimentFailed) {
-            news.addSpecialEvent(SolarSystem.SpecialEvent.ExperimentFailed);
-        }
-        currentSystem.setVisited();
     }
 
     public int getFabricRipProbability() {
@@ -208,6 +167,30 @@ public class Game {
 
     public void setJarekStatus(Jarek jarekStatus) {
         this.jarekStatus = jarekStatus;
+    }
+
+    public void setWildStatus(Wild wildStatus) {
+        this.wildStatus = wildStatus;
+    }
+
+    public void dayPasses() {
+        days++;
+    }
+
+    public void setShip(Ship ship) {
+        this.ship = ship;
+    }
+
+    public News getNews() {
+        return news;
+    }
+
+    public void setCurrentSystem(SolarSystem currentSystem) {
+        this.currentSystem = currentSystem;
+    }
+
+    public Galaxy getGalaxy() {
+        return galaxy;
     }
 
     enum State {

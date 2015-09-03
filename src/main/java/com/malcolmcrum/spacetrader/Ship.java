@@ -7,6 +7,8 @@ import java.util.List;
  * Created by Malcolm on 8/29/2015.
  */
 public class Ship {
+    private static final int SKILL_BONUS = 3;
+    private static final int CLOAK_BONUS = 2;
 
     ShipType type;
     List<Cargo> cargo;
@@ -18,6 +20,7 @@ public class Ship {
     private int hullStrength;
     private int tribbles;
     private final Game game;
+    private boolean hasEscapePod;
 
     public Ship(ShipType type, Game game) {
         this.game = game;
@@ -30,6 +33,7 @@ public class Ship {
         fuel = type.getFuelTanks();
         hullStrength = type.getHullStrength();
         tribbles = 0;
+        hasEscapePod = false;
     }
 
     public void addCrew(Crew member) {
@@ -90,9 +94,9 @@ public class Ship {
         // Gadgets aren't counted in the price, because they are already taken into account in
         // the skill adjustment of the price.
 
-        int pilotSkill = Skills.GetPilotSkill(crew, gadgets, game.getDifficulty());
-        int engineerSkill = Skills.GetEngineerSkill(crew, gadgets, game.getDifficulty());
-        int fighterSkill = Skills.GetFighterSkill(crew, gadgets, game.getDifficulty());
+        int pilotSkill = getPilotSkill();
+        int engineerSkill = getEngineerSkill();
+        int fighterSkill = getFighterSkill();
 
         curPrice = curPrice * (2 * pilotSkill + engineerSkill + 3 * fighterSkill) / 60;
 
@@ -169,6 +173,75 @@ public class Ship {
             bays -= (5 + 10 - (game.getReactorStatus().getValue() - 1)/2);
         }
         return bays;
+    }
+
+    public void setEscapePod(boolean escapePod) {
+        this.hasEscapePod = escapePod;
+    }
+
+    public int getTraderSkill() {
+        int maxSkill = crew.stream()
+                .mapToInt(Crew::getTraderSkill)
+                .max()
+                .getAsInt();
+
+        if (game.getJarekStatus() == Jarek.Delivered) {
+            ++maxSkill;
+        }
+        return applyDifficultyModifierToSkill(maxSkill);
+    }
+
+    public int getFighterSkill() {
+        int maxSkill = crew.stream()
+                .mapToInt(Crew::getFighterSkill)
+                .max()
+                .getAsInt();
+
+        if (gadgets.contains(Gadget.Targeting)) {
+            maxSkill += SKILL_BONUS;
+        }
+
+        return applyDifficultyModifierToSkill(maxSkill);
+    }
+
+    public int getEngineerSkill() {
+        int maxSkill = crew.stream()
+                .mapToInt(Crew::getEngineerSkill)
+                .max()
+                .getAsInt();
+
+        if (gadgets.contains(Gadget.Repairs)) {
+            maxSkill += SKILL_BONUS;
+        }
+
+        return applyDifficultyModifierToSkill(maxSkill);
+    }
+
+    public int getPilotSkill() {
+        int maxSkill = crew.stream()
+                .mapToInt(Crew::getPilotSkill)
+                .max()
+                .getAsInt();
+
+        if (gadgets.contains(Gadget.Navigation)) {
+            maxSkill += SKILL_BONUS;
+        }
+        if (gadgets.contains(Gadget.Cloaking)) {
+            maxSkill += CLOAK_BONUS;
+        }
+
+        return applyDifficultyModifierToSkill(maxSkill);
+    }
+
+    public int applyDifficultyModifierToSkill(int level) {
+        Difficulty d = game.getDifficulty();
+        if (d == Difficulty.Beginner || d == Difficulty.Easy) {
+            return level + 1;
+        } else if (d == Difficulty.Impossible) {
+            return Math.max(1, level - 1);
+        } else {
+            return level;
+        }
     }
 
     private class Cargo {

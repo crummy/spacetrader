@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 import static com.malcolmcrum.spacetrader.Utils.GetRandom;
+import static com.malcolmcrum.spacetrader.Utils.RandomEnum;
 
 /**
  * Galaxy generator - basically sets up SolarSystems.
@@ -332,5 +333,34 @@ public class Galaxy {
 
     public int distanceBetween(SolarSystem origin, SolarSystem destination) {
         return (int)Vector2i.Distance(origin.getLocation(), destination.getLocation());
+    }
+
+    /**
+     * Randomly assigns statuses to solar systems. Used on arrival to a system.
+     * 15% chance to go from Interesting -> Uneventful.
+     * 15% chance to go from Uneventful -> Interesting.
+     */
+    public void shuffleStatuses() {
+        for (SolarSystem system : systems) {
+            if (system.getStatus() != SolarSystem.Status.Uneventful) {
+                if (GetRandom(100) < 15) {
+                    system.setStatus(SolarSystem.Status.Uneventful);
+                }
+            } else if (GetRandom(100) < 15) {
+                system.setStatus(RandomEnum(SolarSystem.Status.class, 1));
+            }
+        }
+    }
+
+    /**
+     * After entering a system, the quantities of items available from a system change
+     * slightly. After tradeResetCountdown reaches zero, the quantities are reset.
+     * This ensures that it isn't really worth the player's time to just travel between
+     * two neighbouring systems.
+     */
+    public void changeTradeItemQuantities() {
+        for (SolarSystem system : systems) {
+            system.performTradeCountdown();
+        }
     }
 }

@@ -108,7 +108,7 @@ public class News {
                     headlines.add("Collector in " + system.getName() + "seeks to purchase Tribbles.");
                 }
 
-                boolean somethingGoingOn = (system.getStatus() != SolarSystem.Status.None);
+                boolean somethingGoingOn = (system.getStatus() != SolarSystem.Status.Uneventful);
                 // Slight logic change to the original here.
                 // In the original, the above moon and tribble stories are only shown if
                 // the system status is not none.
@@ -181,7 +181,7 @@ public class News {
     private String getStatusHeadline(SolarSystem.Status status) {
         String headline = null;
         switch (status) {
-            case None:
+            case Uneventful:
                 break;
             case War:
                 headline = "War News: Offensives Continue!";

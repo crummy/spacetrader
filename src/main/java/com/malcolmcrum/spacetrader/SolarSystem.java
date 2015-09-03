@@ -23,15 +23,17 @@ public class SolarSystem {
     private final SpecialResource specialResource;
     private Status status;
     private final Size size;
-    private final Map<TradeItem, Integer> tradeItems;
+    private final Map<TradeItem, PriceQuantity> tradeItems;
     private int tradeResetCountdown;
     private boolean visited;
     private SpecialEvent specialEvent;
     private SolarSystem wormholeDestination;
     private Crew mercenary;
+    private Game game;
 
-    SolarSystem(int index) {
+    SolarSystem(int index, Game game) {
         name = Name.values()[index];
+        this.game = game;
 
         TechLevel t;
         Politics p;
@@ -51,7 +53,7 @@ public class SolarSystem {
         if (GetRandom(100) < 15) {
             status = RandomEnum(Status.class, 1);
         } else {
-            status = Status.None;
+            status = Status.Uneventful;
         }
 
         size = RandomEnum(Size.class);
@@ -71,7 +73,7 @@ public class SolarSystem {
         return wormholeDestination != null;
     }
 
-    public void initializeTradeItems(Difficulty difficulty) {
+    public void initializeTradeItems() {
         tradeItems.clear();
         for (TradeItem item : TradeItem.values()) {
             boolean bannedItem = (item == TradeItem.Narcotics && !politics.getDrugsOK()) ||
@@ -79,7 +81,7 @@ public class SolarSystem {
             boolean itemTooAdvanced = item.getTechLevelRequiredForProduction().isBeyond(techLevel);
 
             if (bannedItem || itemTooAdvanced) {
-                tradeItems.put(item, 0);
+                tradeItems.put(item, null);
                 continue;
             }
 
@@ -87,7 +89,7 @@ public class SolarSystem {
 
             // Cap robots and narcotics due to potential for easy profits
             if (item == TradeItem.Robots || item == TradeItem.Narcotics) {
-                int difficultyValue = difficulty.getValue();
+                int difficultyValue = game.getDifficulty().getValue();
                 quantity = ((quantity * (5 - difficultyValue)) / (6 - difficultyValue)) + 1;
             }
 
@@ -101,7 +103,7 @@ public class SolarSystem {
                 quantity = (quantity * 3) >> 2;
             }
 
-            if (item.getDoublePriceTrigger() != Status.None
+            if (item.getDoublePriceTrigger() != Status.Uneventful
                     && status == item.getDoublePriceTrigger()) {
                 quantity = quantity / 5;
             }
@@ -111,7 +113,27 @@ public class SolarSystem {
                 quantity = 0;
             }
 
-            tradeItems.put(item, quantity);
+            PriceQuantity priceQuantity = new PriceQuantity();
+            priceQuantity.quantity = quantity;
+            tradeItems.put(item, priceQuantity);
+        }
+    }
+
+    private void adjustTradeItems() {
+        for (TradeItem item : TradeItem.values()) {
+            boolean itemNotAllowed = (item == TradeItem.Narcotics && !politics.getDrugsOK())
+                    || (item == TradeItem.Firearms && !politics.getFirearmsOK())
+                    || (techLevel.isBefore(item.getTechLevelForTopProduction()));
+            if (itemNotAllowed) {
+                tradeItems.put(item, 0);
+            } else {
+                int currentQuantity = tradeItems.get(item);
+                int newQuantity = currentQuantity + GetRandom(5) - GetRandom(5);
+                if (newQuantity < 0) {
+                    newQuantity = 0;
+                }
+                tradeItems.put(item, newQuantity);
+            }
         }
     }
 
@@ -171,14 +193,6 @@ public class SolarSystem {
         return visited;
     }
 
-    public int getTradeResetCountdown() {
-        return tradeResetCountdown;
-    }
-
-    public Map<TradeItem, Integer> getTradeItems() {
-        return tradeItems;
-    }
-
     public Status getStatus() {
         return status;
     }
@@ -197,6 +211,130 @@ public class SolarSystem {
 
     public int getPoliceStrength() {
         return getPolitics().getPoliceStrength().getStrength();
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    /**
+     * After entering a system, the quantities of items available from a system change
+     * slightly. After tradeResetCountdown reaches zero, the quantities are reset.
+     * This ensures that it isn't really worth the player's time to just travel between
+     * two neighbouring systems.
+     * Called on every system when arriving in a system.
+     */
+    public void performTradeCountdown() { // TODO: Better function name?
+        if (tradeResetCountdown > 0) {
+            --tradeResetCountdown;
+            if (tradeResetCountdown > initialTradeResetCountdown()) {
+                tradeResetCountdown = initialTradeResetCountdown();
+            } else if (tradeResetCountdown <= 0) {
+                initializeTradeItems();
+            } else {
+                adjustTradeItems();
+            }
+        }
+    }
+
+    private int initialTradeResetCountdown() {
+        return 3 + game.getDifficulty().getValue();
+    }
+
+    /**
+     * Called only when arriving in a system.
+     */
+    public void determinePrices() { // TBD: Consider putting this in InSystem?
+        for (TradeItem item : TradeItem.values()) {
+            int buyingPrice = getStandardPrice(item);
+            if (buyingPrice <= 0) {
+                tradeItems.put(item, null);
+            } else {
+                // In case of a special status, adjust price accordingly
+                if (item.getDoublePriceTrigger() == status) {
+                    buyingPrice = (buyingPrice * 3) >> 1;
+                }
+
+                // Randomize price a bit
+                buyingPrice = buyingPrice + GetRandom(item.getPriceVariance()) - GetRandom(item.getPriceVariance());
+
+                if (buyingPrice <= 0) {
+                    logger.error("Buying price is <= 0!!");
+                }
+                PriceQuantity priceQuantity = tradeItems.get(item);
+                priceQuantity.buyPrice = buyingPrice;
+
+                // Criminals have to pay off an intermediary
+                if (game.getCaptain().isDubious()) {
+                    priceQuantity.sellPrice = (buyingPrice * 90) / 100;
+                } else {
+                    priceQuantity.sellPrice = buyingPrice;
+                }
+            }
+        }
+        recalculateBuyPrice();
+    }
+
+    private void recalculateBuyPrice() {
+        for (TradeItem item : TradeItem.values()) {
+            PriceQuantity priceQuantity = tradeItems.get(item);
+            if (techLevel.isBefore(item.getTechLevelRequiredForProduction())) {
+                priceQuantity.buyPrice = 0;
+            } else if ((item == TradeItem.Narcotics && !politics.getDrugsOK())
+                    || (item == TradeItem.Firearms && !politics.getFirearmsOK())) {
+                priceQuantity.buyPrice = 0;
+            } else {
+                if (game.getCaptain().isDubious()) {
+                    priceQuantity.buyPrice = (priceQuantity.sellPrice * 100) / 90;
+                } else {
+                    priceQuantity.buyPrice = priceQuantity.sellPrice;
+                }
+                // BuyPrice = SellPrice + 1 to 12% (depending on trader skill (minimum is 1, max 12))
+                int traderSkill = game.getCurrentShip().getTraderSkill();
+                priceQuantity.buyPrice = (priceQuantity.buyPrice * (103 + (Game.MAX_POINTS_PER_SKILL - traderSkill)) / 100);
+                if (priceQuantity.buyPrice <= priceQuantity.sellPrice) {
+                    priceQuantity.buyPrice = priceQuantity.sellPrice + 1;
+                }
+            }
+        }
+    }
+
+    private int getStandardPrice(TradeItem item) {
+        int price;
+
+        if ((item == TradeItem.Narcotics && !politics.getDrugsOK())
+                || (item == TradeItem.Firearms && !politics.getFirearmsOK())) {
+            price = 0;
+        } else if (techLevel.isBefore(item.getTechLevelRequiredForUsage())) {
+            price = 0;
+        } else {
+            // Determine base price on TechLevel of system
+            price = item.getPriceAtLowestTech() + (techLevel.getEra() * item.getPriceIncreasePerTechLevel());
+
+            // If item is highly requested, increase price
+            if (politics.getWantedTradeItem() == item) {
+                price = (price * 4) / 3;
+            }
+
+            // High trader activity decreases price
+            price = (price * (100 - (2 * politics.getTraderStrength().getStrength()))) / 100;
+
+            // Large system = high production; decrease price
+            price = (price * (100 - size.getMultiplier())) / 100;
+
+            // Special resources modifiers
+            if (item.getCheapResourceTrigger() == specialResource) {
+                price = (price * 3) / 4;
+            }
+            if (item.getExpensiveResourceTrigger() == specialResource) {
+                price = (price * 3) / 4;
+            }
+        }
+
+        if (price < 0) {
+            price = 0;
+        }
+        return price;
     }
 
     enum SpecialResource {
@@ -374,7 +512,7 @@ public class SolarSystem {
     }
 
     enum Status {
-        None("UNUSED_TEXT", "under no particular pressure"),
+        Uneventful("UNUSED_TEXT", "under no particular pressure"),
         War("Strife and War", "at war"),
         Plague("Plague Outbreaks", "ravaged by a plague"),
         Drought("Severe Drought", "suffering from a drought"),
@@ -466,6 +604,12 @@ public class SolarSystem {
         public int getOccurrence() {
             return occurrence;
         }
+    }
+
+    private class PriceQuantity { // not a very imaginative name
+        int buyPrice;
+        int sellPrice;
+        int quantity;
     }
 
 }

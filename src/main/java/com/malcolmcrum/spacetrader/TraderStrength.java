@@ -18,4 +18,8 @@ public enum TraderStrength {
     TraderStrength(int strength) {
         this.strength = strength;
     }
+
+    public int getStrength() {
+        return strength;
+    }
 }

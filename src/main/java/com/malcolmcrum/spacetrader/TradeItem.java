@@ -143,7 +143,7 @@ public enum TradeItem {
     private TechLevel techLevelForTopProduction;
     private int lowestTechLevelPrice;
     private int priceIncreasePerLevel;
-    private int maxVariancePercentage;
+    private int priceVariance;
     private Status doublePriceTrigger;
     private SpecialResource cheapResourceTrigger;
     private SpecialResource expensiveResourceTrigger;
@@ -157,7 +157,7 @@ public enum TradeItem {
               TechLevel techLevelForTopProduction,
               int lowestTechLevelPrice,
               int priceIncreasePerLevel,
-              int maxVariancePercentage,
+              int priceVariance,
               Status doublePriceTrigger,
               SpecialResource cheapResourceTrigger,
               SpecialResource expensiveResourceTrigger,
@@ -171,12 +171,12 @@ public enum TradeItem {
         this.techLevelRequiredForUsage = techLevelRequiredForUsage;
         this.lowestTechLevelPrice = lowestTechLevelPrice;
         this.priceIncreasePerLevel = priceIncreasePerLevel;
-        this.maxVariancePercentage = maxVariancePercentage;
+        this.priceVariance = priceVariance;
         this.doublePriceTrigger = doublePriceTrigger;
         this.cheapResourceTrigger = cheapResourceTrigger;
         this.expensiveResourceTrigger = expensiveResourceTrigger;
-        this.minTradePrice = minTradePrice;
-        this.maxTradePrice = maxTradePrice;
+        this.minTradePrice = minTradePrice; // Minimum price to buy/sell in orbit
+        this.maxTradePrice = maxTradePrice; // Maximum price to buy/sell in orbit
         this.roundOff = roundOff;
     }
 
@@ -198,5 +198,21 @@ public enum TradeItem {
 
     public Status getDoublePriceTrigger() {
         return doublePriceTrigger;
+    }
+
+    public int getPriceAtLowestTech() {
+        return lowestTechLevelPrice;
+    }
+
+    public int getPriceIncreasePerTechLevel() {
+        return priceIncreasePerLevel;
+    }
+
+    public TechLevel getTechLevelRequiredForUsage() {
+        return techLevelRequiredForUsage;
+    }
+
+    public int getPriceVariance() {
+        return priceVariance;
     }
 }

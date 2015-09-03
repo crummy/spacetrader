@@ -11,5 +11,5 @@ public enum Alert {
     WildArrested,
     TribbleSurvived,
     InsurancePays,
-    FleaBuilt
+    GameOver, FleaBuilt
 }

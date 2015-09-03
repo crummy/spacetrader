@@ -253,4 +253,13 @@ public enum Politics {
     public PoliceStrength getPoliceStrength() {
         return policeStrength;
     }
+
+    public TradeItem getWantedTradeItem() {
+        return wantedTradeItem;
+    }
+
+    // TODO: Consider returning ints for these
+    public TraderStrength getTraderStrength() {
+        return traderStrength;
+    }
 }

@@ -40,7 +40,7 @@ public abstract class Encounter extends GameState {
         attack();
 
         if (game.getCurrentShip().isDestroyed()) {
-            return new ShipDestroyed();
+            return new ShipDestroyed(game, transit.getDestination());
         }
 
         if (opponent.isDestroyed()) {

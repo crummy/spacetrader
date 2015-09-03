@@ -11,6 +11,8 @@ public class Captain extends Crew {
     private static final int VILLAIN_SCORE = -30;
     private static final int CRIMINAL_SCORE = -10;
     private static final int HERO_SCORE = 75;
+    private static final int CAUGHT_WITH_WILD_SCORE = -4;
+    private static final int DUBIOUS_SCORE = -5;
 
     // gotta move some of these variables elsewhere
     private String name;
@@ -33,7 +35,6 @@ public class Captain extends Crew {
     private boolean remindLoans;
     private int noClaim = 0;
     private boolean artifactOnBoard;
-    Map<TradeItem, Integer> buyingPrice;
     private boolean tribbleMessage;
     private int jarekStatus;
     private int invasionStatus;
@@ -47,7 +48,6 @@ public class Captain extends Crew {
     private boolean showTrackedRange;
     private boolean justLootedMarie;
     private int chanceOfAVeryRareEncounter;
-    private boolean alreadyPaidForNewspaper;
     private boolean canSuperWarp;
     private boolean gameLoaded;
 
@@ -67,15 +67,9 @@ public class Captain extends Crew {
         japoriDiseaseStatus = 0;
         monsterHull = ShipType.SpaceMonster.getHullStrength();
         moonBought = false;
-        escapePod = false;
-        insurance = false;
         remindLoans = true;
         noClaim = 0;
         artifactOnBoard = false;
-        buyingPrice = new HashMap<>();
-        for (TradeItem item : TradeItem.values()) {
-            buyingPrice.put(item, 0);
-        }
         tribbleMessage = false;
         jarekStatus = 0;
         invasionStatus = 0;
@@ -86,7 +80,6 @@ public class Captain extends Crew {
         trackedSystem = -1;
         showTrackedRange = false;
         justLootedMarie = false;
-        alreadyPaidForNewspaper = false;
         canSuperWarp = false;
         gameLoaded = false;
 
@@ -133,10 +126,6 @@ public class Captain extends Crew {
         return experimentStatus;
     }
 
-    public boolean isAlreadyPaidForNewspaper() {
-        return alreadyPaidForNewspaper;
-    }
-
     public int getCredits() {
         return credits;
     }
@@ -159,5 +148,34 @@ public class Captain extends Crew {
 
     public boolean isCriminal() {
         return policeRecordScore <= CRIMINAL_SCORE;
+    }
+
+    public void caughtWithWild() {
+        policeRecordScore += CAUGHT_WITH_WILD_SCORE;
+    }
+
+    public void addCredits(int additionalCredits) {
+        credits += additionalCredits;
+    }
+
+    public void subtractCredits(int creditsLost) {
+        if (credits > creditsLost) {
+            credits -= creditsLost;
+        } else {
+            debt += (creditsLost - credits);
+            credits = 0;
+        }
+    }
+
+    public void setInsurance(boolean insurance) {
+        this.insurance = insurance;
+    }
+
+    public void setNoClaim(int noClaim) {
+        this.noClaim = noClaim;
+    }
+
+    public boolean isDubious() {
+        return policeRecordScore < DUBIOUS_SCORE;
     }
 }
