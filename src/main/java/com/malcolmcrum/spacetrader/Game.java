@@ -15,6 +15,8 @@ public class Game {
     static final int MAX_POINTS_PER_SKILL = 10;
     private static final int MAX_SKILL_POINTS_TOTAL = 20;
     private static final int MIN_POINTS_PER_SKILL = 1;
+    public static final int DEBT_TOO_LARGE = 100000;
+    public static final int MAX_TRIBBLES = 100000;
 
     private boolean reserveMoney;
     private Experiment experimentStatus;
@@ -40,7 +42,11 @@ public class Game {
     private GameState currentState;
     private boolean artifactStatus;
     private boolean artifactOnBoard;
-    private Object jarekStatus;
+    private Jarek jarekStatus;
+    private boolean remindLoans;
+    private boolean trackAutoOff;
+    private SolarSystem trackedSystem;
+    private boolean autoRepair;
 
 
     public boolean startNewGame(String commanderName, int pilotSkill, int fighterSkill, int traderSkill, int engineerSkill, Difficulty difficulty) {
@@ -226,5 +232,29 @@ public class Game {
 
     public Captain getCaptain() {
         return captain;
+    }
+
+    public RareEncounters getRareEncounters() {
+        return rareEncounters;
+    }
+
+    public boolean getRemindLoans() {
+        return remindLoans;
+    }
+
+    public boolean getTrackAutoOff() {
+        return trackAutoOff;
+    }
+
+    public SolarSystem getTrackedSystem() {
+        return trackedSystem;
+    }
+
+    public void setTrackedSystem(SolarSystem trackedSystem) {
+        this.trackedSystem = trackedSystem;
+    }
+
+    public boolean getAutoRepair() {
+        return autoRepair;
     }
 }

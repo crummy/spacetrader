@@ -10,32 +10,48 @@ public class Transit extends GameState {
     private static final int CHANCE_OF_A_VERY_RARE_ENCOUNTER = 5; // out of a thousand
 
     private final SolarSystem origin;
-    private final SolarSystem destination;
+    private SolarSystem destination;
 
     private boolean possibleToGoThroughRip = false;
     private boolean beenRaided = false;
     private int clicksRemaining;
     private int totalClicks;
     private boolean arrivedViaWormhole;
+    private boolean beenInspected;
+    private boolean litterWarning;
 
-    public Transit(Game game, SolarSystem destination) {
+    public Transit(Game game, SolarSystem destination, boolean viaSingularity) {
         super(game);
         origin = game.getCurrentSystem();
         this.destination = destination;
+    }
 
-        int fabricRipProbability = game.getFabricRipProbability();
-        if (!possibleToGoThroughRip
-                && game.getExperimentStatus() == Experiment.Performed
-                && fabricRipProbability > 0) {
-            if (GetRandom(100) < fabricRipProbability || fabricRipProbability == 25) {
-                // TODO: Set status
-                destination = game.galaxy.getRandomSystem();
+    @Override
+    GameState init() {
+        clicksRemaining = 21;
+        totalClicks = clicksRemaining;
+        beenRaided = false;
+        beenInspected = false;
+        litterWarning = false;
+        if (game.getDays() % 3 == 0 && game.getCaptain().isClean()) {
+            game.getCaptain().addPoliceScore(-1);
+        } else if (game.getCaptain().isDubious()){
+            Difficulty d = game.getDifficulty();
+            if (d == Difficulty.Beginner || d == Difficulty.Easy || d == Difficulty.Normal) {
+                game.getCaptain().addPoliceScore(1);
+            } else if (game.getDays() % d.getValue() == 0) {
+                game.getCaptain().addPoliceScore(1);
             }
         }
-        possibleToGoThroughRip = true;
-
-        clicksRemaining = game.galaxy.distanceBetween(origin, destination);
-        totalClicks = clicksRemaining;
+        int fabricRipProbability = game.getFabricRipProbability();
+        if (game.getExperimentStatus() == Experiment.Performed
+                && fabricRipProbability > 0) {
+            if (GetRandom(100) < fabricRipProbability || fabricRipProbability == 25) {
+                game.addAlert(Alert.FlyInFabricRip);
+                this.destination = game.getGalaxy().getRandomSystem();
+            }
+        }
+        return this;
     }
 
     public GameState Travel() {
@@ -134,8 +150,8 @@ public class Transit extends GameState {
                 int rareEncounter = GetRandom(6);
                 switch (rareEncounter) {
                     case 0:
-                        if (!game.rareEncounters.marieCelest()) {
-                            game.rareEncounters.encounteredMarieCelest();
+                        if (!game.getRareEncounters().marie()) {
+                            game.getRareEncounters().encounteredMarie();
                             return new MarieCelesteEncounter();
                         }
                         break;
@@ -143,8 +159,8 @@ public class Transit extends GameState {
                         if (game.getCurrentShip().hasReflectiveShield()
                                 && game.getCaptain().getPilotSkill() < 10
                                 && !game.getCaptain().isCriminal()
-                                && !game.rareEncounters.ahab()) {
-                            game.rareEncounters.encounteredAhab();
+                                && !game.getRareEncounters().ahab()) {
+                            game.getRareEncounters().encounteredAhab();
                             return new AhabEncounter();
                         }
                         break;
@@ -152,8 +168,8 @@ public class Transit extends GameState {
                         if (game.getCurrentShip().hasMilitaryLaser()
                                 && game.getCaptain().getTraderSkill() < 10
                                 && !game.getCaptain().isCriminal()
-                                && !game.rareEncounters.conrad()) {
-                            game.rareEncounters.encounteredConrad();
+                                && !game.getRareEncounters().conrad()) {
+                            game.getRareEncounters().encounteredConrad();
                             return new ConradEncounter();
                         }
                         break;
@@ -161,20 +177,20 @@ public class Transit extends GameState {
                         if (game.getCurrentShip().hasMilitaryLaser()
                                 && game.getCaptain().getTraderSkill() < 10
                                 && !game.getCaptain().isCriminal()
-                                && !game.rareEncounters.huie()) {
-                            game.rareEncounters.encounteredHuie();
+                                && !game.getRareEncounters().huie()) {
+                            game.getRareEncounters().encounteredHuie();
                             return new HuieEncounter();
                         }
                         break;
                     case 4:
-                        if (!game.rareEncounters.oldBottle()) {
-                            game.rareEncounters.encounteredOldBottle();
+                        if (!game.getRareEncounters().oldBottle()) {
+                            game.getRareEncounters().encounteredOldBottle();
                             return new OldBottleEncounter();
                         }
                         break;
                     case 5:
-                        if (!game.rareEncounters.goodBottle()) {
-                            game.rareEncounters.encounteredGoodBottle();
+                        if (!game.getRareEncounters().goodBottle()) {
+                            game.getRareEncounters().encounteredGoodBottle();
                             return new GoodBottleEncounter();
                         }
                         break;
@@ -182,7 +198,19 @@ public class Transit extends GameState {
             }
             --clicksRemaining;
         }
-        return new ArrivalState();
+
+        // Ah, just when you throught you were gonna get away with it...
+        if (justLootedMarie) {
+            ++clicksRemaining;
+            return new PostMariePoliceEncounter();
+        }
+
+        if (hadEncounter) {
+            game.addAlert(Alert.Arrival);
+        } else {
+            game.addAlert(Alert.ArrivalUneventfulTrip);
+        }
+        return new InSystem(game, destination);
     }
 
     /**

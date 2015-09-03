@@ -353,6 +353,12 @@ public class Galaxy {
     }
 
     public void changeTradeItemQuantities() {
+        for (SolarSystem system : systems) {
+            system.getMarket().performTradeCountdown();
+        }
+    }
 
+    public boolean wormholeExistsBetween(SolarSystem system, SolarSystem destination) {
+        return system.getWormholeDestination() == destination;
     }
 }

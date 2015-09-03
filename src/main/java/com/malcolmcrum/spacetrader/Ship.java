@@ -1,12 +1,19 @@
 package com.malcolmcrum.spacetrader;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * Created by Malcolm on 8/29/2015.
  */
 public class Ship {
+    private static final Logger logger = LoggerFactory.getLogger(Ship.class);
+
+
     private static final int SKILL_BONUS = 3;
     private static final int CLOAK_BONUS = 2;
 
@@ -157,6 +164,20 @@ public class Ship {
         }
     }
 
+    public void removeCargo(TradeItem item, int amount) {
+        if (amount > getCargoCount(item)) {
+            logger.error("Trying to remove more cargo than we have!");
+        }
+
+        for (Iterator<Cargo> iterator = cargo.iterator(); iterator.hasNext() && amount > 0;) {
+            Cargo c = iterator.next();
+            if (c.item == item) {
+                iterator.remove();
+                --amount;
+            }
+        }
+    }
+
     private int filledCargoBays() {
         return cargo.size();
     }
@@ -263,6 +284,28 @@ public class Ship {
             return Math.max(1, (((getPriceWithoutCargo(true) * 5) / 2000) *
                     (100-Math.min(daysWithoutClaim, 90)) / 100));
         }
+    }
+
+    public boolean isInsured() {
+        return hasInsurance;
+    }
+
+    public boolean hasEscapePod() {
+        return hasEscapePod;
+    }
+
+    public void setTribbles(int tribbles) {
+        this.tribbles = tribbles;
+    }
+
+    public int getCargoCount(TradeItem item) {
+        int count = 0;
+        for (Cargo c : cargo) {
+            if (c.item == item) {
+                ++count;
+            }
+        }
+        return count;
     }
 
     private class Cargo {

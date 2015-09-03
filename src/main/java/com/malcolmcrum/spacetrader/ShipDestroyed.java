@@ -49,7 +49,7 @@ public class ShipDestroyed extends GameState {
             game.addAlert(Alert.TribbleSurvived);
             // unnecessary to set ship.tribbles = 0 I think
         }
-        if (game.getCaptain().hasInsurance()) {
+        if (game.getCurrentShip().isInsured()) {
             game.addAlert(Alert.InsurancePays);
             int payout = game.getCurrentShip().getPriceWithoutCargo(true);
             game.getCaptain().addCredits(payout);
@@ -65,8 +65,6 @@ public class ShipDestroyed extends GameState {
 
         Ship flea = new Ship(ShipType.Flea, game);
         flea.setEscapePod(false);
-        game.getCaptain().setInsurance(false);
-        game.getCaptain().setNoClaim(0);
 
         game.setShip(flea);
 

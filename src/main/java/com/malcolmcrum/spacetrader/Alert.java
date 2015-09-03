@@ -11,5 +11,5 @@ public enum Alert {
     WildArrested,
     TribbleSurvived,
     InsurancePays,
-    GameOver, FleaBuilt
+    GameOver, WildWontGo, DebtTooLargeForTravel, MustPayMercenaries, CantAffordInsuranceBill, CantAffordWormholeTax, FlyInFabricRip, ArrivalUneventfulTrip, Arrival, DebtReminder, ReactorSmoke, ReactorNoise, ReactorConsume, ReactorMeltdown, TribblesAllIrradiated, TribblesIrradiated, TribblesAteNarcotics, TribblesAteFood, TribblesOnBoard, NoFullTanksOrRepairs, NoFullTanks, RepairsIncomplete, FleaBuilt
 }

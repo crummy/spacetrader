@@ -10,6 +10,7 @@ public class Captain extends Crew {
     private static final int HERO_SCORE = 75;
     private static final int CAUGHT_WITH_WILD_SCORE = -4;
     private static final int DUBIOUS_SCORE = -5;
+    private static final int CLEAN_SCORE = 0;
 
     private final Game game;
     private final String name;
@@ -29,11 +30,6 @@ public class Captain extends Crew {
     private int japoriDiseaseStatus;
     private boolean moonBought;
     private int monsterHull;
-    private boolean escapePod;
-    private boolean insurance;
-    private boolean remindLoans;
-    private int noClaim = 0;
-    private boolean artifactOnBoard;
     private boolean tribbleMessage;
     private int jarekStatus;
     private int invasionStatus;
@@ -50,8 +46,7 @@ public class Captain extends Crew {
     private boolean canSuperWarp;
     private boolean gameLoaded;
     private boolean reserveMoney;
-
-    private boolean isInsured;
+    private boolean artifactOnBoard;
 
     public Captain(Game game, String name) {
         super(0);
@@ -68,8 +63,6 @@ public class Captain extends Crew {
         japoriDiseaseStatus = 0;
         monsterHull = ShipType.SpaceMonster.getHullStrength();
         moonBought = false;
-        remindLoans = true;
-        noClaim = 0;
         artifactOnBoard = false;
         tribbleMessage = false;
         jarekStatus = 0;
@@ -83,8 +76,6 @@ public class Captain extends Crew {
         justLootedMarie = false;
         canSuperWarp = false;
         gameLoaded = false;
-
-        isInsured = false;
     }
 
     public String getCaptainName() {
@@ -101,6 +92,10 @@ public class Captain extends Crew {
 
     public boolean isHeroic() {
         return policeRecordScore == HERO_SCORE;
+    }
+
+    public boolean isClean() {
+        return policeRecordScore > CLEAN_SCORE;
     }
 
     public int getJaporiDiseaseStatus() {
@@ -125,14 +120,6 @@ public class Captain extends Crew {
 
     public int getCredits() {
         return credits;
-    }
-
-    public boolean hasInsurance() {
-        return isInsured;
-    }
-
-    public int getNoClaim() {
-        return noClaim;
     }
 
     public boolean hasBoughtMoon() {
@@ -164,14 +151,6 @@ public class Captain extends Crew {
         }
     }
 
-    public void setInsurance(boolean insurance) {
-        this.insurance = insurance;
-    }
-
-    public void setNoClaim(int noClaim) {
-        this.noClaim = noClaim;
-    }
-
     public boolean isDubious() {
         return policeRecordScore < DUBIOUS_SCORE;
     }
@@ -182,5 +161,9 @@ public class Captain extends Crew {
         } else {
             return Math.max(0, credits - game.getCurrentShip().getMercenaryDailyCost() - game.getCurrentShip().getInsuranceCost());
         }
+    }
+
+    public void addPoliceScore(int i) {
+        policeRecordScore += i;
     }
 }
