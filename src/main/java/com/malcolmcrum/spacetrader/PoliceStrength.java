@@ -18,4 +18,9 @@ public enum PoliceStrength {
     PoliceStrength(int strength) {
         this.strength = strength;
     }
+
+
+    public int getStrength() {
+        return strength;
+    }
 }

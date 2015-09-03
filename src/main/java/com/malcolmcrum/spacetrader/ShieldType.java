@@ -3,7 +3,7 @@ package com.malcolmcrum.spacetrader;
 /**
  * Created by Malcolm on 8/28/2015.
  */
-public enum Shield {
+public enum ShieldType {
     EnergyShield("Energy shield", 0, 5000, TechLevel.Industrial, 70),
     ReflectiveShield("Reflective shield", 0, 20000, TechLevel.PostIndustrial, 30),
     LightningShield("Lightning shield", 0, 45000, TechLevel.Unattainable, 0);
@@ -11,14 +11,14 @@ public enum Shield {
     private final String name;
     private final int power;
     private final int price;
-    private final TechLevel techLevel;
+    private final TechLevel techLevelRequiredForSale;
     private final int chance;
 
-    Shield(String name, int power, int price, TechLevel techLevel, int chance) {
+    ShieldType(String name, int power, int price, TechLevel techLevelRequiredForSale, int chance) {
         this.name = name;
         this.power = power;
         this.price = price;
-        this.techLevel = techLevel;
+        this.techLevelRequiredForSale = techLevelRequiredForSale;
         this.chance = chance;
     }
 
@@ -28,5 +28,9 @@ public enum Shield {
 
     public int getPrice() {
         return price;
+    }
+
+    public int getPower() {
+        return power;
     }
 }

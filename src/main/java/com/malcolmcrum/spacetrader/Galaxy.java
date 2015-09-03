@@ -25,12 +25,7 @@ public class Galaxy {
 
     public Galaxy(Game game) {
         this.game = game;
-
         systems = new ArrayList<>();
-        for (int i = 0; i < SolarSystem.GetMaxSystems(); ++i) {
-            SolarSystem system = new SolarSystem(i);
-            systems.add(system);
-        }
 
         addSolarSystems();
         shuffleSystems();
@@ -80,7 +75,7 @@ public class Galaxy {
         SolarSystem foundSystem = null;
         SolarSystem daled = systemNamed(SolarSystem.Name.Daled);
         for (SolarSystem system : systems) {
-            int distanceToDaled = (int)Vector2i.Distance(system.getLocation(), daled.getLocation());
+            int distanceToDaled = distanceBetween(system, daled);
             if (distanceToDaled >= 70
                     && distanceToDaled < minDistance
                     && !system.hasSpecialEvent()) {
@@ -101,7 +96,7 @@ public class Galaxy {
         SolarSystem foundSystem = null;
         SolarSystem gemulon = systemNamed(SolarSystem.Name.Gemulon);
         for (SolarSystem system : systems) {
-            int distanceToGemulon = (int)Vector2i.Distance(system.getLocation(), gemulon.getLocation());
+            int distanceToGemulon = distanceBetween(system, gemulon);
             if (distanceToGemulon >= 70
                     && distanceToGemulon < minDistance
                     && !system.hasSpecialEvent()
@@ -124,7 +119,7 @@ public class Galaxy {
         SolarSystem foundSystem = null;
         SolarSystem nix = systemNamed(SolarSystem.Name.Nix);
         for (SolarSystem system : systems) {
-            int distanceToNix = (int)Vector2i.Distance(system.getLocation(), nix.getLocation());
+            int distanceToNix = distanceBetween(system, nix);
             if (distanceToNix >= 70
                     && distanceToNix < minDistance
                     && !system.hasSpecialEvent()
@@ -255,16 +250,15 @@ public class Galaxy {
 
     private void addSolarSystems() {
 
-        int count = 0;
-        for (SolarSystem system : systems) {
+        for (int i = 0; i < SolarSystem.GetMaxSystems(); ++i) {
             Vector2i location = new Vector2i();
             boolean neighbourTooClose = false;
             boolean neighbourTooFar = false;
             do {
-                if (count < MAX_WORM_HOLES) {
+                if (i < MAX_WORM_HOLES) {
                     // I'm not totally sure what this math is doing.
-                    location.x = ((CLOSE_DISTANCE >> 1) - GetRandom(CLOSE_DISTANCE)) + ((GALAXY_WIDTH * (1 + 2 * (count % 3))) / 6);
-                    location.y = ((CLOSE_DISTANCE >> 1) - GetRandom(CLOSE_DISTANCE)) + ((GALAXY_HEIGHT * (count < 3 ? 1 : 3)) / 4);
+                    location.x = ((CLOSE_DISTANCE >> 1) - GetRandom(CLOSE_DISTANCE)) + ((GALAXY_WIDTH * (1 + 2 * (i % 3))) / 6);
+                    location.y = ((CLOSE_DISTANCE >> 1) - GetRandom(CLOSE_DISTANCE)) + ((GALAXY_HEIGHT * (i < 3 ? 1 : 3)) / 4);
                 } else {
                     location.x = 1 + GetRandom(GALAXY_WIDTH - 2);
                     location.y = 1 + GetRandom(GALAXY_HEIGHT - 2);
@@ -272,11 +266,12 @@ public class Galaxy {
                     neighbourTooClose = (Math.pow(nearestSystemDistance, 2) <= Math.pow(MIN_DISTANCE+1, 2));
                     neighbourTooFar = (nearestSystemDistance >= CLOSE_DISTANCE);
                 }
-            } while(count > MAX_WORM_HOLES && (neighbourTooClose || neighbourTooFar));
+            } while(i > MAX_WORM_HOLES && (neighbourTooClose || neighbourTooFar));
 
+            SolarSystem system = new SolarSystem(i);
             system.setLocation(location);
             system.initializeTradeItems(game.getDifficulty());
-            ++count;
+            systems.add(system);
         }
     }
 
@@ -320,7 +315,7 @@ public class Galaxy {
                 if (nearbySystem == system) {
                     continue;
                 }
-                int distanceToNeighbour = (int)Vector2i.Distance(system.getLocation(), nearbySystem.getLocation());
+                int distanceToNeighbour = distanceBetween(nearbySystem, system);
                 if (distanceToNeighbour <= ship.getFuelTanks()) {
                     ++neighboursInRange;
                 }
@@ -330,8 +325,12 @@ public class Galaxy {
         return system;
     }
 
-    private SolarSystem getRandomSystem() {
+    SolarSystem getRandomSystem() {
         int index = GetRandom(systems.size());
         return systems.get(index);
+    }
+
+    public int distanceBetween(SolarSystem origin, SolarSystem destination) {
+        return (int)Vector2i.Distance(origin.getLocation(), destination.getLocation());
     }
 }

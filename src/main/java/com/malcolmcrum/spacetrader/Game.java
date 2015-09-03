@@ -3,6 +3,7 @@ package com.malcolmcrum.spacetrader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,7 +16,17 @@ public class Game {
     private static final int MAX_SKILL_POINTS_TOTAL = 20;
     private static final int MIN_POINTS_PER_SKILL = 1;
 
-    private static boolean reserveMoney;
+    private boolean reserveMoney;
+    private Experiment experimentStatus;
+    private Monster monsterStatus;
+    private int fabricRipProbability;
+    private Scarab scarabStatus;
+    private Dragonfly dragonflyStatus;
+    private Invasion invasionStatus;
+    private Wild wildStatus;
+    private int days;
+    private Japori japoriDiseaseStatus;
+    private Reactor reactorStatus;
 
     Galaxy galaxy;
     Captain captain;
@@ -24,6 +35,14 @@ public class Game {
     Difficulty difficulty = Difficulty.Normal;
     News news;
     State state;
+    RareEncounters rareEncounters;
+    private List<Alert> unreadAlerts;
+
+    private GameState currentState;
+    private boolean artifactStatus;
+    private boolean artifactOnBoard;
+    private Object jarekStatus;
+
 
     public boolean startNewGame(String commanderName, int pilotSkill, int fighterSkill, int traderSkill, int engineerSkill, Difficulty difficulty) {
 
@@ -39,10 +58,23 @@ public class Game {
         ship.addCrew(new Crew(0));
         currentSystem = galaxy.getStartSystem(ship.type);
         captain = new Captain(commanderName);
+        rareEncounters = new RareEncounters();
+        unreadAlerts = new ArrayList<>();
 
         if (difficulty == Difficulty.Beginner || difficulty == Difficulty.Easy) {
             currentSystem.setSpecialEvent(SolarSystem.SpecialEvent.LotteryWinner);
         }
+
+        fabricRipProbability = 0;
+        experimentStatus = Experiment.NotStarted;
+        monsterStatus = Monster.Unavailable;
+        scarabStatus = Scarab.Unavailable;
+        dragonflyStatus = Dragonfly.Unavailable;
+        invasionStatus = Invasion.Unavailable;
+        wildStatus = Wild.Unavailable;
+        days = 0;
+        japoriDiseaseStatus = Japori.NoDisease;
+        reactorStatus = Reactor.Unavailable;
 
         return true;
     }
@@ -69,23 +101,24 @@ public class Game {
         return true;
     }
 
-    private void arrivedInSystem() {
+    private void arrivalInSystem(SolarSystem system) {
+
         SolarSystem.SpecialEvent systemEvent = currentSystem.getSpecialEvent();
-        if (systemEvent == SolarSystem.SpecialEvent.MonsterKilled && captain.getMonsterStatus() == 2) {
+        if (systemEvent == SolarSystem.SpecialEvent.MonsterKilled && getMonsterStatus() == Monster.Destroyed) {
             news.addSpecialEvent(SolarSystem.SpecialEvent.MonsterKilled);
         } else if (systemEvent == SolarSystem.SpecialEvent.Dragonfly) {
             news.addSpecialEvent(SolarSystem.SpecialEvent.Dragonfly);
         } else if (systemEvent == SolarSystem.SpecialEvent.ScarabStolen) {
             news.addSpecialEvent(SolarSystem.SpecialEvent.ScarabStolen);
-        } else if (systemEvent == SolarSystem.SpecialEvent.ScarabDestroyed && captain.getScarabStatus() == 2) {
+        } else if (systemEvent == SolarSystem.SpecialEvent.ScarabDestroyed && getScarabStatus() == Scarab.DestroyedUpgradeAvailable) {
             news.addSpecialEvent(SolarSystem.SpecialEvent.ScarabDestroyed);
-        } else if (systemEvent == SolarSystem.SpecialEvent.FlyBaratas && captain.getDragonflyStatus() == 1) {
+        } else if (systemEvent == SolarSystem.SpecialEvent.FlyBaratas && getDragonflyStatus() == Dragonfly.GoToBaratas) {
             news.addSpecialEvent(SolarSystem.SpecialEvent.FlyBaratas);
-        } else if (systemEvent == SolarSystem.SpecialEvent.FlyMelina && captain.getDragonflyStatus() == 2) {
+        } else if (systemEvent == SolarSystem.SpecialEvent.FlyMelina && getDragonflyStatus() == Dragonfly.GoToMelina) {
             news.addSpecialEvent(SolarSystem.SpecialEvent.FlyMelina);
-        } else if (systemEvent == SolarSystem.SpecialEvent.FlyRegulas && captain.getDragonflyStatus() == 3) {
+        } else if (systemEvent == SolarSystem.SpecialEvent.FlyRegulas && getDragonflyStatus() == Dragonfly.GoToRegulas) {
             news.addSpecialEvent(SolarSystem.SpecialEvent.FlyRegulas);
-        } else if (systemEvent == SolarSystem.SpecialEvent.DragonflyDestroyed && captain.getDragonflyStatus() == 5) {
+        } else if (systemEvent == SolarSystem.SpecialEvent.DragonflyDestroyed && getDragonflyStatus() == Dragonfly.Destroyed) {
             news.addSpecialEvent(SolarSystem.SpecialEvent.DragonflyDestroyed);
         } else if (systemEvent == SolarSystem.SpecialEvent.MedicineDelivery && captain.getJaporiDiseaseStatus() == 1) {
             news.addSpecialEvent(SolarSystem.SpecialEvent.MedicineDelivery);
@@ -107,6 +140,74 @@ public class Game {
             news.addSpecialEvent(SolarSystem.SpecialEvent.ExperimentFailed);
         }
         currentSystem.setVisited();
+    }
+
+    public int getFabricRipProbability() {
+        return fabricRipProbability;
+    }
+
+    public Experiment getExperimentStatus() {
+        return experimentStatus;
+    }
+
+    public Monster getMonsterStatus() {
+        return monsterStatus;
+    }
+
+    public Scarab getScarabStatus() {
+        return scarabStatus;
+    }
+
+    public Dragonfly getDragonflyStatus() {
+        return dragonflyStatus;
+    }
+
+    public Invasion getInvasionStatus() {
+        return invasionStatus;
+    }
+
+    public Wild getWildStatus() {
+        return wildStatus;
+    }
+
+    public int getDays() {
+        return days;
+    }
+
+    public Japori getJaporiDiseaseStatus() {
+        return japoriDiseaseStatus;
+    }
+
+    public Reactor getReactorStatus() {
+        return reactorStatus;
+    }
+
+    public void addAlert(Alert alert) {
+        unreadAlerts.add(alert);
+    }
+
+    public void setReactorStatus(Reactor reactorStatus) {
+        this.reactorStatus = reactorStatus;
+    }
+
+    public void setJaporiDiseaseStatus(Japori japoriDiseaseStatus) {
+        this.japoriDiseaseStatus = japoriDiseaseStatus;
+    }
+
+    public boolean getArtifactStatus() {
+        return artifactStatus;
+    }
+
+    public void setArtifactOnBoard(boolean artifactOnBoard) {
+        this.artifactOnBoard = artifactOnBoard;
+    }
+
+    public Object getJarekStatus() {
+        return jarekStatus;
+    }
+
+    public void setJarekStatus(Jarek jarekStatus) {
+        this.jarekStatus = jarekStatus;
     }
 
     enum State {

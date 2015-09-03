@@ -7,10 +7,12 @@ import java.util.Map;
  * Created by Malcolm on 8/28/2015.
  */
 public class Captain extends Crew {
-    private static final int CHANCE_OF_A_VERY_RARE_ENCOUNTER = 5;
+    private static final int PSYCHOPATH_SCORE = -70;
     private static final int VILLAIN_SCORE = -30;
+    private static final int CRIMINAL_SCORE = -10;
     private static final int HERO_SCORE = 75;
 
+    // gotta move some of these variables elsewhere
     private String name;
     private int credits;
     private int debt;
@@ -36,7 +38,6 @@ public class Captain extends Crew {
     private int jarekStatus;
     private int invasionStatus;
     private int experimentStatus;
-    private int fabricRipProbability;
     private boolean possibleToGoThroughRip;
     private boolean arrivedViaWormhole;
     private int veryRareEncounter;
@@ -58,15 +59,11 @@ public class Captain extends Crew {
         this.name = name;
         credits = 1000;
         debt = 0;
-        days = 0;
         policeKills = 0;
         traderKills = 0;
         pirateKills = 0;
         policeRecordScore = 0;
         reputationScore = 0;
-        monsterStatus = 0;
-        dragonflyStatus = 0;
-        scarabStatus = 0;
         japoriDiseaseStatus = 0;
         monsterHull = ShipType.SpaceMonster.getHullStrength();
         moonBought = false;
@@ -82,9 +79,6 @@ public class Captain extends Crew {
         tribbleMessage = false;
         jarekStatus = 0;
         invasionStatus = 0;
-        experimentStatus = 0;
-        fabricRipProbability = 0;
-        possibleToGoThroughRip = false;
         arrivedViaWormhole = false;
         veryRareEncounter = 0;
         wildStatus = 0;
@@ -92,7 +86,6 @@ public class Captain extends Crew {
         trackedSystem = -1;
         showTrackedRange = false;
         justLootedMarie = false;
-        chanceOfAVeryRareEncounter = CHANCE_OF_A_VERY_RARE_ENCOUNTER;
         alreadyPaidForNewspaper = false;
         canSuperWarp = false;
         gameLoaded = false;
@@ -104,24 +97,16 @@ public class Captain extends Crew {
         return name;
     }
 
-    public int getMonsterStatus() {
-        return monsterStatus;
-    }
-
-    public int getScarabStatus() {
-        return scarabStatus;
-    }
-
-    public int getDragonflyStatus() {
-        return dragonflyStatus;
-    }
-
     public int getPoliceRecordScore() {
         return policeRecordScore;
     }
 
     public boolean isVillainous() {
         return policeRecordScore <= VILLAIN_SCORE;
+    }
+
+    public boolean isPsychopathic() {
+        return policeRecordScore <= PSYCHOPATH_SCORE;
     }
 
     public boolean isHeroic() {
@@ -170,5 +155,9 @@ public class Captain extends Crew {
 
     public int getDebt() {
         return debt;
+    }
+
+    public boolean isCriminal() {
+        return policeRecordScore <= CRIMINAL_SCORE;
     }
 }

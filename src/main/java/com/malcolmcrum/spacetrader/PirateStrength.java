@@ -18,4 +18,8 @@ public enum PirateStrength {
     PirateStrength(int strength) {
         this.strength = strength;
     }
+
+    public int getStrength() {
+        return strength;
+    }
 }

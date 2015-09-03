@@ -245,4 +245,12 @@ public enum Politics {
     public TechLevel getMaxTechLevel() {
         return maxTechLevel;
     }
+
+    public PirateStrength getPirateStrength() {
+        return pirateStrength;
+    }
+
+    public PoliceStrength getPoliceStrength() {
+        return policeStrength;
+    }
 }

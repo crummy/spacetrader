@@ -13,7 +13,6 @@ public class Ship {
     List<Gadget> gadgets;
     List<Weapon> weapons;
     List<Shield> shields;
-    List<Integer> shieldStrength;
     List<Crew> crew;
     private int fuel;
     private int hullStrength;
@@ -27,7 +26,6 @@ public class Ship {
         weapons = new ArrayList<>(type.getWeaponSlots());
         gadgets = new ArrayList<>(type.getGadgetSlots());
         shields = new ArrayList<>(type.getShieldSlots());
-        shieldStrength = new ArrayList<>(type.getShieldSlots());
         crew = new ArrayList<>(type.getCrewQuarters());
         fuel = type.getFuelTanks();
         hullStrength = type.getHullStrength();
@@ -62,7 +60,7 @@ public class Ship {
 
         int shieldsPrice = 0;
         for (Shield shield : shields) {
-            shieldsPrice += shield.getSellPrice();
+            shieldsPrice += shield.shieldType.getSellPrice();
         }
 
         int gadgetsPrice = 0;
@@ -87,7 +85,7 @@ public class Ship {
             curPrice += weapon.getPrice();
         }
         for (Shield shield : shields) {
-            curPrice += shield.getPrice();
+            curPrice += shield.shieldType.getPrice();
         }
         // Gadgets aren't counted in the price, because they are already taken into account in
         // the skill adjustment of the price.
@@ -101,8 +99,89 @@ public class Ship {
         return curPrice;
     }
 
+    public void repair(int repairs) {
+        hullStrength += repairs;
+        if (hullStrength > type.getHullStrength()) {
+            repairs = hullStrength - type.getHullStrength();
+            hullStrength = type.getHullStrength();
+        } else {
+            repairs = 0;
+        }
+
+        // Shields are easier to repair
+        repairs = 2 * repairs;
+        for (Shield shield : shields) {
+            shield.power += repairs;
+            if (shield.power > shield.shieldType.getPower()) {
+                repairs = shield.power - shield.shieldType.getPower();
+                shield.power = shield.shieldType.getPower();
+            } else {
+                repairs = 0;
+            }
+        }
+    }
+
+    public boolean hasReflectiveShield() {
+        return shields.stream()
+                .anyMatch(shield -> shield.shieldType == ShieldType.ReflectiveShield);
+    }
+
+    public boolean hasMilitaryLaser() {
+        return weapons.contains(Weapon.MilitaryLaser);
+    }
+
+    public int getTribbles() {
+        return tribbles;
+    }
+
+    public boolean isDestroyed() {
+        return hullStrength <= 0;
+    }
+
+    public boolean addCargo(TradeItem item, int amount, int buyingPrice) {
+        if (filledCargoBays() + amount <= totalCargoBays()) {
+            for (int i = 0; i < amount; ++i) {
+                cargo.add(new Cargo(item, buyingPrice));
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private int filledCargoBays() {
+        return cargo.size();
+    }
+
+    private int totalCargoBays() {
+        int bays = type.getCargoBays();
+        for (Gadget gadget : gadgets) {
+            if (gadget == Gadget.CargoBays) {
+                bays += 5;
+            }
+        }
+        if (game.getJaporiDiseaseStatus() == Japori.GoToJapori) {
+            bays -= 10;
+        }
+        // since the quest ends when the reactor [?]
+        if (game.getReactorStatus() != Reactor.Unavailable
+                && game.getReactorStatus() != Reactor.Delivered) {
+            bays -= (5 + 10 - (game.getReactorStatus().getValue() - 1)/2);
+        }
+        return bays;
+    }
+
     private class Cargo {
         TradeItem item;
         int buyingPrice;
+        Cargo(TradeItem item, int buyingPrice) {
+            this.item = item;
+            this.buyingPrice = buyingPrice;
+        }
+    }
+
+    private class Shield {
+        ShieldType shieldType;
+        int power;
     }
 }

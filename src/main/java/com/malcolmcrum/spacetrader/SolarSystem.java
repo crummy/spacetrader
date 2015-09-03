@@ -191,6 +191,14 @@ public class SolarSystem {
         visited = true;
     }
 
+    public int getPirateStrength() {
+        return getPolitics().getPirateStrength().getStrength();
+    }
+
+    public int getPoliceStrength() {
+        return getPolitics().getPoliceStrength().getStrength();
+    }
+
     enum SpecialResource {
         Nothing("Nothing special"),
         MineralRich("Mineral rich"),
