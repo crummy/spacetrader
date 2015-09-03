@@ -17,7 +17,7 @@ public class InSystem extends GameState {
         game.setCurrentSystem(system);
         game.getGalaxy().shuffleStatuses();
         game.getGalaxy().changeTradeItemQuantities();
-        system.determinePrices();
+        system.getMarket().determinePrices();
         alreadyPaidForNewspaper = false;
         addNewsEvents();
         return this;
@@ -63,5 +63,11 @@ public class InSystem extends GameState {
             news.addSpecialEvent(SolarSystem.SpecialEvent.ExperimentFailed);
         }
         system.setVisited();
+    }
+
+    private boolean canAffordNewspaper() {
+        if (alreadyPaidForNewspaper) {
+            return true;
+        } else return game.getCaptain().getAvailableCash() >= game.getNews().getPrice();
     }
 }

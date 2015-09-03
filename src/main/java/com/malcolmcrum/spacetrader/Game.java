@@ -34,7 +34,6 @@ public class Game {
     private SolarSystem currentSystem;
     private Difficulty difficulty = Difficulty.Normal;
     private News news;
-    private State state;
     private RareEncounters rareEncounters;
     private List<Alert> unreadAlerts;
 
@@ -57,7 +56,7 @@ public class Game {
         ship.addWeapon(Weapon.PulseLaser);
         ship.addCrew(new Crew(0));
         currentSystem = galaxy.getStartSystem(ship.type);
-        captain = new Captain(commanderName);
+        captain = new Captain(this, commanderName);
         rareEncounters = new RareEncounters();
         unreadAlerts = new ArrayList<>();
 
@@ -83,6 +82,7 @@ public class Game {
         return galaxy.systems;
     }
 
+    /*
     public boolean travelToPlanet(SolarSystem destination) {
         if (state != State.OnPlanet) {
             logger.warn("Tried to travel, but we aren't on a planet");
@@ -100,6 +100,7 @@ public class Game {
         state = State.InTransit;
         return true;
     }
+    */
 
     public int getFabricRipProbability() {
         return fabricRipProbability;
@@ -185,54 +186,17 @@ public class Game {
         return news;
     }
 
-    public void setCurrentSystem(SolarSystem currentSystem) {
-        this.currentSystem = currentSystem;
-    }
-
     public Galaxy getGalaxy() {
         return galaxy;
     }
 
-    enum State {
-        NewGame,
-        OnPlanet,
-        InTransit,
-        Dead;
+    public void setCurrentSystem(SolarSystem currentSystem) {
+        this.currentSystem = currentSystem;
     }
 
+    // TODO: move this elsewhere?
     private int currentWorth() {
         return ship.getPrice(false) + captain.getCredits() - captain.getDebt() + (captain.hasBoughtMoon() ? SolarSystem.COST_MOON : 0);
-    }
-
-    private boolean canAffordNewspaper() {
-        if (captain.isAlreadyPaidForNewspaper()) {
-            return true;
-        } else return cashAvailable() >= news.getPrice();
-    }
-
-    private int cashAvailable() {
-        if (!reserveMoney) {
-            return captain.getCredits();
-        } else {
-            return Math.max(0, captain.getCredits() - mercenaryDailyCost() - insuranceCost());
-        }
-    }
-
-    private int insuranceCost() {
-        if (!captain.hasInsurance()) {
-            return 0;
-        } else {
-            return Math.max(1, (((ship.getPriceWithoutCargo(true) * 5) / 2000) *
-                    (100-Math.min(captain.getNoClaim(), 90)) / 100));
-        }
-    }
-
-    private int mercenaryDailyCost() {
-        int cost = 0;
-        for (Crew crew : ship.crew) {
-            cost += crew.getDailyCost();
-        }
-        return cost;
     }
 
     private boolean skillPointsDontAddUp(int pilotSkill, int fighterSkill, int traderSkill, int engineerSkill) {

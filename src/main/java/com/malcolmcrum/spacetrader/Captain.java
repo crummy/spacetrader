@@ -1,8 +1,5 @@
 package com.malcolmcrum.spacetrader;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Created by Malcolm on 8/28/2015.
  */
@@ -14,8 +11,10 @@ public class Captain extends Crew {
     private static final int CAUGHT_WITH_WILD_SCORE = -4;
     private static final int DUBIOUS_SCORE = -5;
 
-    // gotta move some of these variables elsewhere
-    private String name;
+    private final Game game;
+    private final String name;
+
+    // TODO: gotta move some of these variables elsewhere
     private int credits;
     private int debt;
     private int days;
@@ -50,11 +49,13 @@ public class Captain extends Crew {
     private int chanceOfAVeryRareEncounter;
     private boolean canSuperWarp;
     private boolean gameLoaded;
+    private boolean reserveMoney;
 
     private boolean isInsured;
 
-    public Captain(String name) {
+    public Captain(Game game, String name) {
         super(0);
+        this.game = game;
 
         this.name = name;
         credits = 1000;
@@ -88,10 +89,6 @@ public class Captain extends Crew {
 
     public String getCaptainName() {
         return name;
-    }
-
-    public int getPoliceRecordScore() {
-        return policeRecordScore;
     }
 
     public boolean isVillainous() {
@@ -177,5 +174,13 @@ public class Captain extends Crew {
 
     public boolean isDubious() {
         return policeRecordScore < DUBIOUS_SCORE;
+    }
+
+    public int getAvailableCash() {
+        if (!reserveMoney) {
+            return credits;
+        } else {
+            return Math.max(0, credits - game.getCurrentShip().getMercenaryDailyCost() - game.getCurrentShip().getInsuranceCost());
+        }
     }
 }

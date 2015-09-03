@@ -30,7 +30,7 @@ public class SolarSystem {
     private Crew mercenary;
     private Game game;
 
-    SolarSystem(int index, Game game) {
+    SolarSystem(Game game, int index) {
         name = Name.values()[index];
         this.game = game;
 
@@ -157,6 +157,10 @@ public class SolarSystem {
 
     public Size getSize() {
         return size;
+    }
+
+    public Market getMarket() {
+        return market;
     }
 
     enum SpecialResource {

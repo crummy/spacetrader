@@ -21,6 +21,8 @@ public class Ship {
     private int tribbles;
     private final Game game;
     private boolean hasEscapePod;
+    private boolean hasInsurance;
+    private int daysWithoutClaim;
 
     public Ship(ShipType type, Game game) {
         this.game = game;
@@ -34,6 +36,8 @@ public class Ship {
         hullStrength = type.getHullStrength();
         tribbles = 0;
         hasEscapePod = false;
+        hasInsurance = false;
+        daysWithoutClaim = 0;
     }
 
     public void addCrew(Crew member) {
@@ -233,7 +237,7 @@ public class Ship {
         return applyDifficultyModifierToSkill(maxSkill);
     }
 
-    public int applyDifficultyModifierToSkill(int level) {
+    private int applyDifficultyModifierToSkill(int level) {
         Difficulty d = game.getDifficulty();
         if (d == Difficulty.Beginner || d == Difficulty.Easy) {
             return level + 1;
@@ -241,6 +245,23 @@ public class Ship {
             return Math.max(1, level - 1);
         } else {
             return level;
+        }
+    }
+
+    int getMercenaryDailyCost() {
+        int cost = 0;
+        for (Crew member : crew) {
+            cost += member.getDailyCost();
+        }
+        return cost;
+    }
+
+    int getInsuranceCost() {
+        if (hasInsurance) {
+            return 0;
+        } else {
+            return Math.max(1, (((getPriceWithoutCargo(true) * 5) / 2000) *
+                    (100-Math.min(daysWithoutClaim, 90)) / 100));
         }
     }
 

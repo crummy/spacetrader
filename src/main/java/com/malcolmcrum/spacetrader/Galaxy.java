@@ -269,9 +269,9 @@ public class Galaxy {
                 }
             } while(i > MAX_WORM_HOLES && (neighbourTooClose || neighbourTooFar));
 
-            SolarSystem system = new SolarSystem(i);
+            SolarSystem system = new SolarSystem(game, i);
             system.setLocation(location);
-            system.initializeTradeItems(game.getDifficulty());
+            system.getMarket().initializeQuantities();
             systems.add(system);
         }
     }
@@ -352,15 +352,7 @@ public class Galaxy {
         }
     }
 
-    /**
-     * After entering a system, the quantities of items available from a system change
-     * slightly. After tradeResetCountdown reaches zero, the quantities are reset.
-     * This ensures that it isn't really worth the player's time to just travel between
-     * two neighbouring systems.
-     */
     public void changeTradeItemQuantities() {
-        for (SolarSystem system : systems) {
-            system.performTradeCountdown();
-        }
+
     }
 }
