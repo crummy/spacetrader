@@ -30,6 +30,7 @@ public class Ship {
     private boolean hasEscapePod;
     private boolean hasInsurance;
     private int daysWithoutClaim;
+    private int hull;
 
     public Ship(ShipType type, Game game) {
         this.game = game;
@@ -308,6 +309,44 @@ public class Ship {
         return count;
     }
 
+    public void addFuel(int unitsOfFuelBought) {
+        fuel += unitsOfFuelBought;
+        if (fuel > type.getFuelTanks()) {
+            logger.error("Ship is overflowing with fuel");
+            fuel = type.getFuelTanks();
+        }
+    }
+
+    public int getHull() {
+        return hull;
+    }
+
+    /**
+     * Checks ship for at least one item of the requested type. If shield parameter
+     * is null, checks ship for at least one empty slot.
+     * @param shieldType Shield type to check for, or null to check for empty slot
+     * @return True if there is a shield of the requested type on the ship
+     */
+    public boolean hasShield(ShieldType shieldType) {
+        if (shieldType == null && shields.size() < type.getShieldSlots()) {
+            return true;
+        }
+        for (Shield shield : shields) {
+            if (shield.shieldType == shieldType) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void addShield(ShieldType shieldType) {
+        if (shields.size() >= type.getShieldSlots()) {
+            logger.error("Trying to add shields to a full ship!");
+        } else {
+            shields.add(new Shield(shieldType));
+        }
+    }
+
     private class Cargo {
         TradeItem item;
         int buyingPrice;
@@ -320,5 +359,9 @@ public class Ship {
     private class Shield {
         ShieldType shieldType;
         int power;
+        Shield(ShieldType shieldType) {
+            this.shieldType = shieldType;
+            this.power = shieldType.getPower();
+        }
     }
 }

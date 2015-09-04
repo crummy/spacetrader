@@ -1,11 +1,17 @@
 package com.malcolmcrum.spacetrader;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static com.malcolmcrum.spacetrader.Utils.GetRandom;
 
 /**
  * Created by Malcolm on 9/3/2015.
  */
 public class InSystem extends GameState {
+    private static final Logger logger = LoggerFactory.getLogger(InSystem.class);
+
+
     SolarSystem system;
     boolean alreadyPaidForNewspaper;
 
@@ -42,6 +48,8 @@ public class InSystem extends GameState {
         autoRepair();
         autoFuel();
 
+        easterEgg();
+
         game.setCurrentSystem(system);
         game.getGalaxy().shuffleStatuses();
         game.getGalaxy().changeTradeItemQuantities();
@@ -51,28 +59,119 @@ public class InSystem extends GameState {
         return this;
     }
 
+    /**
+     * There's an easter egg that can give the player a lightning shield
+     */
+    private void easterEgg() {
+        if (system.getName() == SolarSystem.Name.Og) {
+            for (TradeItem item : TradeItem.values()) {
+                if (game.getCurrentShip().getCargoCount(item) != 1) {
+                    return;
+                }
+            }
+            game.addAlert(Alert.Egg);
+            if (game.getCurrentShip().hasShield(null)) {
+                game.getCurrentShip().addShield(ShieldType.LightningShield);
+                for (TradeItem item : TradeItem.values()) {
+                    game.getCurrentShip().removeCargo(item, 1);
+                }
+            }
+        }
+    }
+
+    /**
+     * If autoRepair setting is enabled for player, try to repair the whole ship
+     */
     private void autoRepair() {
         if (game.getAutoRepair()) {
-            boolean repairsCompleted = game.getCurrentShip().repairFull(); // TODO: don't do this in ship. ship should not be modifying player money
+            boolean repairsCompleted = buyRepairs();
             if (!repairsCompleted) {
                 game.addAlert(Alert.RepairsIncomplete);
             }
         }
     }
 
-    private void autoFuel() {
+    private boolean buyRepairs() {
+        int spend = -(game.getCurrentShip().getHull() - game.getCurrentShip().type.getHullStrength()) * game.getCurrentShip().type.getRepairCost();
+        return buyRepairs(spend);
+    }
+
+    /**
+     * Buy 'spend' worth of repairs
+     * @param spend Amount of credits to spend on repairs
+     * @return True if all repairs performed. False if player couldn't pony up enough cash.
+     */
+    private boolean buyRepairs(int spend) {
+        boolean success = false;
+        int maxPurchase = (game.getCurrentShip().type.getHullStrength() - game.getCurrentShip().getHull() * game.getCurrentShip().type.getRepairCost());
+        if (spend > maxPurchase) {
+            logger.error("Requesting to repair more hull than is damaged!");
+            spend = maxPurchase;
+            success = false;
+        }
+        if (spend > game.getCaptain().getCredits()) {
+            logger.info("Could not afford requested amount of repairs");
+            spend = game.getCaptain().getCredits();
+            success = false;
+        }
+
+        int repairsBought = spend / game.getCurrentShip().type.getRepairCost();
+        game.getCurrentShip().repair(repairsBought);
+        game.getCaptain().subtractCredits(repairsBought * game.getCurrentShip().type.getRepairCost());
+        return success;
+    }
+
+    /**
+     * If autoFuel setting is enabled for the player, try to fill up the tank
+     */
+    public void autoFuel() {
         game.getCurrentShip().repair(game.getCurrentShip().getEngineerSkill());
         if (game.getAutoFuel()) {
-            boolean fullTanks = game.getCurrentShip().fillErUp(); // TODO: same as above
+            boolean fullTanks = buyFuel();
             if (!fullTanks) {
                 game.addAlert(Alert.NoFullTanks);
             }
         }
     }
 
+    /**
+     * Buys max amount of fuel
+     * @return True if all fuel requested was purchased
+     */
+    private boolean buyFuel() {
+        int spend = -(game.getCurrentShip().getFuel() - game.getCurrentShip().type.getFuelTanks()) * game.getCurrentShip().type.getCostToFillFuelTank();
+        return buyFuel(spend);
+    }
+
+    /**
+     * Buy 'credits' worth of fuel
+     * @param spend Amount of credits to spend on fuel
+     * @return True if purchased all fuel requested. False if player couldn't pony up enough cash.
+     */
+    private boolean buyFuel(int spend) {
+        boolean success = true;
+        int maxPurchase = (game.getCurrentShip().type.getFuelTanks() - game.getCurrentShip().getFuel()) * game.getCurrentShip().type.getCostToFillFuelTank();
+        if (spend > maxPurchase) {
+            logger.error("Requesting to fill up with more fuel than would fit in the tank!");
+            spend = maxPurchase;
+            success = false;
+        }
+        if (spend > game.getCaptain().getCredits()) {
+            logger.info("Could not afford requested amount of fuel");
+            spend = game.getCaptain().getCredits();
+            success = false;
+        }
+
+        int unitsOfFuelBought = spend / game.getCurrentShip().type.getCostToFillFuelTank();
+        game.getCurrentShip().addFuel(unitsOfFuelBought);
+        game.getCaptain().subtractCredits(unitsOfFuelBought * game.getCurrentShip().type.getCostToFillFuelTank());
+        return success;
+    }
+
     private void multiplyTribbles() {
         int tribbles = game.getCurrentShip().getTribbles();
         int previousTribbles = tribbles;
+        boolean foodOnBoard = false;
         if (tribbles > 0 && game.getReactorStatus() != Reactor.Unavailable && game.getReactorStatus() != Reactor.Delivered) {
             tribbles /= 2;
             if (tribbles < 10) {

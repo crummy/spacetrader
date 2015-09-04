@@ -78,6 +78,8 @@ public enum ShipType {
         this.size = size;
     }
 
+    // TODO: Move all of these methods into Ship?
+
     public int getCargoBays() {
         return cargoBays;
     }
@@ -110,10 +112,16 @@ public enum ShipType {
         return price;
     }
 
+    /**
+     * @return Cost to repair a single unit of hull
+     */
     public int getRepairCost() {
         return repairCost;
     }
 
+    /**
+     * @return Cost to fill a single fuel tank (of which the ship has many)
+     */
     public int getCostToFillFuelTank() {
         return costToFillFuelTank;
     }

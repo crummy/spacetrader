@@ -47,6 +47,7 @@ public class Game {
     private boolean trackAutoOff;
     private SolarSystem trackedSystem;
     private boolean autoRepair;
+    private boolean autoFuel;
 
 
     public boolean startNewGame(String commanderName, int pilotSkill, int fighterSkill, int traderSkill, int engineerSkill, Difficulty difficulty) {
@@ -256,5 +257,9 @@ public class Game {
 
     public boolean getAutoRepair() {
         return autoRepair;
+    }
+
+    public boolean getAutoFuel() {
+        return autoFuel;
     }
 }
