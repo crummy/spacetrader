@@ -11,6 +11,8 @@ public class Captain extends Crew {
     private static final int CAUGHT_WITH_WILD_SCORE = -4;
     private static final int DUBIOUS_SCORE = -5;
     private static final int CLEAN_SCORE = 0;
+    private static final int KILL_PIRATE_SCORE = 1;
+    private static final int ATTACK_POLICE_SCORE = -3;
 
     private final Game game;
     private final String name;
@@ -165,5 +167,18 @@ public class Captain extends Crew {
 
     public void addPoliceScore(int i) {
         policeRecordScore += i;
+    }
+
+    public void killedAPirate() {
+        ++pirateKills;
+        addPoliceScore(KILL_PIRATE_SCORE);
+    }
+
+    public void attackedPolice() {
+        policeRecordScore += ATTACK_POLICE_SCORE;
+    }
+
+    public void makeCriminal() {
+        policeRecordScore = CRIMINAL_SCORE;
     }
 }

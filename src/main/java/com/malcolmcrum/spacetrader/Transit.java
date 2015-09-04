@@ -128,13 +128,13 @@ public class Transit extends GameState {
             }
 
             if (encounterPolice) {
-                return new PoliceEncounter();
+                return new PoliceEncounter(game, this);
             } else if (encounterMantis) {
                 return new MantisEncounter();
             } else if (encounterPirate) {
-                return new PirateEncounter();
+                return new PirateEncounter(game, this);
             } else if (encounterTrader) {
-                return new TraderEncounter();
+                return new TraderEncounter(game, this);
             }
 
             // Very Rare Random Events:
