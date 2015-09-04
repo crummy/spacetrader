@@ -7,30 +7,28 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import static com.malcolmcrum.spacetrader.Utils.GetRandom;
+
 /**
  * Created by Malcolm on 8/29/2015.
  */
 public class Ship {
     private static final Logger logger = LoggerFactory.getLogger(Ship.class);
 
-
     private static final int SKILL_BONUS = 3;
     private static final int CLOAK_BONUS = 2;
 
+    // TODO: make below stuff private
     ShipType type;
     List<Cargo> cargo;
     List<Gadget> gadgets;
     List<Weapon> weapons;
     List<Shield> shields;
     List<Crew> crew;
+
     private int fuel;
-    private int hullStrength;
-    private int tribbles;
-    private final Game game;
-    private boolean hasEscapePod;
-    private boolean hasInsurance;
-    private int daysWithoutClaim;
-    private int hull;
+    protected int hullStrength;
+    final Game game;
 
     public Ship(ShipType type, Game game) {
         this.game = game;
@@ -42,10 +40,6 @@ public class Ship {
         crew = new ArrayList<>(type.getCrewQuarters());
         fuel = type.getFuelTanks();
         hullStrength = type.getHullStrength();
-        tribbles = 0;
-        hasEscapePod = false;
-        hasInsurance = false;
-        daysWithoutClaim = 0;
     }
 
     public void addCrew(Crew member) {
@@ -60,42 +54,7 @@ public class Ship {
         return fuel;
     }
 
-    public int getPriceWithoutCargo(boolean forInsurance) {
-        // Trade-in value is three-quarters the original price
-        // OR one-quarter if tribbles are involved and it's not for insurance purposes.
-        int tradeinPrice = (type.getPrice() * (tribbles > 0 && !forInsurance? 1 : 3)) / 4;
-
-        int repairCosts = (hullStrength - type.getHullStrength()) * type.getRepairCost();
-
-        int refillFuel = (type.getFuelTanks() - fuel) * type.getCostToFillFuelTank();
-
-        int weaponsPrice = 0;
-        for (Weapon weapon : weapons) {
-            weaponsPrice += weapon.getSellPrice();
-        }
-
-        int shieldsPrice = 0;
-        for (Shield shield : shields) {
-            shieldsPrice += shield.shieldType.getSellPrice();
-        }
-
-        int gadgetsPrice = 0;
-        for (Gadget gadget : gadgets) {
-            gadgetsPrice += gadget.getSellPrice();
-        }
-
-        return tradeinPrice - repairCosts - refillFuel + weaponsPrice + shieldsPrice + gadgetsPrice;
-    }
-
-    public int getPrice(boolean forInsurance) {
-        int curPrice = getPriceWithoutCargo(forInsurance);
-        for (Cargo c : cargo) {
-            curPrice += c.buyingPrice;
-        }
-        return curPrice;
-    }
-
-    public int getEnemyPrice() {
+    public int getPrice() {
         int curPrice = type.getPrice();
         for (Weapon weapon : weapons) {
             curPrice += weapon.getPrice();
@@ -113,41 +72,6 @@ public class Ship {
         curPrice = curPrice * (2 * pilotSkill + engineerSkill + 3 * fighterSkill) / 60;
 
         return curPrice;
-    }
-
-    public void repair(int repairs) {
-        hullStrength += repairs;
-        if (hullStrength > type.getHullStrength()) {
-            repairs = hullStrength - type.getHullStrength();
-            hullStrength = type.getHullStrength();
-        } else {
-            repairs = 0;
-        }
-
-        // Shields are easier to repair
-        repairs = 2 * repairs;
-        for (Shield shield : shields) {
-            shield.power += repairs;
-            if (shield.power > shield.shieldType.getPower()) {
-                repairs = shield.power - shield.shieldType.getPower();
-                shield.power = shield.shieldType.getPower();
-            } else {
-                repairs = 0;
-            }
-        }
-    }
-
-    public boolean hasReflectiveShield() {
-        return shields.stream()
-                .anyMatch(shield -> shield.shieldType == ShieldType.ReflectiveShield);
-    }
-
-    public boolean hasMilitaryLaser() {
-        return weapons.contains(Weapon.MilitaryLaser);
-    }
-
-    public int getTribbles() {
-        return tribbles;
     }
 
     public boolean isDestroyed() {
@@ -199,10 +123,6 @@ public class Ship {
             bays -= (5 + 10 - (game.getReactorStatus().getValue() - 1)/2);
         }
         return bays;
-    }
-
-    public void setEscapePod(boolean escapePod) {
-        this.hasEscapePod = escapePod;
     }
 
     public int getTraderSkill() {
@@ -270,35 +190,6 @@ public class Ship {
         }
     }
 
-    int getMercenaryDailyCost() {
-        int cost = 0;
-        for (Crew member : crew) {
-            cost += member.getDailyCost();
-        }
-        return cost;
-    }
-
-    int getInsuranceCost() {
-        if (hasInsurance) {
-            return 0;
-        } else {
-            return Math.max(1, (((getPriceWithoutCargo(true) * 5) / 2000) *
-                    (100-Math.min(daysWithoutClaim, 90)) / 100));
-        }
-    }
-
-    public boolean isInsured() {
-        return hasInsurance;
-    }
-
-    public boolean hasEscapePod() {
-        return hasEscapePod;
-    }
-
-    public void setTribbles(int tribbles) {
-        this.tribbles = tribbles;
-    }
-
     public int getCargoCount(TradeItem item) {
         int count = 0;
         for (Cargo c : cargo) {
@@ -317,8 +208,18 @@ public class Ship {
         }
     }
 
-    public int getHull() {
-        return hull;
+    /**
+     * @return Current hull strength
+     */
+    public int getHullStrength() {
+        return hullStrength;
+    }
+
+    /**
+     * @return Maximum hull strength
+     */
+    public int getFullHullStrength() {
+        return type.getHullStrength();
     }
 
     /**
@@ -347,7 +248,53 @@ public class Ship {
         }
     }
 
-    private class Cargo {
+    public int weaponStrength() {
+        int strength = 0;
+        for (Weapon weapon : weapons) {
+            strength += weapon.getPower();
+        }
+        return strength;
+    }
+
+    public void takeDamage(int damage) {
+        // First, shields get depleted
+        for (Shield shield : shields) {
+            if (shield.power > damage) {
+                shield.power -= damage;
+                damage = 0;
+                break;
+            } else {
+                damage -= shield.power;
+                shield.power = 0;
+            }
+        }
+
+        // Remaining damage is taken out of the hull
+        if (damage > 0) {
+            // Reduce damage by part of engineer skill, but ensure damage is at least 1.
+            damage -= GetRandom(getEngineerSkill());
+            if (damage <= 0) {
+                damage = 1;
+            }
+
+            // At least 2 shots on Normal level are needed to destroy the hull
+            // (3 on Easy, 4 on Beginner, 1 on Hard or Impossible). For opponents,
+            // it is always 2.
+            damage = Math.min(damage, (getHullStrength()/minDamage()));
+
+            hullStrength = hullStrength - damage;
+            if (hullStrength < 0) {
+                hullStrength = 0;
+            }
+        }
+    }
+
+    // Overridden in PlayerShip.
+    int minDamage() {
+        return 2;
+    }
+
+    class Cargo {
         TradeItem item;
         int buyingPrice;
         Cargo(TradeItem item, int buyingPrice) {
@@ -356,7 +303,7 @@ public class Ship {
         }
     }
 
-    private class Shield {
+    class Shield {
         ShieldType shieldType;
         int power;
         Shield(ShieldType shieldType) {

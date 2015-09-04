@@ -96,7 +96,7 @@ public class News {
             }
 
             int systemDistance = (int)Vector2i.Distance(currentSystem.getLocation(), system.getLocation());
-            boolean systemNear = (systemDistance <= game.getCurrentShip().type.getFuelTanks());
+            boolean systemNear = (systemDistance <= game.getShip().type.getFuelTanks());
             boolean systemConnectedThroughWormhole = (currentSystem.getWormholeDestination() == system);
             if (systemNear || systemConnectedThroughWormhole) {
 

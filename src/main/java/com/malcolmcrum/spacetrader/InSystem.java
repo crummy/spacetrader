@@ -65,15 +65,15 @@ public class InSystem extends GameState {
     private void easterEgg() {
         if (system.getName() == SolarSystem.Name.Og) {
             for (TradeItem item : TradeItem.values()) {
-                if (game.getCurrentShip().getCargoCount(item) != 1) {
+                if (game.getShip().getCargoCount(item) != 1) {
                     return;
                 }
             }
             game.addAlert(Alert.Egg);
-            if (game.getCurrentShip().hasShield(null)) {
-                game.getCurrentShip().addShield(ShieldType.LightningShield);
+            if (game.getShip().hasShield(null)) {
+                game.getShip().addShield(ShieldType.LightningShield);
                 for (TradeItem item : TradeItem.values()) {
-                    game.getCurrentShip().removeCargo(item, 1);
+                    game.getShip().removeCargo(item, 1);
                 }
             }
         }
@@ -92,7 +92,7 @@ public class InSystem extends GameState {
     }
 
     private boolean buyRepairs() {
-        int spend = -(game.getCurrentShip().getHull() - game.getCurrentShip().type.getHullStrength()) * game.getCurrentShip().type.getRepairCost();
+        int spend = -(game.getShip().getHullStrength() - game.getShip().type.getHullStrength()) * game.getShip().type.getRepairCost();
         return buyRepairs(spend);
     }
 
@@ -103,7 +103,7 @@ public class InSystem extends GameState {
      */
     private boolean buyRepairs(int spend) {
         boolean success = false;
-        int maxPurchase = (game.getCurrentShip().type.getHullStrength() - game.getCurrentShip().getHull() * game.getCurrentShip().type.getRepairCost());
+        int maxPurchase = (game.getShip().type.getHullStrength() - game.getShip().getHullStrength() * game.getShip().type.getRepairCost());
         if (spend > maxPurchase) {
             logger.error("Requesting to repair more hull than is damaged!");
             spend = maxPurchase;
@@ -115,9 +115,9 @@ public class InSystem extends GameState {
             success = false;
         }
 
-        int repairsBought = spend / game.getCurrentShip().type.getRepairCost();
-        game.getCurrentShip().repair(repairsBought);
-        game.getCaptain().subtractCredits(repairsBought * game.getCurrentShip().type.getRepairCost());
+        int repairsBought = spend / game.getShip().type.getRepairCost();
+        game.getShip().repair(repairsBought);
+        game.getCaptain().subtractCredits(repairsBought * game.getShip().type.getRepairCost());
         return success;
     }
 
@@ -125,7 +125,7 @@ public class InSystem extends GameState {
      * If autoFuel setting is enabled for the player, try to fill up the tank
      */
     public void autoFuel() {
-        game.getCurrentShip().repair(game.getCurrentShip().getEngineerSkill());
+        game.getShip().repair(game.getShip().getEngineerSkill());
         if (game.getAutoFuel()) {
             boolean fullTanks = buyFuel();
             if (!fullTanks) {
@@ -139,7 +139,7 @@ public class InSystem extends GameState {
      * @return True if all fuel requested was purchased
      */
     private boolean buyFuel() {
-        int spend = -(game.getCurrentShip().getFuel() - game.getCurrentShip().type.getFuelTanks()) * game.getCurrentShip().type.getCostToFillFuelTank();
+        int spend = -(game.getShip().getFuel() - game.getShip().type.getFuelTanks()) * game.getShip().type.getCostToFillFuelTank();
         return buyFuel(spend);
     }
 
@@ -150,7 +150,7 @@ public class InSystem extends GameState {
      */
     private boolean buyFuel(int spend) {
         boolean success = true;
-        int maxPurchase = (game.getCurrentShip().type.getFuelTanks() - game.getCurrentShip().getFuel()) * game.getCurrentShip().type.getCostToFillFuelTank();
+        int maxPurchase = (game.getShip().type.getFuelTanks() - game.getShip().getFuel()) * game.getShip().type.getCostToFillFuelTank();
         if (spend > maxPurchase) {
             logger.error("Requesting to fill up with more fuel than would fit in the tank!");
             spend = maxPurchase;
@@ -162,40 +162,40 @@ public class InSystem extends GameState {
             success = false;
         }
 
-        int unitsOfFuelBought = spend / game.getCurrentShip().type.getCostToFillFuelTank();
-        game.getCurrentShip().addFuel(unitsOfFuelBought);
-        game.getCaptain().subtractCredits(unitsOfFuelBought * game.getCurrentShip().type.getCostToFillFuelTank());
+        int unitsOfFuelBought = spend / game.getShip().type.getCostToFillFuelTank();
+        game.getShip().addFuel(unitsOfFuelBought);
+        game.getCaptain().subtractCredits(unitsOfFuelBought * game.getShip().type.getCostToFillFuelTank());
         return success;
     }
 
     private void multiplyTribbles() {
-        int tribbles = game.getCurrentShip().getTribbles();
+        int tribbles = game.getShip().getTribbles();
         int previousTribbles = tribbles;
         boolean foodOnBoard = false;
         if (tribbles > 0 && game.getReactorStatus() != Reactor.Unavailable && game.getReactorStatus() != Reactor.Delivered) {
             tribbles /= 2;
             if (tribbles < 10) {
                 game.addAlert(Alert.TribblesAllIrradiated);
-                game.getCurrentShip().setTribbles(0);
+                game.getShip().setTribbles(0);
             } else {
                 game.addAlert(Alert.TribblesIrradiated);
-                game.getCurrentShip().setTribbles(tribbles);
+                game.getShip().setTribbles(tribbles);
             }
-        } else if (tribbles > 0 && game.getCurrentShip().getCargoCount(TradeItem.Narcotics) > 0) {
+        } else if (tribbles > 0 && game.getShip().getCargoCount(TradeItem.Narcotics) > 0) {
             tribbles = 1 + GetRandom(3);
-            int deadTribbles = Math.min(1 + GetRandom(3), game.getCurrentShip().getCargoCount(TradeItem.Narcotics));
-            game.getCurrentShip().removeCargo(TradeItem.Narcotics, deadTribbles);
-            game.getCurrentShip().addCargo(TradeItem.Furs, deadTribbles, 0);
+            int deadTribbles = Math.min(1 + GetRandom(3), game.getShip().getCargoCount(TradeItem.Narcotics));
+            game.getShip().removeCargo(TradeItem.Narcotics, deadTribbles);
+            game.getShip().addCargo(TradeItem.Furs, deadTribbles, 0);
             game.addAlert(Alert.TribblesAteNarcotics);
-            game.getCurrentShip().setTribbles(tribbles);
-        } else if (tribbles > 0 && game.getCurrentShip().getCargoCount(TradeItem.Food) > 0) {
-            tribbles += 100 + GetRandom(game.getCurrentShip().getCargoCount(TradeItem.Food) * 100);
-            int foodLeft = GetRandom(game.getCurrentShip().getCargoCount(TradeItem.Food));
-            int foodEaten = -(foodLeft - game.getCurrentShip().getCargoCount(TradeItem.Food));
-            game.getCurrentShip().removeCargo(TradeItem.Food, foodEaten);
+            game.getShip().setTribbles(tribbles);
+        } else if (tribbles > 0 && game.getShip().getCargoCount(TradeItem.Food) > 0) {
+            tribbles += 100 + GetRandom(game.getShip().getCargoCount(TradeItem.Food) * 100);
+            int foodLeft = GetRandom(game.getShip().getCargoCount(TradeItem.Food));
+            int foodEaten = -(foodLeft - game.getShip().getCargoCount(TradeItem.Food));
+            game.getShip().removeCargo(TradeItem.Food, foodEaten);
             game.addAlert(Alert.TribblesAteFood);
             foodOnBoard = true;
-            game.getCurrentShip().setTribbles(tribbles);
+            game.getShip().setTribbles(tribbles);
         }
 
         if (tribbles > 0 && tribbles < Game.MAX_TRIBBLES) {
@@ -231,15 +231,15 @@ public class InSystem extends GameState {
         }
 
         // Check for enough money to pay mercenaries
-        int mercenaryCost = game.getCurrentShip().getMercenaryDailyCost();
+        int mercenaryCost = game.getShip().getMercenaryDailyCost();
         if (mercenaryCost > game.getCaptain().getCredits()) {
             game.addAlert(Alert.MustPayMercenaries);
             return this;
         }
 
         // Check for enough money to pay for insurance
-        int insuranceCost = game.getCurrentShip().getInsuranceCost();
-        if (game.getCurrentShip().isInsured()
+        int insuranceCost = game.getShip().getInsuranceCost();
+        if (game.getShip().isInsured()
                 && (insuranceCost + mercenaryCost > game.getCaptain().getCredits())) {
             game.addAlert(Alert.CantAffordInsuranceBill);
             return this;
@@ -263,7 +263,7 @@ public class InSystem extends GameState {
 
     private int wormholeTax(SolarSystem destination) {
         if (game.getGalaxy().wormholeExistsBetween(system, destination)) {
-            return game.getCurrentShip().type.getCostToFillFuelTank() * 25;
+            return game.getShip().type.getCostToFillFuelTank() * 25;
         } else {
             return 0;
         }

@@ -30,4 +30,8 @@ public enum Weapon {
     public int getPrice() {
         return price;
     }
+
+    public int getPower() {
+        return power;
+    }
 }

@@ -40,7 +40,7 @@ public class LootShipState extends GameState {
     }
 
     public GameState scoop() {
-        game.getCurrentShip().addCargo(item, 1, 0);
+        game.getShip().addCargo(item, 1, 0);
         return nextState;
     }
 

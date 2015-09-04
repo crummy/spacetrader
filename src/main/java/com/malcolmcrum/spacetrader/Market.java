@@ -170,7 +170,7 @@ public class Market {
                     buyPrice = sellPrice;
                 }
                 // BuyPrice = SellPrice + 1 to 12% (depending on trader skill (minimum is 1, max 12))
-                int traderSkill = game.getCurrentShip().getTraderSkill();
+                int traderSkill = game.getShip().getTraderSkill();
                 buyPrice = (buyPrice * (103 + (Game.MAX_POINTS_PER_SKILL - traderSkill)) / 100);
                 if (buyPrice <= sellPrice) {
                     buyPrice = sellPrice + 1;

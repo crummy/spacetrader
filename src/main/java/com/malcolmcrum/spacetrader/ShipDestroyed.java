@@ -45,13 +45,13 @@ public class ShipDestroyed extends GameState {
             game.getNews().addNotableEvent(News.NotableEvent.WildArrested);
             game.setWildStatus(Wild.Unavailable);
         }
-        if (game.getCurrentShip().getTribbles() > 0) {
+        if (game.getShip().getTribbles() > 0) {
             game.addAlert(Alert.TribbleSurvived);
             // unnecessary to set ship.tribbles = 0 I think
         }
-        if (game.getCurrentShip().isInsured()) {
+        if (game.getShip().isInsured()) {
             game.addAlert(Alert.InsurancePays);
-            int payout = game.getCurrentShip().getPriceWithoutCargo(true);
+            int payout = game.getShip().getPriceWithoutCargo(true);
             game.getCaptain().addCredits(payout);
         }
 

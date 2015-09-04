@@ -159,7 +159,7 @@ public class Captain extends Crew {
         if (!reserveMoney) {
             return credits;
         } else {
-            return Math.max(0, credits - game.getCurrentShip().getMercenaryDailyCost() - game.getCurrentShip().getInsuranceCost());
+            return Math.max(0, credits - game.getShip().getMercenaryDailyCost() - game.getShip().getInsuranceCost());
         }
     }
 

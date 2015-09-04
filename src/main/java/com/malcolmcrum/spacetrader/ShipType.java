@@ -126,11 +126,25 @@ public enum ShipType {
         return costToFillFuelTank;
     }
 
+    public Size getSize() { // TODO: return int?
+        return size;
+    }
+
     enum Size {
-        Tiny,
-        Small,
-        Medium,
-        Large,
-        Huge
+        Tiny(0),
+        Small(1),
+        Medium(2),
+        Large(3),
+        Huge(4);
+
+        private final int value;
+
+        Size(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
     }
 }

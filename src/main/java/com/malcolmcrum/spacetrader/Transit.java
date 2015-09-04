@@ -59,7 +59,7 @@ public class Transit extends GameState {
         while (clicksRemaining > 0) {
             int engineerSkill = game.getCaptain().getEngineerSkill(); // TODO: Check entire ship, not captain?
             int repairsAmount = GetRandom(engineerSkill) >> 1;
-            game.getCurrentShip().repair(repairsAmount);
+            game.getShip().repair(repairsAmount);
 
             boolean spaceMonsterEncounter = clicksRemaining == 1
                     && destination.getName() == SolarSystem.Name.Acamar
@@ -93,7 +93,7 @@ public class Transit extends GameState {
             int encounterTest = GetRandom(44 - (2 * game.getDifficulty().getValue()));
 
             // encounters are half as likely if you're in a flea.
-            if (game.getCurrentShip().type == ShipType.Flea) {
+            if (game.getShip().type == ShipType.Flea) {
                 encounterTest *= 2;
             }
 
@@ -122,7 +122,7 @@ public class Transit extends GameState {
             }
 
             if (!(encounterTrader || encounterPolice || encounterPirate)) {
-                if (game.getCurrentShip().hasArtifactOnBoard() && GetRandom(20) <= 3) {
+                if (game.getShip().hasArtifactOnBoard() && GetRandom(20) <= 3) {
                     encounterMantis = true;
                 }
             }
@@ -156,7 +156,7 @@ public class Transit extends GameState {
                         }
                         break;
                     case 1:
-                        if (game.getCurrentShip().hasReflectiveShield()
+                        if (game.getShip().hasReflectiveShield()
                                 && game.getCaptain().getPilotSkill() < 10
                                 && !game.getCaptain().isCriminal()
                                 && !game.getRareEncounters().ahab()) {
@@ -165,7 +165,7 @@ public class Transit extends GameState {
                         }
                         break;
                     case 2:
-                        if (game.getCurrentShip().hasMilitaryLaser()
+                        if (game.getShip().hasMilitaryLaser()
                                 && game.getCaptain().getTraderSkill() < 10
                                 && !game.getCaptain().isCriminal()
                                 && !game.getRareEncounters().conrad()) {
@@ -174,7 +174,7 @@ public class Transit extends GameState {
                         }
                         break;
                     case 3:
-                        if (game.getCurrentShip().hasMilitaryLaser()
+                        if (game.getShip().hasMilitaryLaser()
                                 && game.getCaptain().getTraderSkill() < 10
                                 && !game.getCaptain().isCriminal()
                                 && !game.getRareEncounters().huie()) {
@@ -199,7 +199,7 @@ public class Transit extends GameState {
             --clicksRemaining;
         }
 
-        // Ah, just when you throught you were gonna get away with it...
+        // Ah, just when you thought you were gonna get away with it...
         if (justLootedMarie) {
             ++clicksRemaining;
             return new PostMariePoliceEncounter();

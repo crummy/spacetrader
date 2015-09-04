@@ -59,7 +59,7 @@ public class Game {
 
         galaxy = new Galaxy(this);
         news = new News(this);
-        ship = new Ship(ShipType.Gnat, this);
+        ship = new PlayerShip(ShipType.Gnat, this);
         ship.addWeapon(Weapon.PulseLaser);
         ship.addCrew(new Crew(0));
         currentSystem = galaxy.getStartSystem(ship.type);
@@ -203,7 +203,7 @@ public class Game {
 
     // TODO: move this elsewhere?
     private int currentWorth() {
-        return ship.getPrice(false) + captain.getCredits() - captain.getDebt() + (captain.hasBoughtMoon() ? SolarSystem.COST_MOON : 0);
+        return ship.getPrice() + captain.getCredits() - captain.getDebt() + (captain.hasBoughtMoon() ? SolarSystem.COST_MOON : 0);
     }
 
     private boolean skillPointsDontAddUp(int pilotSkill, int fighterSkill, int traderSkill, int engineerSkill) {
@@ -223,7 +223,7 @@ public class Game {
         return difficulty;
     }
 
-    public Ship getCurrentShip() {
+    public PlayerShip getShip() {
         return ship;
     }
 
