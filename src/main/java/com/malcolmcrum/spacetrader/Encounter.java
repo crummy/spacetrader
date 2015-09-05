@@ -37,7 +37,7 @@ public abstract class Encounter extends GameState {
         return (int)Math.sqrt(game.getShip().getTribbles()/250);
     }
 
-    public GameState flee() {
+    public GameState fleeAction() {
         if (game.getDifficulty() == Difficulty.Beginner) {
             game.addAlert(Alert.YouEscaped);
             return transit;
@@ -47,6 +47,7 @@ public abstract class Encounter extends GameState {
         int opponentChaseChance = GetRandom(opponent.getPilotSkill()) * (2 * difficulty);
         if (playerFleeChance >= opponentChaseChance) {
             if (playerWasHit) {
+                // TODO: add tribbles?
                 game.addAlert(Alert.YouEscapedWithDamage);
             } else {
                 game.addAlert(Alert.YouEscaped);
@@ -55,20 +56,25 @@ public abstract class Encounter extends GameState {
         }
 
         opponentAction();
-        return finishTurn();
+        return actionResult();
     }
 
-    // from Encounter.c:1468 onwards
-    public GameState executeActions() {
+    public GameState attackAction() {
         if (opponentStatus == Status.Ignoring || opponentStatus == Status.Awake) {
             initialAttack();
         }
 
-        executeAttacks();
-        return finishAttacks();
+        boolean isOpponentFleeing = opponentStatus == Status.Fleeing;
+        executeAttack(game.getShip(), opponent, isOpponentFleeing, false);
+
+        opponentAction();
+        return actionResult();
     }
 
     /**
+     * Sends out warnings if attacking would be foolish, and sets opponent status
+     * to attacking.
+     * Maybe the warnings should be handled in the UI level though.
      * Called if this is the first attack round of an encounter
      */
     void initialAttack() {
@@ -78,38 +84,62 @@ public abstract class Encounter extends GameState {
         }
     }
 
-    /**
-     * Execute a round of attacks - if the opponent is attacking, attempt to hit the player.
-     * If the player is not fleeing, try to hit the opponent.
-     */
-    void executeAttacks() {
-        Ship player = game.getShip();
-
-        // Fire shots at player
-        if (opponentStatus == Status.Attacking) {
-            executeAttack(opponent, player, isPlayerFleeing, true);
+    protected void opponentAction() {
+        switch (opponentStatus) {
+            case Ignoring:
+                logger.error("Player took an action, but opponent is still in Ignoring state!");
+                break;
+            case Awake:
+                logger.error("Player took an action, but opponent is still in Awake state!");
+                break;
+            case Attacking: // Fire shots at player
+                executeAttack(opponent, game.getShip(), isPlayerFleeing, true);
+                break;
+            case Fleeing:
+                fleePlayer();
+                break;
+            case Fled:
+                logger.error("Opponent has already fled but is taking an action!");
+                break;
+            case Surrendered:
+                surrenderToPlayer();
+                break;
+            case Destroyed:
+                logger.error("Opponent is taking a turn but is destroyed!!");
         }
+    }
 
-        // Player fires shots back
-        if (!isPlayerFleeing) {
-            boolean isPirateFleeing = opponentStatus == Status.Fleeing;
-            executeAttack(player, opponent, isPirateFleeing, false);
+    protected abstract void surrenderToPlayer();
+
+    private void fleePlayer() {
+        int playerChaseChance = GetRandom(game.getShip().getPilotSkill()) * 4;
+        int opponentFleeChance = (GetRandom(7 + (opponent.getPilotSkill() / 3))) * 2;
+        if (playerChaseChance <= opponentFleeChance) {
+            game.addAlert(Alert.OpponentEscaped);
+            opponentStatus = Status.Fled;
         }
     }
 
     /**
-     * Wrap up attack phase, by checking for destroyed ships
-     * @return The next gameState to transition to
+     * Wrap up action phase, by checking for end states.
+     * If one is found, return the new state to return to, otherwise
+     * return 'this', as we're not done with the encounter yet.
+     * @return The next GameState to transition to
      */
-    GameState finishAttacks() {
+    protected GameState actionResult() {
         if (game.getShip().isDestroyed() && opponent.isDestroyed()) {
             game.addAlert(Alert.BothDestroyed);
+            opponentStatus = Status.Destroyed;
         }
         if (game.getShip().isDestroyed()) {
             return new ShipDestroyed(game, transit.getDestination());
         } else if (opponent.isDestroyed()) {
             game.addAlert(Alert.OpponentDestroyed);
+            opponentStatus = Status.Destroyed;
             return new LootShipState(game, transit, opponent);
+        }
+        if (opponentStatus == Status.Fled) {
+            return transit;
         }
 
         return this;
@@ -121,15 +151,10 @@ public abstract class Encounter extends GameState {
      * @param defender Ship trying not to get hit
      * @param defenderFleeing If true, attacker gets a second shot, but chance to hit is smaller
      * @param defenderIsPlayer If true, free flees on Beginner for defenders, and possibility for reactor damage boost for attackers
-     * @return
+     * @return True if the defender took damage
      */
-    boolean executeAttack(Ship attacker, Ship defender, Boolean defenderFleeing, boolean defenderIsPlayer) {
+    protected boolean executeAttack(Ship attacker, Ship defender, Boolean defenderFleeing, boolean defenderIsPlayer) {
         Difficulty difficulty = game.getDifficulty();
-
-        // On beginner level, if you flee, you will escape unharmed.
-        if (difficulty == Difficulty.Beginner && defenderIsPlayer) {
-            return false;
-        }
 
         // FighterSkill attacker is pitted against PilotSkill defender; if defender
         // is fleeing the attacker has a free shot, but the chance to hit is smaller
@@ -161,11 +186,12 @@ public abstract class Encounter extends GameState {
 
     abstract String getString();
 
-    enum Status {
+    protected enum Status {
         Ignoring,
-        Awake, // if police, this is "POLICEINSPECTION" equivalent
+        Awake, // if police, this is "POLICEINSPECTION" equivalent. if trader, this is TRADERBUY/TRADERSELL.
         Attacking,
         Fleeing,
+        Fled,
         Surrendered,
         Destroyed
     }

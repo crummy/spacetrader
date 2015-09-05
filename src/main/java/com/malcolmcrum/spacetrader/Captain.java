@@ -181,4 +181,12 @@ public class Captain extends Crew {
     public void makeCriminal() {
         policeRecordScore = CRIMINAL_SCORE;
     }
+
+    public int getPoliceRecordScore() {
+        return policeRecordScore;
+    }
+
+    public int getWorth() {
+        return game.getShip().getPrice(false) + credits - debt + (moonBought ? SolarSystem.COST_MOON : 0);
+    }
 }

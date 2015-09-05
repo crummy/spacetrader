@@ -11,5 +11,5 @@ public enum Alert {
     WildArrested,
     TribbleSurvived,
     InsurancePays,
-    GameOver, WildWontGo, DebtTooLargeForTravel, MustPayMercenaries, CantAffordInsuranceBill, CantAffordWormholeTax, FlyInFabricRip, ArrivalUneventfulTrip, Arrival, DebtReminder, ReactorSmoke, ReactorNoise, ReactorConsume, ReactorMeltdown, TribblesAllIrradiated, TribblesIrradiated, TribblesAteNarcotics, TribblesAteFood, TribblesOnBoard, NoFullTanksOrRepairs, NoFullTanks, RepairsIncomplete, Egg, AttackingWithoutWeapons, BothDestroyed, BountyEarned, OpponentDestroyed, SureToFleeOrBribe, AttackedPoliceNowCriminal, YouEscaped, YouEscapedWithDamage, FleaBuilt
+    GameOver, WildWontGo, DebtTooLargeForTravel, MustPayMercenaries, CantAffordInsuranceBill, CantAffordWormholeTax, FlyInFabricRip, ArrivalUneventfulTrip, Arrival, DebtReminder, ReactorSmoke, ReactorNoise, ReactorConsume, ReactorMeltdown, TribblesAllIrradiated, TribblesIrradiated, TribblesAteNarcotics, TribblesAteFood, TribblesOnBoard, NoFullTanksOrRepairs, NoFullTanks, RepairsIncomplete, Egg, AttackingWithoutWeapons, BothDestroyed, BountyEarned, OpponentDestroyed, SureToFleeOrBribe, AttackedPoliceNowCriminal, YouEscaped, YouEscapedWithDamage, OpponentEscaped, Arrested, Impound, MercenariesLeave, AntidoteRemoved, PoliceConfiscateReactorAlert, InsuranceLost, ShipSold, TribblesSold, FleaBuilt
 }

@@ -32,7 +32,7 @@ public class Game {
 
     private Galaxy galaxy;
     private Captain captain;
-    private Ship ship;
+    private PlayerShip ship;
     private SolarSystem currentSystem;
     private Difficulty difficulty = Difficulty.Normal;
     private News news;
@@ -199,11 +199,6 @@ public class Game {
 
     public void setCurrentSystem(SolarSystem currentSystem) {
         this.currentSystem = currentSystem;
-    }
-
-    // TODO: move this elsewhere?
-    private int currentWorth() {
-        return ship.getPrice() + captain.getCredits() - captain.getDebt() + (captain.hasBoughtMoon() ? SolarSystem.COST_MOON : 0);
     }
 
     private boolean skillPointsDontAddUp(int pilotSkill, int fighterSkill, int traderSkill, int engineerSkill) {

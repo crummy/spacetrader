@@ -138,4 +138,9 @@ public class PlayerShip extends Ship {
             return type.getHullStrength();
         }
     }
+
+    public void cancelInsurance() {
+        hasInsurance = false;
+        daysWithoutClaim = 0;
+    }
 }
