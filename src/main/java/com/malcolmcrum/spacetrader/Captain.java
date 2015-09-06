@@ -17,6 +17,7 @@ public class Captain extends Crew {
     private static final int FLEE_FROM_INSPECTION = -2;
     private static final int DANGEROUS_SCORE = 300;
     private static final int KILL_TRADER_SCORE = -4;
+    private static final int ATTACK_TRADER_SCORE = -2;
 
     private final Game game;
     private final String name;
@@ -176,6 +177,10 @@ public class Captain extends Crew {
         policeRecordScore += ATTACK_POLICE_SCORE;
     }
 
+    public void attackedTrader() {
+        policeRecordScore += ATTACK_TRADER_SCORE;
+    }
+
     public void makeCriminal() {
         policeRecordScore = CRIMINAL_SCORE;
     }
@@ -243,6 +248,10 @@ public class Captain extends Crew {
     public void killedATrader() {
         ++traderKills;
         addPoliceScore(KILL_TRADER_SCORE);
+    }
+
+    public void makeVillain() {
+        policeRecordScore = VILLAIN_SCORE;
     }
 
     enum Reputation {

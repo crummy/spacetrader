@@ -41,11 +41,6 @@ public class Pirate extends Encounter {
     }
 
     @Override
-    public GameState init() {
-        return this;
-    }
-
-    @Override
     protected GameState destroyedOpponent() {
         if (!game.getCaptain().isDubious()) {
             game.addAlert(Alert.BountyEarned);

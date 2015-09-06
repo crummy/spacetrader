@@ -103,13 +103,6 @@ public abstract class Encounter extends GameState {
         return this;
     }
 
-    public String getIntroDescription() {
-        int clicksRemaining = transit.getClicksRemaining();
-        String destinationName = transit.getDestination().getType().getTitle();
-        String encounterName = getTitle();
-        return "At " + clicksRemaining + " clicks from " + destinationName + ", you encounter " + encounterName + ".";
-    }
-
     int getTribbles() {
         return (int)Math.sqrt(game.getShip().getTribbles()/250);
     }

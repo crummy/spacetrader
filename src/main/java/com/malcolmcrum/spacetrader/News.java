@@ -1,5 +1,8 @@
 package com.malcolmcrum.spacetrader;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,6 +13,9 @@ import static com.malcolmcrum.spacetrader.Utils.GetRandom;
  * Created by Malcolm on 8/31/2015.
  */
 public class News {
+    private static final Logger logger = LoggerFactory.getLogger(News.class);
+
+
     static private final int USEFUL_STORY_PROBABILITY = 50 / 8;
 
     final private List<NotableEvent> notableEvents;
@@ -313,6 +319,13 @@ public class News {
 
     public int getPrice() {
         return game.getDifficulty().getValue() + 1;
+    }
+
+    public void replaceEvent(NotableEvent removeme, NotableEvent addme) {
+        if (!notableEvents.remove(removeme)) {
+            logger.error("Tried to remove event that does not exist!");
+        }
+        notableEvents.add(addme);
     }
 
     public enum NotableEvent {

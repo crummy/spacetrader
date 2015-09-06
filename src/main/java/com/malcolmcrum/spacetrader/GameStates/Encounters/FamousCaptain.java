@@ -1,8 +1,10 @@
 package com.malcolmcrum.spacetrader.GameStates.Encounters;
 
+import com.malcolmcrum.spacetrader.Alert;
 import com.malcolmcrum.spacetrader.Game;
 import com.malcolmcrum.spacetrader.GameStates.GameState;
 import com.malcolmcrum.spacetrader.GameStates.Transit;
+import com.malcolmcrum.spacetrader.TradeItem;
 
 /**
  * Created by Malcolm on 9/6/2015.
@@ -29,7 +31,16 @@ public abstract class FamousCaptain extends Encounter {
         } else {
             game.getCaptain().addReputation(100);
         }
-        // TODO: Replace latest news event with ship destroyed
         return super.destroyedOpponent();
+    }
+
+    @Override
+    void initialAttack() {
+        super.initialAttack();
+
+        if (game.getCaptain().isVillainous()) {
+            game.getCaptain().makeVillain();
+        }
+        game.getCaptain().attackedTrader();
     }
 }
