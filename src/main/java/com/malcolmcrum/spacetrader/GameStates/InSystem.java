@@ -64,7 +64,7 @@ public class InSystem extends GameState {
      * There's an easter egg that can give the player a lightning shield
      */
     private void easterEgg() {
-        if (system.getName() == SolarSystem.Name.Og) {
+        if (system.getType() == SolarSystem.Name.Og) {
             for (TradeItem item : TradeItem.values()) {
                 if (game.getShip().getCargoCount(item) != 1) {
                     return;

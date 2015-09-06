@@ -49,6 +49,7 @@ public class Game {
     private SolarSystem trackedSystem;
     private boolean autoRepair;
     private boolean autoFuel;
+    private int monsterHull;
 
 
     public boolean startNewGame(String commanderName, int pilotSkill, int fighterSkill, int traderSkill, int engineerSkill, Difficulty difficulty) {
@@ -82,6 +83,7 @@ public class Game {
         days = 0;
         japoriDiseaseStatus = Japori.NoDisease;
         reactorStatus = Reactor.Unavailable;
+        monsterHull = ShipType.SpaceMonster.getHullStrength();
 
         return true;
     }
@@ -257,5 +259,25 @@ public class Game {
 
     public boolean getAutoFuel() {
         return autoFuel;
+    }
+
+    public void setMonsterStatus(Monster monsterStatus) {
+        this.monsterStatus = monsterStatus;
+    }
+
+    public void setDragonflyStatus(Dragonfly dragonflyStatus) {
+        this.dragonflyStatus = dragonflyStatus;
+    }
+
+    public void setScarabStatus(Scarab scarabStatus) {
+        this.scarabStatus = scarabStatus;
+    }
+
+    public int getMonsterHullStrength() {
+        return monsterHull;
+    }
+
+    public void setMonsterHullStrength(int monsterHullStrength) {
+        this.monsterHull = monsterHullStrength;
     }
 }

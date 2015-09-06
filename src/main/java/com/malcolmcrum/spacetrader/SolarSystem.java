@@ -79,8 +79,12 @@ public class SolarSystem {
         return location;
     }
 
-    public Name getName() {
+    public Name getType() {
         return name;
+    }
+
+    public String getName() {
+        return name.getTitle();
     }
 
     public boolean hasMercenary() {

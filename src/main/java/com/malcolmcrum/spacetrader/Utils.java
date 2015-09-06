@@ -36,6 +36,14 @@ public class Utils {
     public static int Clamp(int val, int min, int max) {
         return Math.max(min, Math.min(max, val));
     }
+
+    public static String Pluralize(int quantity, String units) {
+        if (quantity == 1) {
+            return quantity + " " + units;
+        } else {
+            return quantity + " " + units + "s ";
+        }
+    }
 }
 
 class Vector2i {

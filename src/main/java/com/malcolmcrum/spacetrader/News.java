@@ -40,7 +40,7 @@ public class News {
         Captain captain = game.getCaptain();
         List<String> paper = new ArrayList<>();
 
-        String masthead = generateTitle(currentSystem.getName().getTitle(), currentSystem.getPolitics());
+        String masthead = generateTitle(currentSystem.getType().getTitle(), currentSystem.getPolitics());
         paper.add(masthead);
 
         for (NotableEvent notableEvent : notableEvents) {
@@ -102,10 +102,10 @@ public class News {
 
                 // some stories are always shown
                 if (system.getSpecialEvent() == SolarSystem.SpecialEvent.MoonForSale) {
-                    headlines.add("Seller in " + system.getName() + " has Utopian Moon available.");
+                    headlines.add("Seller in " + system.getType() + " has Utopian Moon available.");
                 }
                 if (system.getSpecialEvent() == SolarSystem.SpecialEvent.TribbleBuyer) {
-                    headlines.add("Collector in " + system.getName() + "seeks to purchase Tribbles.");
+                    headlines.add("Collector in " + system.getType() + "seeks to purchase Tribbles.");
                 }
 
                 boolean somethingGoingOn = (system.getStatus() != SolarSystem.Status.Uneventful);
@@ -119,22 +119,22 @@ public class News {
                     int diceRoll = GetRandom(6);
                     switch (diceRoll) {
                         case 0:
-                            headlines.add("Reports of " + system.getStatus().getTitle() + " in the " + system.getName() + " System");
+                            headlines.add("Reports of " + system.getStatus().getTitle() + " in the " + system.getType() + " System");
                             break;
                         case 1:
-                            headlines.add("News of " + system.getStatus().getTitle() + " in the " + system.getName() + " System");
+                            headlines.add("News of " + system.getStatus().getTitle() + " in the " + system.getType() + " System");
                             break;
                         case 2:
-                            headlines.add("News Rumors of " + system.getStatus().getTitle() + " in the " + system.getName() + " System");
+                            headlines.add("News Rumors of " + system.getStatus().getTitle() + " in the " + system.getType() + " System");
                             break;
                         case 3:
-                            headlines.add("Sources say " + system.getStatus().getTitle() + " in the " + system.getName() + " System");
+                            headlines.add("Sources say " + system.getStatus().getTitle() + " in the " + system.getType() + " System");
                             break;
                         case 4:
-                            headlines.add("Notice: " + system.getStatus().getTitle() + " in the " + system.getName() + " System");
+                            headlines.add("Notice: " + system.getStatus().getTitle() + " in the " + system.getType() + " System");
                             break;
                         case 5:
-                            headlines.add("Evidence Suggests " + system.getStatus().getTitle() + " in the " + system.getName() + " System");
+                            headlines.add("Evidence Suggests " + system.getStatus().getTitle() + " in the " + system.getType() + " System");
                             break;
                     }
                 }
@@ -149,10 +149,10 @@ public class News {
             int diceRoll = GetRandom(4);
             switch (diceRoll) {
                 case 0:
-                    headline = "Police Warning: " + captain.getCaptainName() + " Will Dock At " + system.getName() + "!";
+                    headline = "Police Warning: " + captain.getCaptainName() + " Will Dock At " + system.getType() + "!";
                     break;
                 case 1:
-                    headline = "Notorious Criminal " + captain.getCaptainName() + " Sighted in " + system.getName() + "!";
+                    headline = "Notorious Criminal " + captain.getCaptainName() + " Sighted in " + system.getType() + "!";
                     break;
                 case 2:
                     headline = "Locals Rally to Deny Spaceport Access to " + captain.getCaptainName() + "!";

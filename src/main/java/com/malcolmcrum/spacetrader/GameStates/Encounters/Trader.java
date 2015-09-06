@@ -1,14 +1,13 @@
 package com.malcolmcrum.spacetrader.GameStates.Encounters;
 
 import com.malcolmcrum.spacetrader.Game;
+import com.malcolmcrum.spacetrader.GameStates.GameState;
 import com.malcolmcrum.spacetrader.TradeItem;
 import com.malcolmcrum.spacetrader.GameStates.Transit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.malcolmcrum.spacetrader.Utils.Clamp;
-import static com.malcolmcrum.spacetrader.Utils.GetRandom;
-import static com.malcolmcrum.spacetrader.Utils.RandomEnum;
+import static com.malcolmcrum.spacetrader.Utils.*;
 
 /**
  * TODO: consider splitting this into traderSell and traderBuy encounters
@@ -45,8 +44,53 @@ public class Trader extends Encounter {
     }
 
     @Override
-    String getString() {
-        return null;
+    public String getTitle() {
+        return "trader ship";
+    }
+
+    @Override
+    public String getEncounterDescription() {
+        String clicks = Pluralize(transit.getClicksRemaining(), "click");
+        String destination = transit.getDestination().getName();
+        String ship = opponent.getName();
+        return "At " + clicks + " from " + destination + ", you encounter a trader " + ship + ".";
+    }
+
+    @Override
+    public String descriptionAwake() {
+        return "You are hailed with an offer to trade goods.";
+    }
+
+    @Override
+    protected GameState destroyedOpponent() {
+        game.getCaptain().killedATrader();
+        return super.destroyedOpponent();
+    }
+
+    /**
+     * Decide whether to change tactics (e.g. flee)
+     */
+    protected void opponentHasBeenDamaged() {
+        if (opponent.getHullStrength() < (opponent.getFullHullStrength() * 2) / 3) {
+            if (GetRandom(10) > 3) {
+                opponentStatus = Status.Surrendered;
+            } else {
+                opponentStatus = Status.Fleeing;
+            }
+        } else if (opponent.getHullStrength() < (opponent.getFullHullStrength() * 9) / 10) {
+            if (game.getShip().getHullStrength() < (game.getShip().getFullHullStrength() * 2) / 3) {
+                // If you get damaged a lot, the trader tends to keep fighting
+                if (GetRandom(10) > 7) {
+                    opponentStatus = Status.Fleeing;
+                }
+            } else if (game.getShip().getHullStrength() < (game.getShip().getFullHullStrength() * 9) / 10) {
+                if (GetRandom(10) > 3) {
+                    opponentStatus = Status.Fleeing;
+                }
+            } else {
+                opponentStatus = Status.Fleeing;
+            }
+        }
     }
 
     /**

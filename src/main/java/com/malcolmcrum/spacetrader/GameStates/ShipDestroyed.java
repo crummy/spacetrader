@@ -14,7 +14,7 @@ public class ShipDestroyed extends GameState {
     }
 
     @Override
-    GameState init() {
+    public GameState init() {
         return this;
     }
 
@@ -23,7 +23,7 @@ public class ShipDestroyed extends GameState {
         return new GameOver(game);
     }
 
-    public GameState escape() {
+    public GameState escapeWithPod() {
         if (game.getReactorStatus() != Reactor.Unavailable
                 && game.getReactorStatus() != Reactor.Delivered) {
             game.addAlert(Alert.ReactorDestroyed);
@@ -65,8 +65,7 @@ public class ShipDestroyed extends GameState {
         game.dayPasses();
         game.dayPasses();
 
-        Ship flea = new Ship(ShipType.Flea, game);
-        flea.setEscapePod(false);
+        PlayerShip flea = new PlayerShip(ShipType.Flea, game);
 
         game.setShip(flea);
 

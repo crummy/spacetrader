@@ -70,7 +70,7 @@ public class Transit extends GameState {
             game.getShip().repair(repairsAmount);
 
             boolean spaceMonsterEncounter = clicksRemaining == 1
-                    && destination.getName() == SolarSystem.Name.Acamar
+                    && destination.getType() == SolarSystem.Name.Acamar
                     && game.getMonsterStatus() == com.malcolmcrum.spacetrader.Monster.InAcamar;
             if (spaceMonsterEncounter) {
                 return new Monster();
@@ -85,14 +85,14 @@ public class Transit extends GameState {
             }
 
             boolean dragonflyEncounter = clicksRemaining == 1
-                    && destination.getName() == SolarSystem.Name.Zalkon
+                    && destination.getType() == SolarSystem.Name.Zalkon
                     && game.getDragonflyStatus() == com.malcolmcrum.spacetrader.Dragonfly.GoToZalkon;
             if (dragonflyEncounter) {
                 return new Dragonfly();
             }
 
             boolean encounterMantis = false;
-            if (destination.getName() == SolarSystem.Name.Gemulon
+            if (destination.getType() == SolarSystem.Name.Gemulon
                     && game.getInvasionStatus() != Invasion.TooLate
                     && GetRandom(10) > 4) {
                 encounterMantis = true;
@@ -115,7 +115,7 @@ public class Transit extends GameState {
             } else if (encounterTest < destination.getPirateStrength() + policeStrength() + destination.getTraderStrength()) {
                 encounterTrader = true;
             } else if (game.getWildStatus() == Wild.OnBoard
-                    && destination.getName() == SolarSystem.Name.Kravat) {
+                    && destination.getType() == SolarSystem.Name.Kravat) {
                 // if you're coming in to Kravat & you have Wild onboard, there'll be swarms o' cops.
                 int rareEncounter = GetRandom(100);
                 if (game.getDifficulty() == Difficulty.Beginner || game.getDifficulty() == Difficulty.Easy

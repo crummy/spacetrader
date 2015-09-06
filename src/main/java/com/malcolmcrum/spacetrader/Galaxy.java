@@ -56,7 +56,7 @@ public class Galaxy {
                     if (!system.hasSpecialEvent()) {
                         if (scarabEndpointExists || event != SolarSystem.SpecialEvent.ScarabStolen) {
                             system.setSpecialEvent(event);
-                            logger.info("  Attached event to system: " + system.getName());
+                            logger.info("  Attached event to system: " + system.getType());
                         } else {
                             logger.info("  Skipping - Scarab event but no Scarab endpoint exists.");
                         }
@@ -189,7 +189,7 @@ public class Galaxy {
 
     private SolarSystem systemNamed(SolarSystem.Name name) {
         return systems.stream()
-                .filter(s -> s.getName() == name)
+                .filter(s -> s.getType() == name)
                 .findFirst().get();
     }
 

@@ -2,9 +2,11 @@ package com.malcolmcrum.spacetrader.GameStates.Encounters;
 
 import com.malcolmcrum.spacetrader.*;
 import com.malcolmcrum.spacetrader.GameStates.GameState;
+import com.malcolmcrum.spacetrader.GameStates.InSystem;
 import com.malcolmcrum.spacetrader.GameStates.Transit;
 
 import static com.malcolmcrum.spacetrader.Utils.GetRandom;
+import static com.malcolmcrum.spacetrader.Utils.Pluralize;
 
 /**
  * Created by Malcolm on 9/4/2015.
@@ -12,6 +14,14 @@ import static com.malcolmcrum.spacetrader.Utils.GetRandom;
 public class Police extends Encounter {
     Police(Game game, Transit transit) {
         super(game, transit);
+    }
+
+    @Override
+    public String getEncounterDescription() {
+        String clicks = Pluralize(transit.getClicksRemaining(), "click");
+        String destination = transit.getDestination().getName();
+        String ship = opponent.getName();
+        return "At " + clicks + " from " + destination + ", you encounter a police " + ship + "."
     }
 
     @Override
@@ -36,12 +46,21 @@ public class Police extends Encounter {
     }
 
     @Override
-    String getString() {
-        return "police";
+    public String getTitle() {
+        return "police ship";
     }
 
     @Override
-    public GameState fleeAction() throws InvalidPlayerAction {
+    protected String descriptionAwake() {
+        if (game.getCaptain().isCriminal()) {
+            return "The police hail they want you to surrender.";
+        } else {
+            return "The police summon you to submit to an inspection.";
+        }
+    }
+
+    @Override
+    public GameState fleeAction() throws InvalidPlayerAction, InvalidOpponentAction {
         boolean hasNarcotics = game.getShip().getCargoCount(TradeItem.Narcotics) > 0;
         boolean hasFirearms = game.getShip().getCargoCount(TradeItem.Firearms) > 0;
         boolean hasWild = game.getWildStatus() == Wild.OnBoard;
@@ -54,6 +73,27 @@ public class Police extends Encounter {
         game.getCaptain().fledPolice();
 
         return super.fleeAction();
+    }
+
+    @Override
+    protected GameState destroyedOpponent() {
+        game.getCaptain().killedACop();
+        return super.destroyedOpponent();
+    }
+
+    /**
+     * Decide whether to change tactics (e.g. flee)
+     */
+    protected void opponentHasBeenDamaged() {
+        if (opponent.getHullStrength() < opponent.getFullHullStrength() >> 1) {
+            if (game.getShip().getHullStrength() < game.getShip().getFullHullStrength() >> 1) {
+                if (GetRandom(10) > 5) {
+                    opponentStatus = Status.Fleeing;
+                }
+            } else {
+                opponentStatus = Status.Fleeing;
+            }
+        }
     }
 
     public GameState actionSurrender() {
@@ -70,6 +110,7 @@ public class Police extends Encounter {
         }
 
         arrestPlayer();
+        return new InSystem(game, transit.getDestination());
     }
 
     private void arrestPlayer() {

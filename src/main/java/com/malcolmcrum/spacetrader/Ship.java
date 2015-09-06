@@ -298,6 +298,26 @@ public class Ship {
         return type.getSize().getValue();
     }
 
+    public boolean isInvisibleTo(Ship opponent) {
+        return hasGadget(Gadget.Cloaking) && getEngineerSkill() > opponent.getEngineerSkill();
+    }
+
+    private boolean hasGadget(Gadget gadget) {
+        return gadgets.contains(gadget);
+    }
+
+    public int reputationForKilling() {
+        return 1 + type.ordinal();
+    }
+
+    public void setHullStrength(int hullStrength) {
+        this.hullStrength = hullStrength;
+    }
+
+    public String getName() {
+        return type.getName();
+    }
+
     class Cargo {
         TradeItem item;
         int buyingPrice;

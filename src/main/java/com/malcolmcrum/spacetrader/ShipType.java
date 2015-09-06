@@ -130,6 +130,10 @@ public enum ShipType {
         return size;
     }
 
+    public String getName() {
+        return name;
+    }
+
     enum Size {
         Tiny(0),
         Small(1),

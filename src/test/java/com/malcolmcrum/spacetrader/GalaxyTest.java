@@ -26,20 +26,20 @@ public class GalaxyTest
     public void testHardcodedSpecialEvents() {
         for (SolarSystem system : galaxy.systems) {
             // following are hardcoded directly
-            if (system.getName() == SolarSystem.Name.Acamar) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.MonsterKilled);
-            if (system.getName() == SolarSystem.Name.Baratas) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.FlyBaratas);
-            if (system.getName() == SolarSystem.Name.Melina) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.FlyMelina);
-            if (system.getName() == SolarSystem.Name.Regulas) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.FlyRegulas);
-            if (system.getName() == SolarSystem.Name.Zalkon) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.DragonflyDestroyed);
-            if (system.getName() == SolarSystem.Name.Japori) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.MedicineDelivery);
-            if (system.getName() == SolarSystem.Name.Utopia) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.Retirement);
-            if (system.getName() == SolarSystem.Name.Devidia) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.JarekGetsOut);
-            if (system.getName() == SolarSystem.Name.Kravat) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.WildGetsOut);
+            if (system.getType() == SolarSystem.Name.Acamar) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.MonsterKilled);
+            if (system.getType() == SolarSystem.Name.Baratas) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.FlyBaratas);
+            if (system.getType() == SolarSystem.Name.Melina) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.FlyMelina);
+            if (system.getType() == SolarSystem.Name.Regulas) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.FlyRegulas);
+            if (system.getType() == SolarSystem.Name.Zalkon) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.DragonflyDestroyed);
+            if (system.getType() == SolarSystem.Name.Japori) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.MedicineDelivery);
+            if (system.getType() == SolarSystem.Name.Utopia) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.Retirement);
+            if (system.getType() == SolarSystem.Name.Devidia) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.JarekGetsOut);
+            if (system.getType() == SolarSystem.Name.Kravat) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.WildGetsOut);
 
             // following may in extreme circumstances (like a tiny galaxy) not exist?
-            if (system.getName() == SolarSystem.Name.Gemulon) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.GemulonRescued);
-            if (system.getName() == SolarSystem.Name.Daled) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.ExperimentFailed);
-            if (system.getName() == SolarSystem.Name.Nix) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.ReactorDelivered);
+            if (system.getType() == SolarSystem.Name.Gemulon) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.GemulonRescued);
+            if (system.getType() == SolarSystem.Name.Daled) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.ExperimentFailed);
+            if (system.getType() == SolarSystem.Name.Nix) assertEquals(system.getSpecialEvent(), SolarSystem.SpecialEvent.ReactorDelivered);
         }
     }
 

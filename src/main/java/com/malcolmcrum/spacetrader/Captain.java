@@ -12,8 +12,11 @@ public class Captain extends Crew {
     private static final int DUBIOUS_SCORE = -5;
     private static final int CLEAN_SCORE = 0;
     private static final int KILL_PIRATE_SCORE = 1;
+    private static final int KILL_POLICE_SCORE -6;
     private static final int ATTACK_POLICE_SCORE = -3;
     private static final int FLEE_FROM_INSPECTION = -2;
+    private static final int DANGEROUS_SCORE = 300;
+    private static final int KILL_TRADER_SCORE = -4;
 
     private final Game game;
     private final String name;
@@ -32,7 +35,6 @@ public class Captain extends Crew {
     private int scarabStatus;
     private int japoriDiseaseStatus;
     private boolean moonBought;
-    private int monsterHull;
     private boolean tribbleMessage;
     private int jarekStatus;
     private int invasionStatus;
@@ -50,6 +52,7 @@ public class Captain extends Crew {
     private boolean gameLoaded;
     private boolean reserveMoney;
     private boolean artifactOnBoard;
+    private boolean dangerous;
 
     public Captain(Game game, String name) {
         super(0);
@@ -64,7 +67,6 @@ public class Captain extends Crew {
         policeRecordScore = 0;
         reputationScore = 0;
         japoriDiseaseStatus = 0;
-        monsterHull = ShipType.SpaceMonster.getHullStrength();
         moonBought = false;
         artifactOnBoard = false;
         tribbleMessage = false;
@@ -170,11 +172,6 @@ public class Captain extends Crew {
         policeRecordScore += i;
     }
 
-    public void killedAPirate() {
-        ++pirateKills;
-        addPoliceScore(KILL_PIRATE_SCORE);
-    }
-
     public void attackedPolice() {
         policeRecordScore += ATTACK_POLICE_SCORE;
     }
@@ -183,10 +180,10 @@ public class Captain extends Crew {
         policeRecordScore = CRIMINAL_SCORE;
     }
 
-
     public void makeDubious() {
         policeRecordScore = DUBIOUS_SCORE;
     }
+
 
     public int getPoliceRecordScore() {
         return policeRecordScore;
@@ -218,6 +215,54 @@ public class Captain extends Crew {
             policeRecordScore = DUBIOUS_SCORE - (easierThanNormal ? 0 : 1);
         } else {
             policeRecordScore += FLEE_FROM_INSPECTION;
+        }
+    }
+
+    public boolean isDangerous() {
+        return reputationScore >= DANGEROUS_SCORE;
+    }
+
+    public void makeDangerous() {
+        reputationScore = DANGEROUS_SCORE;
+    }
+
+    public void addReputation(int rep) {
+        reputationScore += rep;
+    }
+
+    public void killedACop() {
+        ++policeKills;
+        addPoliceScore(KILL_POLICE_SCORE);
+    }
+
+    public void killedAPirate() {
+        ++pirateKills;
+        addPoliceScore(KILL_PIRATE_SCORE);
+    }
+
+    public void killedATrader() {
+        ++traderKills;
+        addPoliceScore(KILL_TRADER_SCORE);
+    }
+
+    enum Reputation {
+        Harmless("Harmless", 0),
+        MostlyHarmless("Mostly harmless", 10),
+        Poor("Poor", 20),
+        Average("Average", 40),
+        AboveAverage("Above average", 80),
+        Competent("Competent", 150),
+        Dangerous("Dangerous", 300),
+        Deadly("Deadly", 600),
+        Elite("Elite", 1500);
+
+        private final String name;
+        private final int value;
+
+        Reputation(String name, int value) {
+
+            this.name = name;
+            this.value = value;
         }
     }
 }
