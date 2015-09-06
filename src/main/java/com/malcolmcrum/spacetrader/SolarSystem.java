@@ -213,7 +213,7 @@ public class SolarSystem {
         }
     }
 
-    enum Name {
+    public enum Name {
         Acamar("Acamar"),
         Adahn("Adahn"),        // The alternate personality for The Nameless One in "Planescape: Torment"
         Aldea("Aldea"),

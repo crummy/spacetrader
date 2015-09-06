@@ -12,7 +12,7 @@ public class Captain extends Crew {
     private static final int DUBIOUS_SCORE = -5;
     private static final int CLEAN_SCORE = 0;
     private static final int KILL_PIRATE_SCORE = 1;
-    private static final int KILL_POLICE_SCORE -6;
+    private static final int KILL_POLICE_SCORE = -6;
     private static final int ATTACK_POLICE_SCORE = -3;
     private static final int FLEE_FROM_INSPECTION = -2;
     private static final int DANGEROUS_SCORE = 300;

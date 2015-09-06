@@ -93,7 +93,7 @@ public class PlayerShip extends Ship {
         this.hasEscapePod = escapePod;
     }
 
-    int getMercenaryDailyCost() {
+    public int getMercenaryDailyCost() {
         int cost = 0;
         for (Crew member : crew) {
             cost += member.getDailyCost();
@@ -101,7 +101,7 @@ public class PlayerShip extends Ship {
         return cost;
     }
 
-    int getInsuranceCost() {
+    public int getInsuranceCost() {
         if (hasInsurance) {
             return 0;
         } else {
@@ -151,5 +151,9 @@ public class PlayerShip extends Ship {
     public void removeAllMercenaries() {
         crew.clear();
         crew.add(game.getCaptain());
+    }
+
+    public int getRepairCost() {
+        return type.getRepairCost();
     }
 }

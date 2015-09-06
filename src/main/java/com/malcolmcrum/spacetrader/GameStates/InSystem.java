@@ -22,7 +22,7 @@ public class InSystem extends GameState {
     }
 
     @Override
-    GameState init() {
+    public GameState init() {
         if (game.getCaptain().getDebt() > 0 && game.getRemindLoans() && game.getDays() % 5 == 0) {
             game.addAlert(Alert.DebtReminder);
         }
@@ -93,7 +93,7 @@ public class InSystem extends GameState {
     }
 
     private boolean buyRepairs() {
-        int spend = -(game.getShip().getHullStrength() - game.getShip().type.getHullStrength()) * game.getShip().type.getRepairCost();
+        int spend = -(game.getShip().getHullStrength() - game.getShip().getFullHullStrength()) * game.getShip().getRepairCost();
         return buyRepairs(spend);
     }
 
@@ -104,7 +104,7 @@ public class InSystem extends GameState {
      */
     private boolean buyRepairs(int spend) {
         boolean success = false;
-        int maxPurchase = (game.getShip().type.getHullStrength() - game.getShip().getHullStrength() * game.getShip().type.getRepairCost());
+        int maxPurchase = (game.getShip().getFullHullStrength() - game.getShip().getHullStrength() * game.getShip().getRepairCost());
         if (spend > maxPurchase) {
             logger.error("Requesting to repair more hull than is damaged!");
             spend = maxPurchase;
@@ -116,9 +116,9 @@ public class InSystem extends GameState {
             success = false;
         }
 
-        int repairsBought = spend / game.getShip().type.getRepairCost();
+        int repairsBought = spend / game.getShip().getRepairCost();
         game.getShip().repair(repairsBought);
-        game.getCaptain().subtractCredits(repairsBought * game.getShip().type.getRepairCost());
+        game.getCaptain().subtractCredits(repairsBought * game.getShip().getRepairCost());
         return success;
     }
 
@@ -140,7 +140,7 @@ public class InSystem extends GameState {
      * @return True if all fuel requested was purchased
      */
     private boolean buyFuel() {
-        int spend = -(game.getShip().getFuel() - game.getShip().type.getFuelTanks()) * game.getShip().type.getCostToFillFuelTank();
+        int spend = -(game.getShip().getFuel() - game.getShip().getFuelCapacity()) * game.getShip().getCostToFillFuelTank();
         return buyFuel(spend);
     }
 
@@ -151,7 +151,7 @@ public class InSystem extends GameState {
      */
     private boolean buyFuel(int spend) {
         boolean success = true;
-        int maxPurchase = (game.getShip().type.getFuelTanks() - game.getShip().getFuel()) * game.getShip().type.getCostToFillFuelTank();
+        int maxPurchase = (game.getShip().getFuelCapacity() - game.getShip().getFuel()) * game.getShip().getCostToFillFuelTank();
         if (spend > maxPurchase) {
             logger.error("Requesting to fill up with more fuel than would fit in the tank!");
             spend = maxPurchase;
@@ -163,9 +163,9 @@ public class InSystem extends GameState {
             success = false;
         }
 
-        int unitsOfFuelBought = spend / game.getShip().type.getCostToFillFuelTank();
+        int unitsOfFuelBought = spend / game.getShip().getCostToFillFuelTank();
         game.getShip().addFuel(unitsOfFuelBought);
-        game.getCaptain().subtractCredits(unitsOfFuelBought * game.getShip().type.getCostToFillFuelTank());
+        game.getCaptain().subtractCredits(unitsOfFuelBought * game.getShip().getCostToFillFuelTank());
         return success;
     }
 
@@ -264,7 +264,7 @@ public class InSystem extends GameState {
 
     private int wormholeTax(SolarSystem destination) {
         if (game.getGalaxy().wormholeExistsBetween(system, destination)) {
-            return game.getShip().type.getCostToFillFuelTank() * 25;
+            return game.getShip().getCostToFillFuelTank() * 25;
         } else {
             return 0;
         }

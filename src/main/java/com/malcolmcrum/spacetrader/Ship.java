@@ -54,6 +54,14 @@ public class Ship {
         return fuel;
     }
 
+    public int getFuelCapacity() {
+        return type.getFuelTanks();
+    }
+
+    public int getCostToFillFuelTank() {
+        return type.getCostToFillFuelTank();
+    }
+
     public int getPrice() {
         int curPrice = type.getPrice();
         for (Weapon weapon : weapons) {
