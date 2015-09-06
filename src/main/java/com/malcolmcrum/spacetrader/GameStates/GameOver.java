@@ -1,4 +1,6 @@
-package com.malcolmcrum.spacetrader;
+package com.malcolmcrum.spacetrader.GameStates;
+
+import com.malcolmcrum.spacetrader.Game;
 
 /**
  * Created by Malcolm on 9/3/2015.

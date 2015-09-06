@@ -1,4 +1,9 @@
-package com.malcolmcrum.spacetrader;
+package com.malcolmcrum.spacetrader.GameStates;
+
+import com.malcolmcrum.spacetrader.Difficulty;
+import com.malcolmcrum.spacetrader.Game;
+import com.malcolmcrum.spacetrader.Ship;
+import com.malcolmcrum.spacetrader.TradeItem;
 
 import static com.malcolmcrum.spacetrader.Utils.GetRandom;
 import static com.malcolmcrum.spacetrader.Utils.RandomEnum;

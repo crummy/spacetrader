@@ -1,12 +1,16 @@
-package com.malcolmcrum.spacetrader;
+package com.malcolmcrum.spacetrader.GameStates.Encounters;
+
+import com.malcolmcrum.spacetrader.*;
+import com.malcolmcrum.spacetrader.GameStates.GameState;
+import com.malcolmcrum.spacetrader.GameStates.Transit;
 
 import static com.malcolmcrum.spacetrader.Utils.GetRandom;
 
 /**
  * Created by Malcolm on 9/4/2015.
  */
-public class PoliceEncounter extends Encounter {
-    PoliceEncounter(Game game, Transit transit) {
+public class Police extends Encounter {
+    Police(Game game, Transit transit) {
         super(game, transit);
     }
 
@@ -27,8 +31,8 @@ public class PoliceEncounter extends Encounter {
     }
 
     @Override
-    protected void surrenderToPlayer() throws InvalidOpponentActionException {
-        throw new InvalidOpponentActionException();
+    protected void surrenderToPlayer() throws InvalidOpponentAction {
+        throw new InvalidOpponentAction();
     }
 
     @Override
@@ -37,7 +41,7 @@ public class PoliceEncounter extends Encounter {
     }
 
     @Override
-    public GameState fleeAction() {
+    public GameState fleeAction() throws InvalidPlayerAction {
         boolean hasNarcotics = game.getShip().getCargoCount(TradeItem.Narcotics) > 0;
         boolean hasFirearms = game.getShip().getCargoCount(TradeItem.Firearms) > 0;
         boolean hasWild = game.getWildStatus() == Wild.OnBoard;

@@ -3,7 +3,7 @@ package com.malcolmcrum.spacetrader;
 /**
  * Created by Malcolm on 8/28/2015.
  */
-public enum Gadget {
+enum Gadget {
     CargoBays("5 extra cargo bays", 2500, TechLevel.EarlyIndustrial, 35),
     Repairs("Auto-repair system", 7500, TechLevel.Industrial, 20),
     Navigation("Navigating system", 15000, TechLevel.PostIndustrial, 20),

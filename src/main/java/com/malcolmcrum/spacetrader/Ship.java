@@ -294,6 +294,10 @@ public class Ship {
         return 2;
     }
 
+    public int getSizeValue() {
+        return type.getSize().getValue();
+    }
+
     class Cargo {
         TradeItem item;
         int buyingPrice;

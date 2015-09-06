@@ -54,13 +54,13 @@ public class News {
                 paper.add(headline);
             }
         }
-        if (currentSystem.getSpecialEvent() == SolarSystem.SpecialEvent.MonsterKilled && captain.getMonsterStatus() == 1) {
+        if (currentSystem.getSpecialEvent() == SolarSystem.SpecialEvent.MonsterKilled && game.getMonsterStatus() == Monster.InAcamar) {
             paper.add("Space Monster Threatens Homeworld!");
         }
-        if (currentSystem.getSpecialEvent() == SolarSystem.SpecialEvent.ScarabDestroyed && captain.getScarabStatus() == 1) {
+        if (currentSystem.getSpecialEvent() == SolarSystem.SpecialEvent.ScarabDestroyed && game.getScarabStatus() == Scarab.Alive) {
             paper.add("Wormhole Travelers Harassed by Unusual Ship!");
         }
-        if (currentSystem.getSpecialEvent() == SolarSystem.SpecialEvent.DragonflyDestroyed && captain.getDragonflyStatus() == 4 && !specialEvents.contains(SolarSystem.SpecialEvent.DragonflyDestroyed)) {
+        if (currentSystem.getSpecialEvent() == SolarSystem.SpecialEvent.DragonflyDestroyed && game.getDragonflyStatus() == Dragonfly.GoToZalkon && !specialEvents.contains(SolarSystem.SpecialEvent.DragonflyDestroyed)) {
             paper.add("Unidentified Ship: A Threat to Zalkon?");
         }
         if (currentSystem.getSpecialEvent() == SolarSystem.SpecialEvent.GemulonRescued && !specialEvents.contains(SolarSystem.SpecialEvent.GemulonRescued)) {
@@ -315,7 +315,7 @@ public class News {
         return game.getDifficulty().getValue() + 1;
     }
 
-    enum NotableEvent {
+    public enum NotableEvent {
         WildArrested("Notorious Criminal Jonathan Wild Arrested!"),
         CaughtLittering("Police Trace Orbiting Space Litter to {{CAPTAIN_NAME}}."),
         ExperimentPerformed("Travelers Report Timespace Damage, Warp Problems!"),

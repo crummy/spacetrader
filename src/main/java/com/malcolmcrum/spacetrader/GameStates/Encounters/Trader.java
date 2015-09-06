@@ -1,5 +1,8 @@
-package com.malcolmcrum.spacetrader;
+package com.malcolmcrum.spacetrader.GameStates.Encounters;
 
+import com.malcolmcrum.spacetrader.Game;
+import com.malcolmcrum.spacetrader.TradeItem;
+import com.malcolmcrum.spacetrader.GameStates.Transit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,14 +14,14 @@ import static com.malcolmcrum.spacetrader.Utils.RandomEnum;
  * TODO: consider splitting this into traderSell and traderBuy encounters
  * Created by Malcolm on 9/4/2015.
  */
-public class TraderEncounter extends Encounter {
-    private static final Logger logger = LoggerFactory.getLogger(TraderEncounter.class);
+public class Trader extends Encounter {
+    private static final Logger logger = LoggerFactory.getLogger(Trader.class);
 
     private boolean isBuying;
     private TradeItem item;
     private int price;
 
-    public TraderEncounter(Game game, Transit transit) {
+    public Trader(Game game, Transit transit) {
         super(game, transit);
         isBuying = GetRandom(1) == 1;
         item = getRandomItemForTrade();

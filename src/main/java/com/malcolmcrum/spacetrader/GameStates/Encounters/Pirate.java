@@ -1,11 +1,16 @@
-package com.malcolmcrum.spacetrader;
+package com.malcolmcrum.spacetrader.GameStates.Encounters;
+
+import com.malcolmcrum.spacetrader.Alert;
+import com.malcolmcrum.spacetrader.Game;
+import com.malcolmcrum.spacetrader.GameStates.GameState;
+import com.malcolmcrum.spacetrader.GameStates.Transit;
 
 /**
  * Created by Malcolm on 9/4/2015.
  */
-public class PirateEncounter extends Encounter {
+public class Pirate extends Encounter {
 
-    PirateEncounter(Game game, Transit transit) {
+    Pirate(Game game, Transit transit) {
         super(game, transit);
     }
 

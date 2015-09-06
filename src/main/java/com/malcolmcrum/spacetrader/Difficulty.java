@@ -3,7 +3,7 @@ package com.malcolmcrum.spacetrader;
 /**
  * Created by Malcolm on 8/28/2015.
  */
-public enum Difficulty {
+enum Difficulty {
     Beginner(0, "Beginner"),
     Easy(1, "Easy"),
     Normal(2, "Normal"),

@@ -1,5 +1,10 @@
-package com.malcolmcrum.spacetrader;
+package com.malcolmcrum.spacetrader.GameStates.Encounters;
 
+import com.malcolmcrum.spacetrader.*;
+import com.malcolmcrum.spacetrader.GameStates.GameState;
+import com.malcolmcrum.spacetrader.GameStates.LootShipState;
+import com.malcolmcrum.spacetrader.GameStates.ShipDestroyed;
+import com.malcolmcrum.spacetrader.GameStates.Transit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,12 +35,12 @@ public abstract class Encounter extends GameState {
     }
 
     @Override
-    GameState init() {
+    public GameState init() {
         tribblesOnScreen = getTribbles();
         return this;
     }
 
-    public String getDescription() {
+    public String getIntroDescription() {
         int clicksRemaining = transit.getClicksRemaining();
         String destinationName = transit.getDestination().getName().getTitle();
         String encounterName = getString();
@@ -46,14 +51,14 @@ public abstract class Encounter extends GameState {
         return (int)Math.sqrt(game.getShip().getTribbles()/250);
     }
 
-    public GameState ignoreAction() throws InvalidPlayerActionException {
+    public GameState ignoreAction() throws InvalidPlayerAction {
         if (opponentStatus != Status.Ignoring && opponentStatus != Status.Fleeing) {
-            throw new InvalidPlayerActionException();
+            throw new InvalidPlayerAction();
         }
         return transit;
     }
 
-    public GameState fleeAction() throws InvalidOpponentActionException {
+    public GameState fleeAction() throws InvalidOpponentAction, InvalidPlayerAction {
         if (game.getDifficulty() == Difficulty.Beginner) {
             game.addAlert(Alert.YouEscaped);
             return transit;
@@ -75,7 +80,7 @@ public abstract class Encounter extends GameState {
         return actionResult();
     }
 
-    public GameState attackAction() throws InvalidOpponentActionException {
+    public GameState attackAction() throws InvalidOpponentAction {
         if (opponentStatus == Status.Ignoring || opponentStatus == Status.Awake) {
             initialAttack();
         }
@@ -95,19 +100,19 @@ public abstract class Encounter extends GameState {
      */
     void initialAttack() {
         opponentStatus = Status.Attacking;
-        if (game.getShip().weapons.size() == 0) {
+        if (game.getShip().weaponStrength() == 0) {
             game.addAlert(Alert.AttackingWithoutWeapons);
         }
     }
 
-    protected void opponentAction() throws InvalidOpponentActionException {
+    protected void opponentAction() throws InvalidOpponentAction {
         switch (opponentStatus) {
             case Ignoring:
                 logger.error("Player took an action, but opponent is still in Ignoring state!");
-                throw new InvalidOpponentActionException();
+                throw new InvalidOpponentAction();
             case Awake:
                 logger.error("Player took an action, but opponent is still in Awake state!");
-                throw new InvalidOpponentActionException();
+                throw new InvalidOpponentAction();
             case Attacking: // Fire shots at player
                 executeAttack(opponent, game.getShip(), isPlayerFleeing, true);
                 break;
@@ -116,13 +121,13 @@ public abstract class Encounter extends GameState {
                 break;
             case Fled:
                 logger.error("Opponent has already fled but is taking an action!");
-                throw new InvalidOpponentActionException();
+                throw new InvalidOpponentAction();
             case Surrendered:
                 surrenderToPlayer();
                 break;
             case Destroyed:
                 logger.error("Opponent is taking a turn but is destroyed!!");
-                throw new InvalidOpponentActionException();
+                throw new InvalidOpponentAction();
         }
         if (opponent.getHullStrength() < opponent.getFullHullStrength()) {
             opponentHasBeenDamaged();
@@ -136,7 +141,7 @@ public abstract class Encounter extends GameState {
 
     }
 
-    protected void surrenderToPlayer() throws InvalidOpponentActionException {
+    protected void surrenderToPlayer() throws InvalidOpponentAction {
 
     }
 
@@ -191,7 +196,7 @@ public abstract class Encounter extends GameState {
 
         // FighterSkill attacker is pitted against PilotSkill defender; if defender
         // is fleeing the attacker has a free shot, but the chance to hit is smaller
-        int hitChance = GetRandom(attacker.getFighterSkill() + defender.type.getSize().getValue());
+        int hitChance = GetRandom(attacker.getFighterSkill() + defender.getSizeValue());
         int dodgeChance = (defenderFleeing ? 2 : 1) * GetRandom(5 + (defender.getPilotSkill() >> 1));
         if (hitChance < dodgeChance) {
             // Missed.

@@ -1,5 +1,6 @@
-package com.malcolmcrum.spacetrader;
+package com.malcolmcrum.spacetrader.GameStates;
 
+import com.malcolmcrum.spacetrader.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

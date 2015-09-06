@@ -3,7 +3,7 @@ package com.malcolmcrum.spacetrader;
 /**
  * Created by Malcolm on 8/28/2015.
  */
-public enum BribeLevel {
+enum BribeLevel {
     Impossible(0),
     VeryHard(1),
     Hard(2),

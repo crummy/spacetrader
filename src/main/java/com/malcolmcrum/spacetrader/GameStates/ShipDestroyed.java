@@ -1,4 +1,6 @@
-package com.malcolmcrum.spacetrader;
+package com.malcolmcrum.spacetrader.GameStates;
+
+import com.malcolmcrum.spacetrader.*;
 
 /**
  * Created by Malcolm on 9/2/2015.
@@ -6,7 +8,7 @@ package com.malcolmcrum.spacetrader;
 public class ShipDestroyed extends GameState {
     SolarSystem newSystem; // system we wake up on
 
-    ShipDestroyed(Game game, SolarSystem newSystem) {
+    public ShipDestroyed(Game game, SolarSystem newSystem) {
         super(game);
         this.newSystem = newSystem;
     }
