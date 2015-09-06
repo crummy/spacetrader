@@ -21,7 +21,7 @@ public class Police extends Encounter {
         String clicks = Pluralize(transit.getClicksRemaining(), "click");
         String destination = transit.getDestination().getName();
         String ship = opponent.getName();
-        return "At " + clicks + " from " + destination + ", you encounter a police " + ship + "."
+        return "At " + clicks + " from " + destination + ", you encounter a police " + ship + ".";
     }
 
     @Override

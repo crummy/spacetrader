@@ -7,6 +7,7 @@ import com.malcolmcrum.spacetrader.GameStates.GameState;
 import com.malcolmcrum.spacetrader.GameStates.Transit;
 
 import static com.malcolmcrum.spacetrader.Utils.GetRandom;
+import static com.malcolmcrum.spacetrader.Utils.Pluralize;
 
 /**
  * Created by Malcolm on 9/6/2015.
@@ -17,6 +18,14 @@ public class Monster extends Encounter {
     Monster(Game game, Transit transit) {
         super(game, transit);
         opponent.setHullStrength(game.getMonsterHullStrength());
+    }
+
+    @Override
+    public String getEncounterDescription() {
+        String clicks = Pluralize(transit.getClicksRemaining(), "click");
+        String destination = transit.getDestination().getName();
+        String ship = opponent.getName();
+        return "At " + clicks + " from " + destination + ", you encounter " + ship + ".";
     }
 
     @Override

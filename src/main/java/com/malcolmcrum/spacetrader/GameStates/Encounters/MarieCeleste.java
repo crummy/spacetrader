@@ -1,5 +1,8 @@
 package com.malcolmcrum.spacetrader.GameStates.Encounters;
 
+import com.malcolmcrum.spacetrader.Game;
+import com.malcolmcrum.spacetrader.GameStates.Transit;
+
 import static com.malcolmcrum.spacetrader.Utils.Pluralize;
 
 /**
@@ -7,6 +10,10 @@ import static com.malcolmcrum.spacetrader.Utils.Pluralize;
  * Created by Malcolm on 9/6/2015.
  */
 public class MarieCeleste extends Encounter {
+
+    MarieCeleste(Game game, Transit transit) {
+        super(game, transit);
+    }
 
     @Override
     public String getTitle() {
