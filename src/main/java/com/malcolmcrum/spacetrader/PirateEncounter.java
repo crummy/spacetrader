@@ -10,12 +10,17 @@ public class PirateEncounter extends Encounter {
     }
 
     @Override
+    protected void surrenderToPlayer() {
+
+    }
+
+    @Override
     String getString() {
         return "a pirate";
     }
 
     @Override
-    GameState finishAttacks() {
+    protected GameState actionResult() {
         if (opponent.isDestroyed()) {
             if (!game.getCaptain().isDubious()) {
                 game.addAlert(Alert.BountyEarned);
@@ -26,11 +31,11 @@ public class PirateEncounter extends Encounter {
             }
             game.getCaptain().killedAPirate();
         }
-        return super.finishAttacks();
+        return super.actionResult();
     }
 
     @Override
-    GameState init() {
+    protected GameState init() {
         return this;
     }
 

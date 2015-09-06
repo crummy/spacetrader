@@ -19,6 +19,8 @@ public class Transit extends GameState {
     private boolean arrivedViaWormhole;
     private boolean beenInspected;
     private boolean litterWarning;
+    private boolean hadEncounter;
+    private boolean justLootedMarie;
 
     public Transit(Game game, SolarSystem destination, boolean viaSingularity) {
         super(game);
@@ -113,7 +115,7 @@ public class Transit extends GameState {
                 if (game.getDifficulty() == Difficulty.Beginner || game.getDifficulty() == Difficulty.Easy
                         && rareEncounter < 25) {
                     encounterPolice = true;
-                } else if (game.getDifficulty == Difficulty.Normal
+                } else if (game.getDifficulty() == Difficulty.Normal
                         && rareEncounter < 33) {
                     encounterPolice = true;
                 } else if (rareEncounter < 50) {
@@ -235,5 +237,9 @@ public class Transit extends GameState {
 
     public SolarSystem getDestination() {
         return destination;
+    }
+
+    public void setHadEncounter(boolean hadEncounter) {
+        this.hadEncounter = hadEncounter;
     }
 }

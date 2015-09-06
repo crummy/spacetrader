@@ -245,4 +245,20 @@ public class Market {
     private SolarSystem.Status status() {
         return system.getStatus();
     }
+
+    public boolean isBuying(TradeItem item) {
+        return buyPrices.get(item) > 0;
+    }
+
+    public boolean isSelling(TradeItem item) {
+        return sellPrices.get(item) > 0;
+    }
+
+    public int getBuyPrice(TradeItem item) {
+        return buyPrices.get(item);
+    }
+
+    public int getSellPrice(TradeItem item) {
+        return buyPrices.get(item);
+    }
 }

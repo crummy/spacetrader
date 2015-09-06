@@ -185,7 +185,7 @@ public class Game {
         days++;
     }
 
-    public void setShip(Ship ship) {
+    public void setShip(PlayerShip ship) {
         this.ship = ship;
     }
 

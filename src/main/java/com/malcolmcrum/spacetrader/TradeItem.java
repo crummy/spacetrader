@@ -215,4 +215,16 @@ public enum TradeItem {
     public int getPriceVariance() {
         return priceVariance;
     }
+
+    public int getRoundOff() {
+        return roundOff;
+    }
+
+    public int getMinTradePrice() {
+        return minTradePrice;
+    }
+
+    public int getMaxTradePrice() {
+        return maxTradePrice;
+    }
 }

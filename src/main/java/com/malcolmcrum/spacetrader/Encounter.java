@@ -18,12 +18,21 @@ public abstract class Encounter extends GameState {
     Status opponentStatus;
     boolean isPlayerFleeing;
     boolean playerWasHit;
+    int tribblesOnScreen;
 
     Encounter(Game game, Transit transit) {
         super(game);
+        transit.setHadEncounter(true);
         this.transit = transit;
         this.isPlayerFleeing = false;
         this.playerWasHit = false;
+        this.tribblesOnScreen = 0;
+    }
+
+    @Override
+    GameState init() {
+        tribblesOnScreen = getTribbles();
+        return this;
     }
 
     public String getDescription() {
@@ -37,7 +46,14 @@ public abstract class Encounter extends GameState {
         return (int)Math.sqrt(game.getShip().getTribbles()/250);
     }
 
-    public GameState fleeAction() {
+    public GameState ignoreAction() throws InvalidPlayerActionException {
+        if (opponentStatus != Status.Ignoring && opponentStatus != Status.Fleeing) {
+            throw new InvalidPlayerActionException();
+        }
+        return transit;
+    }
+
+    public GameState fleeAction() throws InvalidOpponentActionException {
         if (game.getDifficulty() == Difficulty.Beginner) {
             game.addAlert(Alert.YouEscaped);
             return transit;
@@ -47,7 +63,7 @@ public abstract class Encounter extends GameState {
         int opponentChaseChance = GetRandom(opponent.getPilotSkill()) * (2 * difficulty);
         if (playerFleeChance >= opponentChaseChance) {
             if (playerWasHit) {
-                // TODO: add tribbles?
+                tribblesOnScreen = getTribbles();
                 game.addAlert(Alert.YouEscapedWithDamage);
             } else {
                 game.addAlert(Alert.YouEscaped);
@@ -59,7 +75,7 @@ public abstract class Encounter extends GameState {
         return actionResult();
     }
 
-    public GameState attackAction() {
+    public GameState attackAction() throws InvalidOpponentActionException {
         if (opponentStatus == Status.Ignoring || opponentStatus == Status.Awake) {
             initialAttack();
         }
@@ -84,14 +100,14 @@ public abstract class Encounter extends GameState {
         }
     }
 
-    protected void opponentAction() {
+    protected void opponentAction() throws InvalidOpponentActionException {
         switch (opponentStatus) {
             case Ignoring:
                 logger.error("Player took an action, but opponent is still in Ignoring state!");
-                break;
+                throw new InvalidOpponentActionException();
             case Awake:
                 logger.error("Player took an action, but opponent is still in Awake state!");
-                break;
+                throw new InvalidOpponentActionException();
             case Attacking: // Fire shots at player
                 executeAttack(opponent, game.getShip(), isPlayerFleeing, true);
                 break;
@@ -100,16 +116,29 @@ public abstract class Encounter extends GameState {
                 break;
             case Fled:
                 logger.error("Opponent has already fled but is taking an action!");
-                break;
+                throw new InvalidOpponentActionException();
             case Surrendered:
                 surrenderToPlayer();
                 break;
             case Destroyed:
                 logger.error("Opponent is taking a turn but is destroyed!!");
+                throw new InvalidOpponentActionException();
+        }
+        if (opponent.getHullStrength() < opponent.getFullHullStrength()) {
+            opponentHasBeenDamaged();
         }
     }
 
-    protected abstract void surrenderToPlayer();
+    /**
+     * Decide whether to change tactics (e.g. flee)
+     */
+    protected void opponentHasBeenDamaged() {
+
+    }
+
+    protected void surrenderToPlayer() throws InvalidOpponentActionException {
+
+    }
 
     private void fleePlayer() {
         int playerChaseChance = GetRandom(game.getShip().getPilotSkill()) * 4;
@@ -117,6 +146,8 @@ public abstract class Encounter extends GameState {
         if (playerChaseChance <= opponentFleeChance) {
             game.addAlert(Alert.OpponentEscaped);
             opponentStatus = Status.Fled;
+        } else {
+            game.addAlert(Alert.OpponentDidntEscape);
         }
     }
 
@@ -141,6 +172,8 @@ public abstract class Encounter extends GameState {
         if (opponentStatus == Status.Fled) {
             return transit;
         }
+
+        tribblesOnScreen = getTribbles();
 
         return this;
     }

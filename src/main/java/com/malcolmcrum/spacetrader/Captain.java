@@ -13,6 +13,7 @@ public class Captain extends Crew {
     private static final int CLEAN_SCORE = 0;
     private static final int KILL_PIRATE_SCORE = 1;
     private static final int ATTACK_POLICE_SCORE = -3;
+    private static final int FLEE_FROM_INSPECTION = -2;
 
     private final Game game;
     private final String name;
@@ -182,11 +183,41 @@ public class Captain extends Crew {
         policeRecordScore = CRIMINAL_SCORE;
     }
 
+
+    public void makeDubious() {
+        policeRecordScore = DUBIOUS_SCORE;
+    }
+
     public int getPoliceRecordScore() {
         return policeRecordScore;
     }
 
     public int getWorth() {
         return game.getShip().getPrice(false) + credits - debt + (moonBought ? SolarSystem.COST_MOON : 0);
+    }
+
+    public void payInterest() {
+        if (debt > 0) {
+            int additionalDebt = Math.max(1, debt/10);
+            if (credits > additionalDebt) {
+                credits -= additionalDebt;
+            } else {
+                debt += (additionalDebt - credits);
+                credits = 0;
+            }
+        }
+    }
+
+    public void setDebt(int debt) {
+        this.debt = debt;
+    }
+
+    public void fledPolice() {
+        if (policeRecordScore > DUBIOUS_SCORE) {
+            boolean easierThanNormal = game.getDifficulty() == Difficulty.Beginner || game.getDifficulty() == Difficulty.Easy;
+            policeRecordScore = DUBIOUS_SCORE - (easierThanNormal ? 0 : 1);
+        } else {
+            policeRecordScore += FLEE_FROM_INSPECTION;
+        }
     }
 }

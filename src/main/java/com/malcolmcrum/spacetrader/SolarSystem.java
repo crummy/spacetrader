@@ -147,6 +147,10 @@ public class SolarSystem {
         return getPolitics().getPoliceStrength().getStrength();
     }
 
+    public int getTraderStrength() {
+        return getPolitics().getPoliceStrength().getStrength();
+    }
+
     public void setStatus(Status status) {
         this.status = status;
     }

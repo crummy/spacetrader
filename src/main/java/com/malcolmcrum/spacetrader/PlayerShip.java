@@ -143,4 +143,13 @@ public class PlayerShip extends Ship {
         hasInsurance = false;
         daysWithoutClaim = 0;
     }
+
+    public int getMercenaryCount() {
+        return crew.size() - 1;
+    }
+
+    public void removeAllMercenaries() {
+        crew.clear();
+        crew.add(game.getCaptain());
+    }
 }

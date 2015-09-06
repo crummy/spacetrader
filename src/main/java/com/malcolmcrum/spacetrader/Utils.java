@@ -31,6 +31,11 @@ public class Utils {
         int x = offset + rand.nextInt(c.getEnumConstants().length - offset);
         return c.getEnumConstants()[x];
     }
+
+    // thanks http://stackoverflow.com/a/16659144/281657
+    public static int Clamp(int val, int min, int max) {
+        return Math.max(min, Math.min(max, val));
+    }
 }
 
 class Vector2i {

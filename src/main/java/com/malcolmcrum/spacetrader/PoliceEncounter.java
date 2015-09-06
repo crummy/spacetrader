@@ -1,5 +1,7 @@
 package com.malcolmcrum.spacetrader;
 
+import static com.malcolmcrum.spacetrader.Utils.GetRandom;
+
 /**
  * Created by Malcolm on 9/4/2015.
  */
@@ -25,13 +27,45 @@ public class PoliceEncounter extends Encounter {
     }
 
     @Override
-    String getString() {
-        return null;
+    protected void surrenderToPlayer() throws InvalidOpponentActionException {
+        throw new InvalidOpponentActionException();
     }
 
     @Override
-    GameState init() {
-        return this;
+    String getString() {
+        return "police";
+    }
+
+    @Override
+    public GameState fleeAction() {
+        boolean hasNarcotics = game.getShip().getCargoCount(TradeItem.Narcotics) > 0;
+        boolean hasFirearms = game.getShip().getCargoCount(TradeItem.Firearms) > 0;
+        boolean hasWild = game.getWildStatus() == Wild.OnBoard;
+        boolean hasReactor = game.getReactorStatus() != Reactor.Unavailable && game.getReactorStatus() != Reactor.Delivered;
+        if (!hasNarcotics && !hasFirearms && !hasWild && !hasReactor) {
+            game.addAlert(Alert.SureToFleeOrBribe);
+        }
+
+        opponentStatus = Status.Attacking;
+        game.getCaptain().fledPolice();
+
+        return super.fleeAction();
+    }
+
+    public GameState actionSurrender() {
+        if (game.getCaptain().isPsychopathic()) {
+            game.addAlert(Alert.NoSurrender);
+            return this;
+        }
+
+        if (game.getWildStatus() == Wild.OnBoard) {
+            game.addAlert(Alert.SurrenderWithWild);
+        }
+        if (game.getReactorStatus() != Reactor.Unavailable && game.getReactorStatus() != Reactor.Delivered) {
+            game.addAlert(Alert.SurrenderWithReactor);
+        }
+
+        arrestPlayer();
     }
 
     private void arrestPlayer() {
@@ -86,19 +120,36 @@ public class PoliceEncounter extends Encounter {
             game.setReactorStatus(Reactor.Unavailable);
         }
 
-        for (int i = 0; i < imprisonment; ++i) {
-            game.dayPasses();
-        }
-
-        if (game.getCaptain().getCredits() >= fine) {
+        int credits = game.getCaptain().getCredits();
+        if (credits >= fine) {
             game.getCaptain().subtractCredits(fine);
         } else {
-            game.getCaptain().subtractCredits(game.getCaptain().getCredits());
+            game.getCaptain().subtractCredits(credits);
             game.addAlert(Alert.ShipSold);
             if (game.getShip().getTribbles() > 0) {
                 game.addAlert(Alert.TribblesSold);
             }
             game.addAlert(Alert.FleaRecieved);
+            game.setShip(new PlayerShip(ShipType.Flea, game));
+        }
+
+        game.getCaptain().makeDubious();
+
+        credits = game.getCaptain().getCredits();
+        int debt = game.getCaptain().getDebt();
+        if (debt > 0) {
+            if (credits >= debt) {
+                game.getCaptain().subtractCredits(debt);
+                game.getCaptain().setDebt(0);
+            } else {
+                game.getCaptain().setDebt(debt - credits);
+                game.getCaptain().subtractCredits(credits);
+            }
+        }
+
+        for (int i = 0; i < imprisonment; ++i) {
+            game.dayPasses();
+            game.getCaptain().payInterest();
         }
     }
 }
