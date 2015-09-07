@@ -32,8 +32,8 @@ public class InSystem extends GameState {
         this.system = system;
     }
 
-    //@Override
-    public static List<Method> getActions() {
+    @Override
+    public List<Method> getActions() {
         List<Method> actions = new ArrayList<>();
         try {
             actions.add(InSystem.class.getMethod("buyRepairs", int.class));
@@ -118,19 +118,19 @@ public class InSystem extends GameState {
         }
     }
 
-    public boolean buyShip(String name) {
+    public GameState buyShip(String name) {
         // TODO
-        return false;
+        return this;
     }
 
-    public boolean buyInsurance() {
+    public GameState buyInsurance() {
         // TODO
-        return false;
+        return this;
     }
 
-    public boolean buyEscapePod() {
+    public GameState buyEscapePod() {
         // TODO
-        return false;
+        return this;
     }
 
     public boolean buyRepairs() {

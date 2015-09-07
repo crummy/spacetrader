@@ -6,6 +6,10 @@ import com.malcolmcrum.spacetrader.GameStates.Encounters.Dragonfly;
 import com.malcolmcrum.spacetrader.GameStates.Encounters.Monster;
 import com.malcolmcrum.spacetrader.GameStates.Encounters.Scarab;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.malcolmcrum.spacetrader.Utils.GetRandom;
 
 /**
@@ -60,6 +64,12 @@ public class Transit extends GameState {
             }
         }
         return this;
+    }
+
+    @Override
+    public List<Method> getActions() {
+        // There are no actions possible in Transit. It just serves to generate Encounters.
+        return new ArrayList<>();
     }
 
     public GameState Travel() {

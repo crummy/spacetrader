@@ -3,6 +3,10 @@ package com.malcolmcrum.spacetrader.GameStates.Encounters;
 import com.malcolmcrum.spacetrader.Game;
 import com.malcolmcrum.spacetrader.GameStates.Transit;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.malcolmcrum.spacetrader.Utils.Pluralize;
 
 /**
@@ -13,6 +17,36 @@ public class MarieCeleste extends Encounter {
 
     public MarieCeleste(Game game, Transit transit) {
         super(game, transit);
+    }
+
+    @Override
+    public List<Method> getActions() {
+        List<Method> actions = new ArrayList<>();
+        try {
+            switch(opponentStatus) {
+                case Ignoring:
+                    break;
+                case Awake:
+                    actions.add(MarieCeleste.class.getMethod("actionBoard"));
+                    actions.add(MarieCeleste.class.getMethod("actionIgnore"));
+                    break;
+                case Attacking:
+
+                    break;
+                case Fleeing:
+
+                    break;
+                case Fled:
+                    break;
+                case Surrendered:
+                    break;
+                case Destroyed:
+                    break;
+            }
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        return actions;
     }
 
     @Override

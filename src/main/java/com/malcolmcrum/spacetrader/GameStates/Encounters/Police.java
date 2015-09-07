@@ -5,6 +5,10 @@ import com.malcolmcrum.spacetrader.GameStates.GameState;
 import com.malcolmcrum.spacetrader.GameStates.InSystem;
 import com.malcolmcrum.spacetrader.GameStates.Transit;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.malcolmcrum.spacetrader.Utils.GetRandom;
 import static com.malcolmcrum.spacetrader.Utils.Pluralize;
 
@@ -14,6 +18,43 @@ import static com.malcolmcrum.spacetrader.Utils.Pluralize;
 public class Police extends Encounter {
     public Police(Game game, Transit transit) {
         super(game, transit);
+    }
+
+    @Override
+    public List<Method> getActions() {
+        List<Method> actions = new ArrayList<>();
+        try {
+            switch(opponentStatus) {
+                case Ignoring:
+                    actions.add(Police.class.getMethod("actionAttack"));
+                    actions.add(Police.class.getMethod("ignoreAction"));
+                    break;
+                case Awake:
+                    actions.add(Police.class.getMethod("actionAttack"));
+                    actions.add(Police.class.getMethod("actionFlee"));
+                    actions.add(Police.class.getMethod("actionSubmit"));
+                    actions.add(Police.class.getMethod("actionBribe"));
+                    break;
+                case Attacking:
+                    actions.add(Police.class.getMethod("actionAttack"));
+                    actions.add(Police.class.getMethod("actionFlee"));
+                    actions.add(Police.class.getMethod("actionSurrender"));
+                    break;
+                case Fleeing:
+                    actions.add(Police.class.getMethod("actionAttack"));
+                    actions.add(Police.class.getMethod("actionIgnore"));
+                    break;
+                case Fled:
+                    break;
+                case Surrendered:
+                    break;
+                case Destroyed:
+                    break;
+            }
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        return actions;
     }
 
     @Override

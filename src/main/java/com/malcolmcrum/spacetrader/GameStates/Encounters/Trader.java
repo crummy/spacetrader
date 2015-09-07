@@ -7,6 +7,10 @@ import com.malcolmcrum.spacetrader.GameStates.Transit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.malcolmcrum.spacetrader.Utils.*;
 
 /**
@@ -41,6 +45,43 @@ public class Trader extends Encounter {
         price /= item.getRoundOff();
         price *= item.getRoundOff();
         price = Clamp(price, item.getMinTradePrice(), item.getMaxTradePrice());
+    }
+
+    @Override
+    public List<Method> getActions() {
+        List<Method> actions = new ArrayList<>();
+        try {
+            switch(opponentStatus) {
+                case Ignoring:
+                    actions.add(Trader.class.getMethod("actionAttack"));
+                    actions.add(Trader.class.getMethod("actionIgnore"));
+                    break;
+                case Awake:
+                    actions.add(Trader.class.getMethod("actionAttack"));
+                    actions.add(Trader.class.getMethod("actionIgnore"));
+                    actions.add(Trader.class.getMethod("actionTrade"));
+                    break;
+                case Attacking:
+                    actions.add(Trader.class.getMethod("actionAttack"));
+                    actions.add(Trader.class.getMethod("actionFlee"));
+                    break;
+                case Fleeing:
+                    actions.add(Trader.class.getMethod("actionAttack"));
+                    actions.add(Trader.class.getMethod("actionIgnore"));
+                    break;
+                case Fled:
+                    break;
+                case Surrendered:
+                    actions.add(Trader.class.getMethod("actionAttack"));
+                    actions.add(Trader.class.getMethod("actionPlunder"));
+                    break;
+                case Destroyed:
+                    break;
+            }
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        return actions;
     }
 
     @Override

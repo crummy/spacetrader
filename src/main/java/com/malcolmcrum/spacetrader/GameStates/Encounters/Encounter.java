@@ -8,6 +8,9 @@ import com.malcolmcrum.spacetrader.GameStates.Transit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Method;
+import java.util.List;
+
 import static com.malcolmcrum.spacetrader.Utils.GetRandom;
 
 /**
@@ -33,6 +36,7 @@ public abstract class Encounter extends GameState {
     boolean isPlayerFleeing;
     boolean playerWasHit;
     int tribblesOnScreen;
+    private Status status;
 
     Encounter(Game game, Transit transit) {
         super(game);
@@ -291,7 +295,11 @@ public abstract class Encounter extends GameState {
         return true;
     }
 
-    protected enum Status {
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public enum Status {
         Ignoring,
         Awake, // if police, this is "POLICEINSPECTION" equivalent. if trader, this is TRADERBUY/TRADERSELL.
         Attacking,

@@ -4,6 +4,10 @@ import com.malcolmcrum.spacetrader.Game;
 import com.malcolmcrum.spacetrader.GameStates.Transit;
 import com.malcolmcrum.spacetrader.Ship;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.malcolmcrum.spacetrader.Utils.Pluralize;
 
 /**
@@ -12,6 +16,36 @@ import static com.malcolmcrum.spacetrader.Utils.Pluralize;
 public class OldBottle extends Encounter {
     public OldBottle(Game game, Transit transit) {
         super(game, transit);
+    }
+
+    @Override
+    public List<Method> getActions() {
+        List<Method> actions = new ArrayList<>();
+        try {
+            switch(opponentStatus) {
+                case Ignoring:
+                    break;
+                case Awake:
+                    actions.add(OldBottle.class.getMethod("actionDrink"));
+                    actions.add(OldBottle.class.getMethod("actionIgnore"));
+                    break;
+                case Attacking:
+
+                    break;
+                case Fleeing:
+
+                    break;
+                case Fled:
+                    break;
+                case Surrendered:
+                    break;
+                case Destroyed:
+                    break;
+            }
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        return actions;
     }
 
     @Override

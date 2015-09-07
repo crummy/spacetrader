@@ -5,6 +5,10 @@ import com.malcolmcrum.spacetrader.Game;
 import com.malcolmcrum.spacetrader.GameStates.GameState;
 import com.malcolmcrum.spacetrader.GameStates.Transit;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.malcolmcrum.spacetrader.Utils.GetRandom;
 import static com.malcolmcrum.spacetrader.Utils.Pluralize;
 
@@ -15,6 +19,41 @@ public class Pirate extends Encounter {
 
     public Pirate(Game game, Transit transit) {
         super(game, transit);
+    }
+
+    @Override
+    public List<Method> getActions() {
+        List<Method> actions = new ArrayList<>();
+        try {
+            switch(opponentStatus) {
+                case Ignoring:
+                    actions.add(Pirate.class.getMethod("actionAttack"));
+                    actions.add(Pirate.class.getMethod("actionIgnore"));
+                    break;
+                case Awake:
+                    break;
+                case Attacking:
+                    actions.add(Pirate.class.getMethod("actionAttack"));
+                    actions.add(Pirate.class.getMethod("actionFlee"));
+                    actions.add(Pirate.class.getMethod("actionSurrender"));
+                    break;
+                case Fleeing:
+                    actions.add(Pirate.class.getMethod("actionAttack"));
+                    actions.add(Pirate.class.getMethod("actionIgnore"));
+                    break;
+                case Fled:
+                    break;
+                case Surrendered:
+                    actions.add(Pirate.class.getMethod("actionAttack"));
+                    actions.add(Pirate.class.getMethod("actionPlunder"));
+                    break;
+                case Destroyed:
+                    break;
+            }
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        return actions;
     }
 
     @Override

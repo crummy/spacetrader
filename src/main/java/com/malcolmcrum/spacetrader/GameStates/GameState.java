@@ -15,7 +15,7 @@ public abstract class GameState {
         this.game = game;
     }
 
-    //public abstract List<Method> getActions();
+    public abstract List<Method> getActions();
 
     public abstract GameState init();
 }
