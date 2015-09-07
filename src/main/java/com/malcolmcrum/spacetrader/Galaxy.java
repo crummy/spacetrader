@@ -42,11 +42,11 @@ public class Galaxy {
     }
 
     private void addScatteredSpecialEvents(boolean scarabEndpointExists) {
-        logger.info("SCATTERING EVENTS");
+        logger.debug("SCATTERING EVENTS");
         for (SolarSystem.SpecialEvent event : SolarSystem.SpecialEvent.values()) {
-            logger.info("Adding event " + event.getTitle());
+            logger.debug("Adding event " + event.getTitle());
             if (event.hasFixedLocation()) {
-                logger.info("  Event has fixed location; no need to scatter it.");
+                logger.trace("  Event has fixed location; no need to scatter it.");
                 continue;
             }
             for (int occurrence = 0; occurrence < event.getOccurrence(); ++occurrence) {
@@ -56,9 +56,9 @@ public class Galaxy {
                     if (!system.hasSpecialEvent()) {
                         if (scarabEndpointExists || event != SolarSystem.SpecialEvent.ScarabStolen) {
                             system.setSpecialEvent(event);
-                            logger.info("  Attached event to system: " + system.getType());
+                            logger.trace("  Attached event to system: " + system.getType());
                         } else {
-                            logger.info("  Skipping - Scarab event but no Scarab endpoint exists.");
+                            logger.trace("  Skipping - Scarab event but no Scarab endpoint exists.");
                         }
                         keepLooking = false;
                     }
@@ -241,11 +241,11 @@ public class Galaxy {
                 destination = getRandomSystem();
             } while (destination.hasWormhole() && source != destination);
             source.setWormhole(destination);
-            logger.info("Pointed wormhole from " + source.getName() + " to " + destination.getName());
+            logger.debug("Pointed wormhole from " + source.getName() + " to " + destination.getName());
             source = destination;
         }
         source.setWormhole(initialSystem);
-        logger.info("Pointed wormhole from " + source.getName() + " to " + initialSystem.getName());
+        logger.debug("Pointed wormhole from " + source.getName() + " to " + initialSystem.getName());
     }
 
 

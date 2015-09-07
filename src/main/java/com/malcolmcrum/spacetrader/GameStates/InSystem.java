@@ -36,10 +36,11 @@ public class InSystem extends GameState {
     public static List<Method> getActions() {
         List<Method> actions = new ArrayList<>();
         try {
-            actions.add(InSystem.class.getMethod("buyRepairs"));
-            actions.add(InSystem.class.getMethod("buyFuel"));
-            actions.add(InSystem.class.getMethod("buyShip"));
+            actions.add(InSystem.class.getMethod("buyRepairs", int.class));
+            actions.add(InSystem.class.getMethod("buyFuel", int.class));
+            actions.add(InSystem.class.getMethod("buyShip", String.class));
             actions.add(InSystem.class.getMethod("buyEscapePod"));
+            actions.add(InSystem.class.getMethod("buyInsurance"));
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
@@ -117,6 +118,21 @@ public class InSystem extends GameState {
         }
     }
 
+    public boolean buyShip(String name) {
+        // TODO
+        return false;
+    }
+
+    public boolean buyInsurance() {
+        // TODO
+        return false;
+    }
+
+    public boolean buyEscapePod() {
+        // TODO
+        return false;
+    }
+
     public boolean buyRepairs() {
         int spend = -(game.getShip().getHullStrength() - game.getShip().getFullHullStrength()) * game.getShip().getRepairCost();
         return buyRepairs(spend);
@@ -164,7 +180,7 @@ public class InSystem extends GameState {
      * Buys max amount of fuel
      * @return True if all fuel requested was purchased
      */
-    private boolean buyFuel() {
+    public boolean buyFuel() {
         int spend = -(game.getShip().getFuel() - game.getShip().getFuelCapacity()) * game.getShip().getCostToFillFuelTank();
         return buyFuel(spend);
     }
@@ -174,7 +190,7 @@ public class InSystem extends GameState {
      * @param spend Amount of credits to spend on fuel
      * @return True if purchased all fuel requested. False if player couldn't pony up enough cash.
      */
-    private boolean buyFuel(int spend) {
+    public boolean buyFuel(int spend) {
         boolean success = true;
         int maxPurchase = (game.getShip().getFuelCapacity() - game.getShip().getFuel()) * game.getShip().getCostToFillFuelTank();
         if (spend > maxPurchase) {
