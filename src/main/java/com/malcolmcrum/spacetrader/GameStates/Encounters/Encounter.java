@@ -230,7 +230,7 @@ public abstract class Encounter extends GameState {
         } else if (opponent.isDestroyed()) {
             game.addAlert(Alert.OpponentDestroyed);
             opponentStatus = Status.Destroyed;
-            game.getCaptain().addReputation(opponent.reputationForKilling());
+            game.getCaptain().addReputation(opponent.reputationGainForKilling());
             return destroyedOpponent();
         }
         if (opponentStatus == Status.Fled) {

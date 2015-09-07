@@ -10,7 +10,7 @@ import static com.malcolmcrum.spacetrader.Utils.Pluralize;
  */
 public class GoodBottle extends Encounter {
 
-    GoodBottle(Game game, Transit transit) {
+    public GoodBottle(Game game, Transit transit) {
         super(game, transit);
     }
 

@@ -4,14 +4,25 @@ import com.malcolmcrum.spacetrader.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.malcolmcrum.spacetrader.Utils.GetRandom;
 
 /**
+ * InSystem.
+ * ACTIONS:
+ * - buyRepairs()
+ * - buyRepairs(int amount)
+ * - buyFuel()
+ * - buyFuel(int amount)
+ * - buyShip(ShipType type)
+ * - buyEscapePod()
  * Created by Malcolm on 9/3/2015.
  */
 public class InSystem extends GameState {
     private static final Logger logger = LoggerFactory.getLogger(InSystem.class);
-
 
     SolarSystem system;
     boolean alreadyPaidForNewspaper;
@@ -19,6 +30,20 @@ public class InSystem extends GameState {
     public InSystem(Game game, SolarSystem system) {
         super(game);
         this.system = system;
+    }
+
+    //@Override
+    public static List<Method> getActions() {
+        List<Method> actions = new ArrayList<>();
+        try {
+            actions.add(InSystem.class.getMethod("buyRepairs"));
+            actions.add(InSystem.class.getMethod("buyFuel"));
+            actions.add(InSystem.class.getMethod("buyShip"));
+            actions.add(InSystem.class.getMethod("buyEscapePod"));
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        return actions;
     }
 
     @Override
@@ -92,7 +117,7 @@ public class InSystem extends GameState {
         }
     }
 
-    private boolean buyRepairs() {
+    public boolean buyRepairs() {
         int spend = -(game.getShip().getHullStrength() - game.getShip().getFullHullStrength()) * game.getShip().getRepairCost();
         return buyRepairs(spend);
     }
@@ -102,7 +127,7 @@ public class InSystem extends GameState {
      * @param spend Amount of credits to spend on repairs
      * @return True if all repairs performed. False if player couldn't pony up enough cash.
      */
-    private boolean buyRepairs(int spend) {
+    public boolean buyRepairs(int spend) {
         boolean success = false;
         int maxPurchase = (game.getShip().getFullHullStrength() - game.getShip().getHullStrength() * game.getShip().getRepairCost());
         if (spend > maxPurchase) {

@@ -8,7 +8,7 @@ import com.malcolmcrum.spacetrader.GameStates.Transit;
  * Created by Malcolm on 9/6/2015.
  */
 public class PostMariePolice extends Police {
-    PostMariePolice(Game game, Transit transit) {
+    public PostMariePolice(Game game, Transit transit) {
         super(game, transit);
     }
 

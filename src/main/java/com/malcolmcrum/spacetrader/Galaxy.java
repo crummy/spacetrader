@@ -241,11 +241,11 @@ public class Galaxy {
                 destination = getRandomSystem();
             } while (destination.hasWormhole() && source != destination);
             source.setWormhole(destination);
-            logger.info("Pointed wormhole from " + source + " to " + destination);
+            logger.info("Pointed wormhole from " + source.getName() + " to " + destination.getName());
             source = destination;
         }
         source.setWormhole(initialSystem);
-        logger.info("Pointed wormhole from " + source + " to " + initialSystem);
+        logger.info("Pointed wormhole from " + source.getName() + " to " + initialSystem.getName());
     }
 
 
@@ -298,7 +298,7 @@ public class Galaxy {
      * @param ship Current ship, used for range calculations of other planets
      * @return A goldilock system in the galaxy.
      */
-    public SolarSystem getStartSystem(ShipType ship) {
+    public SolarSystem getStartSystem(int maxRange) {
         SolarSystem system;
         boolean threeNearbySystems, noSpecialEvent, atLeastAgricultural, beforeHiTech;
 
@@ -317,7 +317,7 @@ public class Galaxy {
                     continue;
                 }
                 int distanceToNeighbour = distanceBetween(nearbySystem, system);
-                if (distanceToNeighbour <= ship.getFuelTanks()) {
+                if (distanceToNeighbour <= maxRange) {
                     ++neighboursInRange;
                 }
             }
@@ -326,7 +326,7 @@ public class Galaxy {
         return system;
     }
 
-    SolarSystem getRandomSystem() {
+    public SolarSystem getRandomSystem() {
         int index = GetRandom(systems.size());
         return systems.get(index);
     }

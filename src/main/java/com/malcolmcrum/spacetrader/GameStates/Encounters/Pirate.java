@@ -13,7 +13,7 @@ import static com.malcolmcrum.spacetrader.Utils.Pluralize;
  */
 public class Pirate extends Encounter {
 
-    Pirate(Game game, Transit transit) {
+    public Pirate(Game game, Transit transit) {
         super(game, transit);
     }
 

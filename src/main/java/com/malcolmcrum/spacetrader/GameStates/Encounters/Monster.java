@@ -15,7 +15,7 @@ import static com.malcolmcrum.spacetrader.Utils.Pluralize;
 public class Monster extends Encounter {
 
 
-    Monster(Game game, Transit transit) {
+    public Monster(Game game, Transit transit) {
         super(game, transit);
         opponent.setHullStrength(game.getMonsterHullStrength());
     }

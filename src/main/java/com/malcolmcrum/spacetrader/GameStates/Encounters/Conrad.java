@@ -11,7 +11,7 @@ import static com.malcolmcrum.spacetrader.Utils.Pluralize;
  * Created by Malcolm on 9/6/2015.
  */
 public class Conrad extends FamousCaptain {
-    Conrad(Game game, Transit transit) {
+    public Conrad(Game game, Transit transit) {
         super(game, transit);
     }
 

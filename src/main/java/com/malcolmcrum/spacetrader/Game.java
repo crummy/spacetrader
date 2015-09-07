@@ -64,7 +64,7 @@ public class Game {
         ship = new PlayerShip(ShipType.Gnat, this);
         ship.addWeapon(Weapon.PulseLaser);
         ship.addCrew(new Crew(0));
-        currentSystem = galaxy.getStartSystem(ship.type);
+        currentSystem = galaxy.getStartSystem(ship.getFuelCapacity());
         captain = new Captain(this, commanderName);
         rareEncounters = new RareEncounters();
         unreadAlerts = new ArrayList<>();
@@ -91,26 +91,6 @@ public class Game {
     public List<SolarSystem> getSystems() {
         return galaxy.systems;
     }
-
-    /*
-    public boolean travelToPlanet(SolarSystem destination) {
-        if (state != State.OnPlanet) {
-            logger.warn("Tried to travel, but we aren't on a planet");
-            return false;
-        }
-        if (currentSystem == destination) {
-            logger.warn("Tried to travel to planet we're already on");
-        }
-        int distance = (int)Vector2i.Distance(currentSystem.getLocation(), destination.getLocation());
-        if (distance > ship.getFuel()) {
-            logger.warn("Tried to travel to planet out of range of fuel tanks");
-            return false;
-        }
-        currentSystem = destination;
-        state = State.InTransit;
-        return true;
-    }
-    */
 
     public int getFabricRipProbability() {
         return fabricRipProbability;

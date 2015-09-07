@@ -35,7 +35,7 @@ public class Transit extends GameState {
     }
 
     @Override
-    GameState init() {
+    public GameState init() {
         clicksRemaining = 21;
         totalClicks = clicksRemaining;
         beenRaided = false;
@@ -73,7 +73,7 @@ public class Transit extends GameState {
                     && destination.getType() == SolarSystem.Name.Acamar
                     && game.getMonsterStatus() == com.malcolmcrum.spacetrader.Monster.InAcamar;
             if (spaceMonsterEncounter) {
-                return new Monster();
+                return new Monster(game, this);
             }
 
             boolean scarabEncounter = clicksRemaining == 20
@@ -81,14 +81,14 @@ public class Transit extends GameState {
                     && game.getScarabStatus() == com.malcolmcrum.spacetrader.Scarab.Alive
                     && arrivedViaWormhole;
             if (scarabEncounter) {
-                return new Scarab();
+                return new Scarab(game, this);
             }
 
             boolean dragonflyEncounter = clicksRemaining == 1
                     && destination.getType() == SolarSystem.Name.Zalkon
                     && game.getDragonflyStatus() == com.malcolmcrum.spacetrader.Dragonfly.GoToZalkon;
             if (dragonflyEncounter) {
-                return new Dragonfly();
+                return new Dragonfly(game, this);
             }
 
             boolean encounterMantis = false;
@@ -101,7 +101,7 @@ public class Transit extends GameState {
             int encounterTest = GetRandom(44 - (2 * game.getDifficulty().getValue()));
 
             // encounters are half as likely if you're in a flea.
-            if (game.getShip().type == ShipType.Flea) {
+            if (game.getShip().getType() == ShipType.Flea) {
                 encounterTest *= 2;
             }
 
@@ -138,7 +138,7 @@ public class Transit extends GameState {
             if (encounterPolice) {
                 return new Police(game, this);
             } else if (encounterMantis) {
-                return new Mantis();
+                return new Mantis(game, this);
             } else if (encounterPirate) {
                 return new Pirate(game, this);
             } else if (encounterTrader) {
@@ -160,7 +160,7 @@ public class Transit extends GameState {
                     case 0:
                         if (!game.getRareEncounters().marie()) {
                             game.getRareEncounters().encounteredMarie();
-                            return new MarieCeleste();
+                            return new MarieCeleste(game, this);
                         }
                         break;
                     case 1:
@@ -169,7 +169,7 @@ public class Transit extends GameState {
                                 && !game.getCaptain().isCriminal()
                                 && !game.getRareEncounters().ahab()) {
                             game.getRareEncounters().encounteredAhab();
-                            return new Ahab();
+                            return new Ahab(game, this);
                         }
                         break;
                     case 2:
@@ -178,7 +178,7 @@ public class Transit extends GameState {
                                 && !game.getCaptain().isCriminal()
                                 && !game.getRareEncounters().conrad()) {
                             game.getRareEncounters().encounteredConrad();
-                            return new Conrad();
+                            return new Conrad(game, this);
                         }
                         break;
                     case 3:
@@ -187,19 +187,19 @@ public class Transit extends GameState {
                                 && !game.getCaptain().isCriminal()
                                 && !game.getRareEncounters().huie()) {
                             game.getRareEncounters().encounteredHuie();
-                            return new Huie();
+                            return new Huie(game, this);
                         }
                         break;
                     case 4:
                         if (!game.getRareEncounters().oldBottle()) {
                             game.getRareEncounters().encounteredOldBottle();
-                            return new OldBottle();
+                            return new OldBottle(game, this);
                         }
                         break;
                     case 5:
                         if (!game.getRareEncounters().goodBottle()) {
                             game.getRareEncounters().encounteredGoodBottle();
-                            return new GoodBottle();
+                            return new GoodBottle(game, this);
                         }
                         break;
                 }
@@ -210,7 +210,7 @@ public class Transit extends GameState {
         // Ah, just when you thought you were gonna get away with it...
         if (justLootedMarie) {
             ++clicksRemaining;
-            return new PostMariePolice();
+            return new PostMariePolice(game, this);
         }
 
         if (hadEncounter) {

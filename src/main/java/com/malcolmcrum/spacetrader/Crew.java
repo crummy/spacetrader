@@ -57,7 +57,7 @@ public class Crew {
         return name;
     }
 
-    private enum Name {
+    protected enum Name {
         Captain("You"),
         Alyssa("Alyssa"),
         Armatur("Armatur"),

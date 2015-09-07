@@ -155,9 +155,9 @@ public class GalaxyTest
 
     @Test
     public void testGetStartSystem() throws Exception {
-        SolarSystem system = galaxy.getStartSystem(ShipType.Beetle);
+        SolarSystem system = galaxy.getStartSystem(ShipType.Gnat.getFuelTanks());
         assertFalse(system.hasSpecialEvent());
-        assertFalse(system.getTechLevel() == TechLevel.Agricultural);
+        assertFalse(system.getTechLevel() == TechLevel.Preagricultural);
         assertFalse(system.getTechLevel() == TechLevel.HiTech);
     }
 

@@ -12,7 +12,7 @@ import static com.malcolmcrum.spacetrader.Utils.Pluralize;
  * Created by Malcolm on 9/4/2015.
  */
 public class Police extends Encounter {
-    Police(Game game, Transit transit) {
+    public Police(Game game, Transit transit) {
         super(game, transit);
     }
 

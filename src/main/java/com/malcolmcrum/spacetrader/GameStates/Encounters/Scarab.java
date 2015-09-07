@@ -11,7 +11,7 @@ import static com.malcolmcrum.spacetrader.Utils.Pluralize;
  */
 public class Scarab extends Encounter {
 
-    Scarab(Game game, Transit transit) {
+    public Scarab(Game game, Transit transit) {
         super(game, transit);
     }
 

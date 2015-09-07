@@ -11,7 +11,7 @@ import static com.malcolmcrum.spacetrader.Utils.Pluralize;
  */
 public class Dragonfly extends Encounter {
 
-    Dragonfly(Game game, Transit transit) {
+    public Dragonfly(Game game, Transit transit) {
         super(game, transit);
     }
 

@@ -18,13 +18,12 @@ public class Ship {
     private static final int SKILL_BONUS = 3;
     private static final int CLOAK_BONUS = 2;
 
-    // TODO: make below stuff private
-    ShipType type;
-    List<Cargo> cargo;
-    List<Gadget> gadgets;
-    List<Weapon> weapons;
-    List<Shield> shields;
-    List<Crew> crew;
+    protected ShipType type;
+    protected List<Cargo> cargo;
+    protected List<Gadget> gadgets;
+    protected List<Weapon> weapons;
+    protected List<Shield> shields;
+    protected List<Crew> crew;
 
     private int fuel;
     protected int hullStrength;
@@ -314,7 +313,7 @@ public class Ship {
         return gadgets.contains(gadget);
     }
 
-    public int reputationForKilling() {
+    public int reputationGainForKilling() {
         return 1 + type.ordinal();
     }
 
@@ -324,6 +323,10 @@ public class Ship {
 
     public String getName() {
         return type.getName();
+    }
+
+    public ShipType getType() {
+        return type;
     }
 
     class Cargo {

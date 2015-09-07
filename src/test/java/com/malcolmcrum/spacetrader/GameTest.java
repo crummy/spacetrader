@@ -15,7 +15,7 @@ public class GameTest {
 
         boolean success = game.startNewGame("Bill", 5, 5, 5, 5, Difficulty.Easy);
         assertTrue("Game wouldn't let us start with correct skillpoints", success);
-        assertTrue("lottery winner", game.currentSystem.getSpecialEvent() == SolarSystem.SpecialEvent.LotteryWinner);
+        assertTrue("lottery winner", game.getCurrentSystem().getSpecialEvent() == SolarSystem.SpecialEvent.LotteryWinner);
 
         boolean negativeSkillGame = game.startNewGame("Bill", -1, 5, 5, 5, Difficulty.Easy);
         assertFalse("negative skills", negativeSkillGame);

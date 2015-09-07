@@ -10,6 +10,7 @@ public class PlayerShip extends Ship {
     private boolean hasEscapePod;
     private boolean hasInsurance;
     private int daysWithoutClaim;
+    private boolean artifactOnBoard;
 
     public PlayerShip(ShipType type, Game game) {
         super(type, game);
@@ -17,6 +18,7 @@ public class PlayerShip extends Ship {
         hasEscapePod = false;
         hasInsurance = false;
         daysWithoutClaim = 0;
+        artifactOnBoard = false;
     }
 
     public int getPriceWithoutCargo(boolean forInsurance) {
@@ -155,5 +157,9 @@ public class PlayerShip extends Ship {
 
     public int getRepairCost() {
         return type.getRepairCost();
+    }
+
+    public boolean hasArtifactOnBoard() {
+        return artifactOnBoard;
     }
 }

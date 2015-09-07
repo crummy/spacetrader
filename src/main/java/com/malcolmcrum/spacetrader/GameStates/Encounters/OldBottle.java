@@ -10,7 +10,7 @@ import static com.malcolmcrum.spacetrader.Utils.Pluralize;
  * Created by Malcolm on 9/6/2015.
  */
 public class OldBottle extends Encounter {
-    OldBottle(Game game, Transit transit) {
+    public OldBottle(Game game, Transit transit) {
         super(game, transit);
     }
 
