@@ -2,6 +2,10 @@ package com.malcolmcrum.spacetrader.GameStates;
 
 import com.malcolmcrum.spacetrader.*;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Malcolm on 9/2/2015.
  */
@@ -13,9 +17,17 @@ public class ShipDestroyed extends GameState {
         this.newSystem = newSystem;
     }
 
+    public List<Method> getActions() {
+        return new ArrayList<>();
+    }
+
     @Override
     public GameState init() {
-        return this;
+        if (game.getShip().hasEscapePod()) {
+            return escapeWithPod();
+        } else {
+            return gameOver();
+        }
     }
 
     public GameState gameOver() {

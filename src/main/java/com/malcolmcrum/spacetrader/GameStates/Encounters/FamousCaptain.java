@@ -1,10 +1,10 @@
 package com.malcolmcrum.spacetrader.GameStates.Encounters;
 
-import com.malcolmcrum.spacetrader.Alert;
-import com.malcolmcrum.spacetrader.Game;
+import com.malcolmcrum.spacetrader.*;
 import com.malcolmcrum.spacetrader.GameStates.GameState;
 import com.malcolmcrum.spacetrader.GameStates.Transit;
-import com.malcolmcrum.spacetrader.TradeItem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -14,8 +14,23 @@ import java.util.List;
  * Created by Malcolm on 9/6/2015.
  */
 public abstract class FamousCaptain extends Encounter {
+    private static final Logger logger = LoggerFactory.getLogger(FamousCaptain.class);
+
     FamousCaptain(Game game, Transit transit) {
         super(game, transit);
+        opponent = new Ship(ShipType.Wasp, game);
+        opponent.addCrew(new Crew(Game.MAX_POINTS_PER_SKILL, Game.MAX_POINTS_PER_SKILL, Game.MAX_POINTS_PER_SKILL, Game.MAX_POINTS_PER_SKILL));
+
+        opponent.addGadget(Gadget.Targeting);
+        opponent.addGadget(Gadget.Navigation);
+
+        for (int i = 0; i < ShipType.Wasp.getShieldSlots(); ++i) {
+            opponent.addShield(ShieldType.ReflectiveShield);
+        }
+
+        for (int i = 0; i < ShipType.Wasp.getWeaponSlots(); ++i) {
+            opponent.addWeapon(Weapon.MilitaryLaser);
+        }
     }
 
     @Override
@@ -42,7 +57,7 @@ public abstract class FamousCaptain extends Encounter {
                     break;
             }
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            logger.error("Method does not exist: " + e.getMessage());
         }
         return actions;
     }

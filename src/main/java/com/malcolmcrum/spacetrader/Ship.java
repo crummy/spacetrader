@@ -329,6 +329,14 @@ public class Ship {
         return type;
     }
 
+    public void addGadget(Gadget gadget) {
+        if (gadgets.size() > type.getGadgetSlots()) {
+            logger.error("Tried to add more gadgets than we have slots!");
+            return;
+        }
+        gadgets.add(gadget);
+    }
+
     class Cargo {
         TradeItem item;
         int buyingPrice;

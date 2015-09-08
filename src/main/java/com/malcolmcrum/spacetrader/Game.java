@@ -13,7 +13,7 @@ import java.util.List;
 public class Game {
     private static final Logger logger = LoggerFactory.getLogger(Game.class);
 
-    static final int MAX_POINTS_PER_SKILL = 10;
+    public static final int MAX_POINTS_PER_SKILL = 10;
     private static final int MAX_SKILL_POINTS_TOTAL = 20;
     private static final int MIN_POINTS_PER_SKILL = 1;
     public static final int DEBT_TOO_LARGE = 100000;

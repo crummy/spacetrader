@@ -1,7 +1,10 @@
 package com.malcolmcrum.spacetrader.GameStates.Encounters;
 
 import com.malcolmcrum.spacetrader.Game;
+import com.malcolmcrum.spacetrader.GameStates.GameState;
 import com.malcolmcrum.spacetrader.GameStates.Transit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -13,6 +16,8 @@ import static com.malcolmcrum.spacetrader.Utils.Pluralize;
  * Created by Malcolm on 9/6/2015.
  */
 public class GoodBottle extends Encounter {
+    private static final Logger logger = LoggerFactory.getLogger(GoodBottle.class);
+
 
     public GoodBottle(Game game, Transit transit) {
         super(game, transit);
@@ -43,9 +48,14 @@ public class GoodBottle extends Encounter {
                     break;
             }
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            logger.error("Method does not exist: " + e.getMessage());
         }
         return actions;
+    }
+
+    public GameState actionDrink() {
+        // TODO
+        return this;
     }
 
     @Override

@@ -1,9 +1,13 @@
 package com.malcolmcrum.spacetrader.GameStates.Encounters;
 
 import com.malcolmcrum.spacetrader.Alert;
+import com.malcolmcrum.spacetrader.Difficulty;
 import com.malcolmcrum.spacetrader.Game;
 import com.malcolmcrum.spacetrader.GameStates.GameState;
 import com.malcolmcrum.spacetrader.GameStates.Transit;
+import com.malcolmcrum.spacetrader.ShipType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -16,9 +20,17 @@ import static com.malcolmcrum.spacetrader.Utils.Pluralize;
  * Created by Malcolm on 9/4/2015.
  */
 public class Pirate extends Encounter {
+    private static final Logger logger = LoggerFactory.getLogger(Pirate.class);
+
 
     public Pirate(Game game, Transit transit) {
         super(game, transit);
+        int tries = 1 + (game.getCaptain().getWorth() / 100000);
+        int difficulty = game.getDifficulty().getValue();
+        int normal = Difficulty.Normal.getValue();
+        tries = Math.max(1, tries + difficulty - normal);
+
+
     }
 
     @Override
@@ -51,9 +63,19 @@ public class Pirate extends Encounter {
                     break;
             }
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            logger.error("Method does not exist: " + e.getMessage());
         }
         return actions;
+    }
+
+    public GameState actionSurrender() {
+        // TODO
+        return this;
+    }
+
+    public GameState actionPlunder() {
+        // TODO
+        return this;
     }
 
     @Override

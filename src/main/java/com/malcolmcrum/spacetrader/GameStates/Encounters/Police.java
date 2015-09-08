@@ -4,6 +4,8 @@ import com.malcolmcrum.spacetrader.*;
 import com.malcolmcrum.spacetrader.GameStates.GameState;
 import com.malcolmcrum.spacetrader.GameStates.InSystem;
 import com.malcolmcrum.spacetrader.GameStates.Transit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -16,6 +18,9 @@ import static com.malcolmcrum.spacetrader.Utils.Pluralize;
  * Created by Malcolm on 9/4/2015.
  */
 public class Police extends Encounter {
+    private static final Logger logger = LoggerFactory.getLogger(Police.class);
+
+
     public Police(Game game, Transit transit) {
         super(game, transit);
     }
@@ -27,7 +32,7 @@ public class Police extends Encounter {
             switch(opponentStatus) {
                 case Ignoring:
                     actions.add(Police.class.getMethod("actionAttack"));
-                    actions.add(Police.class.getMethod("ignoreAction"));
+                    actions.add(Police.class.getMethod("actionIgnore"));
                     break;
                 case Awake:
                     actions.add(Police.class.getMethod("actionAttack"));
@@ -52,9 +57,14 @@ public class Police extends Encounter {
                     break;
             }
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            logger.error("Method does not exist: " + e.getMessage());
         }
         return actions;
+    }
+
+    public GameState actionSubmit() {
+        // TODO
+        return this;
     }
 
     @Override
@@ -101,7 +111,7 @@ public class Police extends Encounter {
     }
 
     @Override
-    public GameState fleeAction() throws InvalidPlayerAction, InvalidOpponentAction {
+    public GameState actionFlee() throws InvalidPlayerAction, InvalidOpponentAction {
         boolean hasNarcotics = game.getShip().getCargoCount(TradeItem.Narcotics) > 0;
         boolean hasFirearms = game.getShip().getCargoCount(TradeItem.Firearms) > 0;
         boolean hasWild = game.getWildStatus() == Wild.OnBoard;
@@ -113,7 +123,7 @@ public class Police extends Encounter {
         opponentStatus = Status.Attacking;
         game.getCaptain().fledPolice();
 
-        return super.fleeAction();
+        return super.actionFlee();
     }
 
     @Override
@@ -152,6 +162,11 @@ public class Police extends Encounter {
 
         arrestPlayer();
         return new InSystem(game, transit.getDestination());
+    }
+
+    public GameState actionBribe() {
+        // TODO;
+        return this;
     }
 
     private void arrestPlayer() {

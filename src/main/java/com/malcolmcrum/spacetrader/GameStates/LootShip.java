@@ -5,21 +5,36 @@ import com.malcolmcrum.spacetrader.Game;
 import com.malcolmcrum.spacetrader.Ship;
 import com.malcolmcrum.spacetrader.TradeItem;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.malcolmcrum.spacetrader.Utils.GetRandom;
 import static com.malcolmcrum.spacetrader.Utils.RandomEnum;
 
 /**
  * Created by Malcolm on 9/2/2015.
  */
-public class LootShipState extends GameState {
+public class LootShip extends GameState {
     GameState nextState;
     Ship ship;
     TradeItem item;
 
-    public LootShipState(Game game, Transit transit, Ship ship) {
+    public LootShip(Game game, Transit transit, Ship ship) {
         super(game);
         this.ship = ship;
         nextState = transit;
+    }
+
+    public List<Method> getActions() {
+        List<Method> actions = new ArrayList<>();
+        try {
+            actions.add(LootShip.class.getMethod("scoop"));
+            actions.add(LootShip.class.getMethod("skip"));
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        return actions;
     }
 
     @Override

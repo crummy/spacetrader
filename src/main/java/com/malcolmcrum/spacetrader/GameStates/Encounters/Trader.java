@@ -79,7 +79,7 @@ public class Trader extends Encounter {
                     break;
             }
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            logger.error("Method does not exist: " + e.getMessage());
         }
         return actions;
     }
@@ -87,6 +87,11 @@ public class Trader extends Encounter {
     @Override
     public String getTitle() {
         return "trader ship";
+    }
+
+    public GameState actionPlunder() {
+        // TODO
+        return this;
     }
 
     @Override

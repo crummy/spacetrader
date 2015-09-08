@@ -7,6 +7,7 @@ import com.malcolmcrum.spacetrader.GameStates.Encounters.Scarab;
 import com.malcolmcrum.spacetrader.GameStates.Transit;
 import org.junit.Test;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -39,6 +40,7 @@ public class EncounterTest extends GameStateTest {
         Transit transit = new Transit(game, game.getCurrentSystem(), false);
 
         Police police = new Police(game, transit);
+        police.init();
         List<String> inspectionActions = Arrays.asList(ATTACK_ACTION, FLEE_ACTION, SUBMIT_ACTION, BRIBE_ACTION);
         checkActions(police, Encounter.Status.Awake, inspectionActions);
 
@@ -57,6 +59,7 @@ public class EncounterTest extends GameStateTest {
         Transit transit = new Transit(game, game.getCurrentSystem(), false);
 
         PostMariePolice police = new PostMariePolice(game, transit);
+        police.init();
         List<String> inspectionActions = Arrays.asList(ATTACK_ACTION, FLEE_ACTION, YIELD_ACTION, BRIBE_ACTION);
         checkActions(police, Encounter.Status.Awake, inspectionActions);
     }
@@ -67,6 +70,7 @@ public class EncounterTest extends GameStateTest {
         Transit transit = new Transit(game, game.getCurrentSystem(), false);
 
         Trader trader = new Trader(game, transit);
+        trader.init();
 
         List<String> tradeActions = Arrays.asList(ATTACK_ACTION, IGNORE_ACTION, TRADE_ACTION);
         checkActions(trader, Encounter.Status.Awake, tradeActions);
@@ -85,23 +89,12 @@ public class EncounterTest extends GameStateTest {
 
     }
 
-    private void checkActions(Encounter opponent, Encounter.Status status, List<String> allowedActions) {
-        opponent.setStatus(status);
-        methods = opponent.getActions();
-        for (String action : allActions) {
-            if (allowedActions.contains(action)) {
-                assertNotNull(findMethodNamed(action));
-            } else {
-                assertNull(findMethodNamed(action));
-            }
-        }
-    }
-
     @Test
     public void testPirate() {
         Transit transit = new Transit(game, game.getCurrentSystem(), false);
 
         Pirate pirate = new Pirate(game, transit);
+        pirate.init();
 
         List<String> fleeingActions = Arrays.asList(ATTACK_ACTION, IGNORE_ACTION);
         checkActions(pirate, Encounter.Status.Fleeing, fleeingActions);
@@ -121,6 +114,7 @@ public class EncounterTest extends GameStateTest {
         Transit transit = new Transit(game, game.getCurrentSystem(), false);
 
         Monster monster = new Monster(game, transit);
+        monster.init();
         List<String> ignoringActions = Arrays.asList(ATTACK_ACTION, IGNORE_ACTION);
         checkActions(monster, Encounter.Status.Ignoring, ignoringActions);
 
@@ -133,6 +127,7 @@ public class EncounterTest extends GameStateTest {
         Transit transit = new Transit(game, game.getCurrentSystem(), false);
 
         Dragonfly dragonfly = new Dragonfly(game, transit);
+        dragonfly.init();
         List<String> ignoringActions = Arrays.asList(ATTACK_ACTION, IGNORE_ACTION);
         checkActions(dragonfly, Encounter.Status.Ignoring, ignoringActions);
 
@@ -157,6 +152,7 @@ public class EncounterTest extends GameStateTest {
         Transit transit = new Transit(game, game.getCurrentSystem(), false);
 
         MarieCeleste marie = new MarieCeleste(game, transit);
+        marie.init();
         List<String> boardActions = Arrays.asList(BOARD_ACTION, IGNORE_ACTION);
         checkActions(marie, Encounter.Status.Awake, boardActions);
     }
@@ -166,10 +162,12 @@ public class EncounterTest extends GameStateTest {
         Transit transit = new Transit(game, game.getCurrentSystem(), false);
 
         GoodBottle good = new GoodBottle(game, transit);
+        good.init();
         List<String> bottleActions = Arrays.asList(DRINK_ACTION, IGNORE_ACTION);
         checkActions(good, Encounter.Status.Awake, bottleActions);
 
         OldBottle old = new OldBottle(game, transit);
+        old.init();
         checkActions(old, Encounter.Status.Awake, bottleActions);
     }
 
@@ -188,6 +186,18 @@ public class EncounterTest extends GameStateTest {
 
             List<String> meetActions = Arrays.asList(ATTACK_ACTION, IGNORE_ACTION, MEET_ACTION);
             checkActions(captain, Encounter.Status.Awake, meetActions);
+        }
+    }
+
+    private void checkActions(Encounter opponent, Encounter.Status status, List<String> allowedActions) {
+        opponent.setStatus(status);
+        List<Method> methods = opponent.getActions();
+        for (String action : allActions) {
+            if (allowedActions.contains(action)) {
+                assertNotNull(action + " should be allowed", findMethodNamed(action, methods));
+            } else {
+                assertNull(action + " should not be allowed", findMethodNamed(action, methods));
+            }
         }
     }
 

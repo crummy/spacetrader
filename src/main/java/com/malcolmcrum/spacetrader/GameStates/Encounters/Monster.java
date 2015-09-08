@@ -1,10 +1,10 @@
 package com.malcolmcrum.spacetrader.GameStates.Encounters;
 
-import com.malcolmcrum.spacetrader.Alert;
-import com.malcolmcrum.spacetrader.Difficulty;
-import com.malcolmcrum.spacetrader.Game;
+import com.malcolmcrum.spacetrader.*;
 import com.malcolmcrum.spacetrader.GameStates.GameState;
 import com.malcolmcrum.spacetrader.GameStates.Transit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -17,6 +17,8 @@ import static com.malcolmcrum.spacetrader.Utils.Pluralize;
  * Created by Malcolm on 9/6/2015.
  */
 public class Monster extends Encounter {
+    private static final Logger logger = LoggerFactory.getLogger(Monster.class);
+
 
     @Override
     public List<Method> getActions() {
@@ -25,7 +27,7 @@ public class Monster extends Encounter {
             switch(opponentStatus) {
                 case Ignoring:
                     actions.add(Monster.class.getMethod("actionAttack"));
-                    actions.add(Monster.class.getMethod("ignoreAction"));
+                    actions.add(Monster.class.getMethod("actionIgnore"));
                     break;
                 case Awake:
                     break;
@@ -43,15 +45,27 @@ public class Monster extends Encounter {
                     break;
             }
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            logger.error("Method does not exist: " + e.getMessage());
         }
         return actions;
     }
 
-
     public Monster(Game game, Transit transit) {
         super(game, transit);
-        opponent.setHullStrength(game.getMonsterHullStrength());
+        opponent = new Ship(ShipType.SpaceMonster, game);
+
+        int difficulty = game.getDifficulty().getValue();
+        opponent.addCrew(new Crew(8 + difficulty, 8 + difficulty, 1, 1 + difficulty));
+
+        // Monster continues health from previous encounter.
+        int savedHealth = game.getMonsterHullStrength();
+        opponent.setHullStrength(savedHealth);
+
+        if (game.getShip().isInvisibleTo(opponent)) {
+            opponentStatus = Status.Ignoring;
+        } else {
+            opponentStatus = Status.Attacking;
+        }
     }
 
     @Override
@@ -74,7 +88,7 @@ public class Monster extends Encounter {
 
     @Override
     // Overridden just so we can set the monster's health after a successful flee
-    public GameState fleeAction() throws InvalidOpponentAction, InvalidPlayerAction {
+    public GameState actionFlee() throws InvalidOpponentAction, InvalidPlayerAction {
         isPlayerFleeing = true;
 
         opponentAction();

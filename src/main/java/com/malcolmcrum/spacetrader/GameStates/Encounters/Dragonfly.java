@@ -1,8 +1,13 @@
 package com.malcolmcrum.spacetrader.GameStates.Encounters;
 
+import com.malcolmcrum.spacetrader.Crew;
 import com.malcolmcrum.spacetrader.Game;
 import com.malcolmcrum.spacetrader.GameStates.GameState;
 import com.malcolmcrum.spacetrader.GameStates.Transit;
+import com.malcolmcrum.spacetrader.Ship;
+import com.malcolmcrum.spacetrader.ShipType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -14,6 +19,8 @@ import static com.malcolmcrum.spacetrader.Utils.Pluralize;
  * Created by Malcolm on 9/6/2015.
  */
 public class Dragonfly extends Encounter {
+    private static final Logger logger = LoggerFactory.getLogger(Dragonfly.class);
+
 
     @Override
     public List<Method> getActions() {
@@ -22,7 +29,7 @@ public class Dragonfly extends Encounter {
             switch(opponentStatus) {
                 case Ignoring:
                     actions.add(Dragonfly.class.getMethod("actionAttack"));
-                    actions.add(Dragonfly.class.getMethod("ignoreAction"));
+                    actions.add(Dragonfly.class.getMethod("actionIgnore"));
                     break;
                 case Awake:
                     break;
@@ -40,13 +47,23 @@ public class Dragonfly extends Encounter {
                     break;
             }
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            logger.error("Method does not exist: " + e.getMessage());
         }
         return actions;
     }
 
     public Dragonfly(Game game, Transit transit) {
         super(game, transit);
+        opponent = new Ship(ShipType.Dragonfly, game);
+
+        int difficulty = game.getDifficulty().getValue();
+        opponent.addCrew(new Crew(4 + difficulty, 6 + difficulty, 1, 6 + difficulty));
+
+        if (game.getShip().isInvisibleTo(opponent)) {
+            opponentStatus = Status.Ignoring;
+        } else {
+            opponentStatus = Status.Attacking;
+        }
     }
 
     @Override

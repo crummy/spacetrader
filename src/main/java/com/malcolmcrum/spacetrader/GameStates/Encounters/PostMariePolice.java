@@ -1,7 +1,10 @@
 package com.malcolmcrum.spacetrader.GameStates.Encounters;
 
 import com.malcolmcrum.spacetrader.Game;
+import com.malcolmcrum.spacetrader.GameStates.GameState;
 import com.malcolmcrum.spacetrader.GameStates.Transit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -12,6 +15,9 @@ import java.util.List;
  * Created by Malcolm on 9/6/2015.
  */
 public class PostMariePolice extends Police {
+    private static final Logger logger = LoggerFactory.getLogger(PostMariePolice.class);
+
+
     public PostMariePolice(Game game, Transit transit) {
         super(game, transit);
     }
@@ -46,9 +52,14 @@ public class PostMariePolice extends Police {
                     break;
             }
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            logger.error("Method does not exist: " + e.getMessage());
         }
         return actions;
+    }
+
+    public GameState actionYield() {
+        // TODO
+        return this;
     }
 
     @Override

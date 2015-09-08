@@ -21,7 +21,15 @@ public class Crew {
         return Name.values().length;
     }
 
-    Crew(int index) {
+    public Crew(int pilot, int fighter, int trader, int engineer) {
+        this.name = null;
+        this.pilot = pilot;
+        this.fighter = fighter;
+        this.engineer = engineer;
+        this.trader = trader;
+    }
+
+    public Crew(int index) {
         this.name = Name.values()[index];
         pilot = randomSkill();
         fighter = randomSkill();

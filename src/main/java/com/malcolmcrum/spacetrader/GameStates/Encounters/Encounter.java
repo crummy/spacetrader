@@ -2,14 +2,11 @@ package com.malcolmcrum.spacetrader.GameStates.Encounters;
 
 import com.malcolmcrum.spacetrader.*;
 import com.malcolmcrum.spacetrader.GameStates.GameState;
-import com.malcolmcrum.spacetrader.GameStates.LootShipState;
+import com.malcolmcrum.spacetrader.GameStates.LootShip;
 import com.malcolmcrum.spacetrader.GameStates.ShipDestroyed;
 import com.malcolmcrum.spacetrader.GameStates.Transit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.lang.reflect.Method;
-import java.util.List;
 
 import static com.malcolmcrum.spacetrader.Utils.GetRandom;
 
@@ -45,6 +42,7 @@ public abstract class Encounter extends GameState {
         this.isPlayerFleeing = false;
         this.playerWasHit = false;
         this.tribblesOnScreen = 0;
+        this.opponentStatus = Status.Awake;
     }
 
     /**
@@ -111,14 +109,14 @@ public abstract class Encounter extends GameState {
         return (int)Math.sqrt(game.getShip().getTribbles()/250);
     }
 
-    public GameState ignoreAction() throws InvalidPlayerAction {
+    public GameState actionIgnore() throws InvalidPlayerAction {
         if (opponentStatus != Status.Ignoring && opponentStatus != Status.Fleeing) {
             throw new InvalidPlayerAction();
         }
         return transit;
     }
 
-    public GameState fleeAction() throws InvalidOpponentAction, InvalidPlayerAction {
+    public GameState actionFlee() throws InvalidOpponentAction, InvalidPlayerAction {
         isPlayerFleeing = true;
 
         opponentAction();
@@ -143,7 +141,7 @@ public abstract class Encounter extends GameState {
         return actionResult();
     }
 
-    public GameState attackAction() throws InvalidOpponentAction {
+    public GameState actionAttack() throws InvalidOpponentAction {
         if (opponentStatus == Status.Ignoring || opponentStatus == Status.Awake) {
             initialAttack();
         }
@@ -253,7 +251,7 @@ public abstract class Encounter extends GameState {
      * @return Next state to transition to
      */
     protected GameState destroyedOpponent() {
-        return new LootShipState(game, transit, opponent);
+        return new LootShip(game, transit, opponent);
     }
 
     /**
@@ -296,7 +294,7 @@ public abstract class Encounter extends GameState {
     }
 
     public void setStatus(Status status) {
-        this.status = status;
+        this.opponentStatus = status;
     }
 
     public enum Status {
