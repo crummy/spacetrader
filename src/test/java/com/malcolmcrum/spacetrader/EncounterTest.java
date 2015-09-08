@@ -194,9 +194,9 @@ public class EncounterTest extends GameStateTest {
         List<Method> methods = opponent.getActions();
         for (String action : allActions) {
             if (allowedActions.contains(action)) {
-                assertNotNull(action + " should be allowed", findMethodNamed(action, methods));
+                assertNotNull(action + " should be allowed for " + status, findMethodNamed(action, methods));
             } else {
-                assertNull(action + " should not be allowed", findMethodNamed(action, methods));
+                assertNull(action + " should not be allowed for " + status, findMethodNamed(action, methods));
             }
         }
     }

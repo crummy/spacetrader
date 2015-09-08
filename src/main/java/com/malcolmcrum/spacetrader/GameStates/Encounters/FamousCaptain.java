@@ -31,6 +31,8 @@ public abstract class FamousCaptain extends Encounter {
         for (int i = 0; i < ShipType.Wasp.getWeaponSlots(); ++i) {
             opponent.addWeapon(Weapon.MilitaryLaser);
         }
+
+        opponentStatus = Status.Awake;
     }
 
     @Override
@@ -46,6 +48,8 @@ public abstract class FamousCaptain extends Encounter {
                     actions.add(FamousCaptain.class.getMethod("actionMeet"));
                     break;
                 case Attacking:
+                    actions.add(FamousCaptain.class.getMethod("actionAttack"));
+                    actions.add(FamousCaptain.class.getMethod("actionFlee"));
                     break;
                 case Fleeing:
                     break;
@@ -60,6 +64,11 @@ public abstract class FamousCaptain extends Encounter {
             logger.error("Method does not exist: " + e.getMessage());
         }
         return actions;
+    }
+
+    public GameState actionMeet() {
+        // TODO
+        return this;
     }
 
     @Override
