@@ -1,5 +1,7 @@
 package com.malcolmcrum.spacetrader;
 
+import static com.malcolmcrum.spacetrader.Utils.GetRandom;
+
 /**
  * Created by Malcolm on 8/28/2015.
  */
@@ -32,5 +34,23 @@ public enum ShieldType {
 
     public int getPower() {
         return power;
+    }
+
+    public static ShieldType GetAdjustedRandomShield() {
+        int totalOccurrenceChance = 0;
+        for (ShieldType type : ShieldType.values()) {
+            totalOccurrenceChance += type.chance;
+        }
+
+        int chosenOccurrenceIndex = GetRandom(totalOccurrenceChance);
+
+        int currentOccurrenceTotal = 0;
+        for (ShieldType type : ShieldType.values()) {
+            currentOccurrenceTotal += type.chance;
+            if (currentOccurrenceTotal >= chosenOccurrenceIndex) {
+                return type;
+            }
+        }
+        return null;
     }
 }

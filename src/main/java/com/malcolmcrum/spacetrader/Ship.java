@@ -247,12 +247,16 @@ public class Ship {
         return false;
     }
 
-    public void addShield(ShieldType shieldType) {
+    public void addShield(ShieldType shieldType, int power) {
         if (shields.size() >= type.getShieldSlots()) {
             logger.error("Trying to add shields to a full ship!");
         } else {
-            shields.add(new Shield(shieldType));
+            shields.add(new Shield(shieldType, power));
         }
+    }
+
+    public void addShield(ShieldType shieldType) {
+        addShield(shieldType, shieldType.getPower());
     }
 
     public int weaponStrength() {
@@ -309,7 +313,7 @@ public class Ship {
         return hasGadget(Gadget.Cloaking) && getEngineerSkill() > opponent.getEngineerSkill();
     }
 
-    private boolean hasGadget(Gadget gadget) {
+    public boolean hasGadget(Gadget gadget) {
         return gadgets.contains(gadget);
     }
 
@@ -337,6 +341,33 @@ public class Ship {
         gadgets.add(gadget);
     }
 
+    public int getCargoBays() {
+        int bays = type.getCargoBays();
+        for (Gadget g : gadgets) {
+            if (g == Gadget.CargoBays) {
+                bays += 5;
+            }
+        }
+        return bays;
+    }
+
+    public boolean hasWeapon(Weapon weapon) {
+        return weapons.contains(weapon);
+    }
+
+    public boolean hasShields() {
+        for (Shield shield : shields) {
+            if (shield.power > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public int getCrewQuarters() {
+        return type.getCrewQuarters();
+    }
+
     class Cargo {
         TradeItem item;
         int buyingPrice;
@@ -349,9 +380,9 @@ public class Ship {
     class Shield {
         ShieldType shieldType;
         int power;
-        Shield(ShieldType shieldType) {
+        Shield(ShieldType shieldType, int power) {
             this.shieldType = shieldType;
-            this.power = shieldType.getPower();
+            this.power = power;
         }
     }
 }

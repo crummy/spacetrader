@@ -3,6 +3,7 @@ package com.malcolmcrum.spacetrader;
 import static com.malcolmcrum.spacetrader.Utils.GetRandom;
 
 /**
+ * TODO: Split into Crew and Mercenary
  * Created by Malcolm on 8/28/2015.
  */
 public class Crew {
@@ -16,6 +17,14 @@ public class Crew {
     private int engineer;
 
     private int dailyCost;
+
+    public Crew() {
+        this.name = null;
+        this.pilot = 1 + GetRandom(Game.MAX_POINTS_PER_SKILL);
+        this.fighter = 1 + GetRandom(Game.MAX_POINTS_PER_SKILL);
+        this.engineer = 1 + GetRandom(Game.MAX_POINTS_PER_SKILL);
+        this.trader = 1 + GetRandom(Game.MAX_POINTS_PER_SKILL);
+    }
 
     public static int getMaxCrew() {
         return Name.values().length;

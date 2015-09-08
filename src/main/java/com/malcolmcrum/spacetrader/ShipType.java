@@ -152,7 +152,7 @@ public enum ShipType {
         int currentOccurrenceTotal = 0;
         for (ShipType type : ShipType.values()) {
             currentOccurrenceTotal += type.occurrenceChance;
-            if (totalOccurrenceChance >= chosenOccurrenceIndex) {
+            if (currentOccurrenceTotal >= chosenOccurrenceIndex) {
                 return type;
             }
         }
