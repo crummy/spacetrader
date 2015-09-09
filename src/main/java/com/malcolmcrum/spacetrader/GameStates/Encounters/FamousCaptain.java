@@ -18,21 +18,36 @@ public abstract class FamousCaptain extends Encounter {
 
     FamousCaptain(Game game, Transit transit) {
         super(game, transit);
-        opponent = new Ship(ShipType.Wasp, game);
-        opponent.addCrew(new Crew(Game.MAX_POINTS_PER_SKILL, Game.MAX_POINTS_PER_SKILL, Game.MAX_POINTS_PER_SKILL, Game.MAX_POINTS_PER_SKILL));
+    }
 
+    @Override
+    protected ShipType chooseShipType(int tries) {
+        return ShipType.Wasp;
+    }
+
+    @Override
+    protected void addCrew() {
+        opponent.addCrew(new Crew(Game.MAX_POINTS_PER_SKILL, Game.MAX_POINTS_PER_SKILL, Game.MAX_POINTS_PER_SKILL, Game.MAX_POINTS_PER_SKILL));
+    }
+
+    @Override
+    protected void addGadgets(int tries) {
         opponent.addGadget(Gadget.Targeting);
         opponent.addGadget(Gadget.Navigation);
+    }
 
+    @Override
+    protected void addShields(int tries) {
         for (int i = 0; i < ShipType.Wasp.getShieldSlots(); ++i) {
             opponent.addShield(ShieldType.ReflectiveShield);
         }
+    }
 
+    @Override
+    protected void addWeapons(int tries) {
         for (int i = 0; i < ShipType.Wasp.getWeaponSlots(); ++i) {
             opponent.addWeapon(Weapon.MilitaryLaser);
         }
-
-        opponentStatus = Status.Awake;
     }
 
     @Override

@@ -1,7 +1,9 @@
 package com.malcolmcrum.spacetrader.GameStates.Encounters;
 
+import com.malcolmcrum.spacetrader.Difficulty;
 import com.malcolmcrum.spacetrader.Game;
 import com.malcolmcrum.spacetrader.GameStates.GameState;
+import com.malcolmcrum.spacetrader.ShipType;
 import com.malcolmcrum.spacetrader.TradeItem;
 import com.malcolmcrum.spacetrader.GameStates.Transit;
 import org.slf4j.Logger;
@@ -26,7 +28,7 @@ public class Trader extends Encounter {
 
     public Trader(Game game, Transit transit) {
         super(game, transit);
-        isBuying = GetRandom(1) == 1;
+        isBuying = GetRandom(2) == 1;
         item = getRandomItemForTrade();
         price = isBuying ? game.getCurrentSystem().getMarket().getSellPrice(item) : game.getCurrentSystem().getMarket().getBuyPrice(item);
         if (item == TradeItem.Narcotics || item == TradeItem.Firearms) {
@@ -94,6 +96,11 @@ public class Trader extends Encounter {
         return this;
     }
 
+    public GameState actionTrade() {
+        // TODO
+        return this;
+    }
+
     @Override
     public String getEncounterDescription() {
         String clicks = Pluralize(transit.getClicksRemaining(), "click");
@@ -111,6 +118,11 @@ public class Trader extends Encounter {
     protected GameState destroyedOpponent() {
         game.getCaptain().killedATrader();
         return super.destroyedOpponent();
+    }
+
+    @Override
+    protected ShipType baseShipType() {
+        return ShipType.Gnat;
     }
 
     /**
@@ -171,7 +183,7 @@ public class Trader extends Encounter {
         }
         // if we didn't succeed in picking randomly, we'll pick sequentially. We can do this, because
         // this routine is only called if there are tradeable goods.
-        for (int i = 0; i < TradeItem.values().length; ++i) {
+        for (TradeItem item : TradeItem.values()) {
             boolean isLegal = item != TradeItem.Firearms && item != TradeItem.Narcotics;
             boolean playerIsDubious = game.getCaptain().isDubious();
             if (isBuying) {
@@ -190,5 +202,15 @@ public class Trader extends Encounter {
         }
         logger.error("Could not find a valid trade item for trader!");
         return null;
+    }
+
+    @Override
+    protected boolean shipTypeAcceptable(ShipType betterShip) {
+        int difficulty = game.getDifficulty().getValue();
+        int normal = Difficulty.Normal.ordinal();
+        int shipLevel = betterShip.getMinStrengthForTraderEncounter().getStrength();
+        int difficultyModifier = (game.getDifficulty() == Difficulty.Hard || game.getDifficulty() == Difficulty.Impossible) ? difficulty - normal : 0;
+        int destinationRequirement = transit.getDestination().getTraderStrength();
+        return destinationRequirement + difficultyModifier >= shipLevel;
     }
 }

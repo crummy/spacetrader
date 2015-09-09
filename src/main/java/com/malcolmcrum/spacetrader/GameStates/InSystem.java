@@ -80,7 +80,6 @@ public class InSystem extends GameState {
         game.setCurrentSystem(system);
         game.getGalaxy().shuffleStatuses();
         game.getGalaxy().changeTradeItemQuantities();
-        system.getMarket().determinePrices();
         alreadyPaidForNewspaper = false;
         addNewsEvents();
         return this;

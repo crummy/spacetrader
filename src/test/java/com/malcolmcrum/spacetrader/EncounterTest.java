@@ -67,7 +67,7 @@ public class EncounterTest extends GameStateTest {
 
     @Test
     public void testTrader() {
-        Transit transit = new Transit(game, game.getCurrentSystem(), false);
+        Transit transit = new Transit(game, game.getGalaxy().getRandomSystem(), false);
 
         Trader trader = new Trader(game, transit);
         trader.init();

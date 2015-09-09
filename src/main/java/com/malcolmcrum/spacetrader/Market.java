@@ -29,6 +29,8 @@ public class Market {
         buyPrices = new HashMap<>();
         quantities = new HashMap<>();
         tradeResetCountdown = 0;
+        initializeQuantities();
+        determinePrices();
     }
 
     public void initializeQuantities() {
@@ -38,11 +40,11 @@ public class Market {
             boolean itemTooAdvanced = item.getTechLevelRequiredForProduction().isBeyond(techLevel());
 
             if (bannedItem || itemTooAdvanced) {
-                quantities.put(item, null);
+                quantities.put(item, 0);
                 continue;
             }
 
-            int quantity = ((9 + GetRandom(5)) - techLevel().erasBetween(item.getTechLevelForTopProduction())) * (1 + size().getMultiplier());
+            Integer quantity = ((9 + GetRandom(5)) - techLevel().erasBetween(item.getTechLevelForTopProduction())) * (1 + size().getMultiplier());
 
             // Cap robots and narcotics due to potential for easy profits
             if (item == TradeItem.Robots || item == TradeItem.Narcotics) {
@@ -75,13 +77,14 @@ public class Market {
     }
 
     /**
-     * Called only when arriving in a system.
+     * Called when LEAVING a system on the DESTINATION - seems odd, but it's necessary
+     * because traders have to know what stuff was available at the destination
      */
     public void determinePrices() { // TODO: Consider putting this in InSystem?
         for (TradeItem item : TradeItem.values()) {
             int buyingPrice = getStandardPrice(item);
             if (buyingPrice <= 0) {
-                buyPrices.put(item, null);
+                buyPrices.put(item, 0);
             } else {
                 // In case of a special status, adjust price accordingly
                 if (item.getDoublePriceTrigger() == status()) {
@@ -142,7 +145,7 @@ public class Market {
                     || (item == TradeItem.Firearms && !firearmsOK())
                     || (techLevel().isBefore(item.getTechLevelForTopProduction()));
             if (itemNotAllowed) {
-                quantities.put(item, null);
+                quantities.put(item, 0);
             } else {
                 int currentQuantity = quantities.get(item);
                 int newQuantity = currentQuantity + GetRandom(5) - GetRandom(5);
@@ -208,7 +211,7 @@ public class Market {
                 price = (price * 3) / 4;
             }
             if (item.getExpensiveResourceTrigger() == specialResource()) {
-                price = (price * 3) / 4;
+                price = (price * 4) / 3;
             }
         }
 
@@ -247,18 +250,22 @@ public class Market {
     }
 
     public boolean isBuying(TradeItem item) {
-        return buyPrices.get(item) > 0;
+        for (TradeItem i : quantities.keySet()) {
+            logger.error("System has item " + i + ", price " + buyPrices.get(i));
+        }
+        logger.error("Looking up item " + item + ": " + buyPrices.get(item));
+        return buyPrices.get(item) != 0;
     }
 
     public boolean isSelling(TradeItem item) {
-        return sellPrices.get(item) > 0;
+        return sellPrices.get(item) != 0;
     }
 
-    public int getBuyPrice(TradeItem item) {
+    public Integer getBuyPrice(TradeItem item) {
         return buyPrices.get(item);
     }
 
-    public int getSellPrice(TradeItem item) {
+    public Integer getSellPrice(TradeItem item) {
         return buyPrices.get(item);
     }
 }

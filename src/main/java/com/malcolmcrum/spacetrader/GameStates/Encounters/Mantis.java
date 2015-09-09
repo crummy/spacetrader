@@ -25,4 +25,9 @@ public class Mantis extends Pirate {
         String ship = opponent.getName();
         return "At " + clicks + " from " + destination + ", you encounter an alien " + ship + ".";
     }
+
+    @Override
+    protected int getShipTypeTries() {
+        return 1 + game.getDifficulty().getValue();
+    }
 }

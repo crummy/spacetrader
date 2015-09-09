@@ -271,7 +271,6 @@ public class Galaxy {
 
             SolarSystem system = new SolarSystem(game, i);
             system.setLocation(location);
-            system.getMarket().initializeQuantities();
             systems.add(system);
         }
     }

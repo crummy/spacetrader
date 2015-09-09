@@ -9,15 +9,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.malcolmcrum.spacetrader.Utils.GetRandom;
+import static com.malcolmcrum.spacetrader.Utils.RandomEnum;
 
 /**
- * UI strings:
- * Miss: The getTitle() missed you.
- * Hit: The getTitle() hits you.
- * Flee: The getTitle() didn't get away.
- * Player miss: You missed the getTitle().
- * Player hit: You hit the getTitle().
- * Flee: The getTitle() is still following you.
+ * Base class for all encounters.
+ * Includes a lot of default encounter behaviour - some of which is unused in base classes
+ * (e.g. you can't attack a bottle).
+ * Call getAction() on an encounter to get ways you can interact with it.
  * Created by Malcolm on 9/2/2015.
  */
 public abstract class Encounter extends GameState {
@@ -33,7 +31,6 @@ public abstract class Encounter extends GameState {
     boolean isPlayerFleeing;
     boolean playerWasHit;
     int tribblesOnScreen;
-    private Status status;
 
     Encounter(Game game, Transit transit) {
         super(game);
@@ -43,6 +40,26 @@ public abstract class Encounter extends GameState {
         this.playerWasHit = false;
         this.tribblesOnScreen = 0;
         this.opponentStatus = Status.Awake;
+
+        int tries = getShipTypeTries();
+
+        ShipType shipType = chooseShipType(tries);
+
+        opponent = new Ship(shipType, game);
+
+        tries = getEquipmentTries();
+
+        addGadgets(tries);
+
+        addCargo();
+
+        addWeapons(tries);
+
+        addShields(tries);
+
+        setHullStrength();
+
+        addCrew();
     }
 
     /**
@@ -295,6 +312,209 @@ public abstract class Encounter extends GameState {
 
     public void setStatus(Status status) {
         this.opponentStatus = status;
+    }
+
+    /**
+     * The simplest ship that this encounter can use.
+     * Actually, it's a flea for anyone but a trader.
+     * @return Poorest ship type possible for this encounter
+     */
+    protected ShipType baseShipType() {
+        return ShipType.Flea;
+    }
+
+    protected ShipType chooseShipType(int tries) {
+
+        ShipType shipType = baseShipType();
+        for (int i = 0; i < tries; ++i) {
+            ShipType betterShip;
+            do {
+                betterShip = ShipType.GetAdjustedRandomShip();
+            } while (!shipTypeAcceptable(betterShip));
+
+            if (betterShip != null && betterShip.ordinal() > shipType.ordinal()) {
+                shipType = betterShip;
+            }
+        }
+        return shipType;
+    }
+
+    protected boolean shipTypeAcceptable(ShipType betterShip) {
+        return true;
+    }
+
+    protected void addCrew() {
+        int pilotSkill = 1 + GetRandom(Game.MAX_POINTS_PER_SKILL);
+        int fighterSkill = 1 + GetRandom(Game.MAX_POINTS_PER_SKILL);
+        int traderSkill = 1 + GetRandom(Game.MAX_POINTS_PER_SKILL);
+        int engineerSkill = 1 + GetRandom(Game.MAX_POINTS_PER_SKILL);
+        int difficulty = game.getDifficulty().getValue();
+        if (transit.getDestination().getType() == SolarSystem.Name.Kravat && game.getWildStatus() == Wild.OnBoard && GetRandom(10) < difficulty + 1) {
+            engineerSkill = Game.MAX_POINTS_PER_SKILL;
+        }
+        opponent.addCrew(new Crew(pilotSkill, fighterSkill, traderSkill, engineerSkill));
+
+        int crew;
+        if (game.getDifficulty() != Difficulty.Impossible) {
+            crew = 1 + GetRandom(opponent.getCrewQuarters());
+            if (game.getDifficulty() == Difficulty.Hard && crew < opponent.getCrewQuarters()) {
+                ++crew;
+            }
+        } else {
+            crew = opponent.getCrewQuarters();
+        }
+
+        for (int i = 0; i < crew; ++i) {
+            opponent.addCrew(new Crew());
+        }
+    }
+
+    protected void setHullStrength() {
+        if (!opponent.hasShields() || GetRandom(10) <= 7) {
+            int strength = 0;
+            for (int i = 0; i < 5; ++i) {
+                int randomStrength = 1 + GetRandom(1 + opponent.getFullHullStrength());
+                if (randomStrength > strength) {
+                    strength = randomStrength;
+                }
+            }
+            opponent.setHullStrength(strength);
+        }
+    }
+
+    protected void addShields(int tries) {
+        int shields;
+        if (opponent.getShieldSlots() == 0) {
+            shields = 0;
+        } else if (game.getDifficulty() != Difficulty.Impossible) {
+            shields = GetRandom(opponent.getShieldSlots() + 1);
+            if (shields < opponent.getShieldSlots()) {
+                if (tries > 3) {
+                    ++shields;
+                } else {
+                    shields += GetRandom(2);
+                }
+            }
+        } else {
+            shields = opponent.getShieldSlots();
+        }
+
+        ShieldType bestShieldSoFar = ShieldType.EnergyShield;
+        for (int i = 0; i < shields; ++i) {
+            for (int j = 0; j < tries; ++j) {
+                ShieldType randomShield = ShieldType.GetAdjustedRandomShield();
+                if (randomShield != null && randomShield.ordinal() > bestShieldSoFar.ordinal()) {
+                    bestShieldSoFar = randomShield;
+                }
+            }
+            int shieldPower = 0;
+            for (int j = 0; j < 5; ++j) {
+                int randomPower = GetRandom(bestShieldSoFar.getPower());
+                if (randomPower > shieldPower) {
+                    shieldPower = randomPower;
+                }
+            }
+            opponent.addShield(bestShieldSoFar, shieldPower);
+        }
+    }
+
+    protected void addWeapons(int tries) {
+        int weapons;
+        if (opponent.getWeaponSlots() == 0) {
+            weapons = 0;
+        }  else if (opponent.getWeaponSlots() == 1) {
+            weapons = 1;
+        } else if (game.getDifficulty() != Difficulty.Impossible) {
+            weapons = 1 + GetRandom(opponent.getWeaponSlots());
+            if (weapons < opponent.getWeaponSlots()) {
+                if (tries > 4 && game.getDifficulty() == Difficulty.Hard) {
+                    ++weapons;
+                } else if (tries > 3 || game.getDifficulty() == Difficulty.Hard) {
+                    weapons += GetRandom(2);
+                }
+            }
+        } else {
+            weapons = opponent.getWeaponSlots();
+        }
+
+        Weapon bestWeaponSoFar = Weapon.PulseLaser;
+        for (int i = 0; i < weapons; ++i) {
+            for (int j = 0; j < tries; ++j) {
+                Weapon randomWeapon = Weapon.GetAdjustedRandomWeapon();
+                if (randomWeapon != null && randomWeapon.ordinal() > bestWeaponSoFar.ordinal()) {
+                    bestWeaponSoFar = randomWeapon;
+                }
+            }
+            opponent.addWeapon(bestWeaponSoFar);
+        }
+    }
+
+    protected void addCargo() {
+        if (opponent.getCargoBays() > 5) {
+            int cargoToGenerate = getCargoToGenerate();
+
+            if (cargoToGenerate < 1) {
+                cargoToGenerate = 1;
+            }
+
+            for (int i = 0; i < cargoToGenerate; ++i) {
+                TradeItem item = RandomEnum(TradeItem.class);
+                opponent.addCargo(item, 1, 0);
+            }
+        }
+    }
+
+    protected int getCargoToGenerate() {
+        int cargoToGenerate;
+        int cargoBays = opponent.getCargoBays();
+        if (game.getDifficulty() == Difficulty.Hard || game.getDifficulty() == Difficulty.Impossible) {
+            int m = 3 + GetRandom(cargoBays - 5);
+            cargoToGenerate = Math.min(m, 15);
+        } else {
+            cargoToGenerate = cargoBays;
+        }
+        return cargoToGenerate;
+    }
+
+    protected void addGadgets(int tries) {
+        int gadgetCount;
+        if (opponent.getGadgetSlots() == 0) {
+            gadgetCount = 0;
+        } else if (game.getDifficulty() != Difficulty.Impossible) {
+            gadgetCount = GetRandom(opponent.getGadgetSlots() + 1);
+            if (gadgetCount < opponent.getGadgetSlots()) {
+                if (tries > 4) {
+                    ++gadgetCount;
+                } else if (tries > 2) {
+                    gadgetCount += GetRandom(2);
+                }
+            }
+        } else {
+            gadgetCount = opponent.getGadgetSlots();
+        }
+
+        Gadget bestGadgetSoFar = Gadget.CargoBays;
+        for (int i = 0; i < gadgetCount; ++i) {
+            for (int j = 0; j < tries; ++j) {
+                Gadget randomGadget = Gadget.GetAdjustedRandomGadget();
+                if (!opponent.hasGadget(randomGadget)) {
+                    if (randomGadget != null && randomGadget.ordinal() > bestGadgetSoFar.ordinal()) {
+                        bestGadgetSoFar = randomGadget;
+                    }
+                }
+            }
+            opponent.addGadget(bestGadgetSoFar);
+        }
+    }
+
+    protected int getShipTypeTries() {
+        return 1;
+    }
+
+    protected int getEquipmentTries() {
+        int difficulty = game.getDifficulty().getValue();
+        int normal = Difficulty.Normal.getValue();
+        return Math.max(1, (game.getCaptain().getWorth() / 150000) + difficulty - normal);
     }
 
     public enum Status {

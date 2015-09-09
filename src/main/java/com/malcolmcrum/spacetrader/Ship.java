@@ -368,6 +368,18 @@ public class Ship {
         return type.getCrewQuarters();
     }
 
+    public int getGadgetSlots() {
+        return type.getGadgetSlots();
+    }
+
+    public int getWeaponSlots() {
+        return type.getWeaponSlots();
+    }
+
+    public int getShieldSlots() {
+        return type.getShieldSlots();
+    }
+
     class Cargo {
         TradeItem item;
         int buyingPrice;

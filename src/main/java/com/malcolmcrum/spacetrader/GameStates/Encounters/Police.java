@@ -253,4 +253,34 @@ public class Police extends Encounter {
             game.getCaptain().payInterest();
         }
     }
+
+    // The police will try to hunt you down with better ships if you are
+    // a villain, and they will try even harder when you are considered to
+    // be a psychopath (or are transporting Jonathan Wild)
+    @Override
+    protected int getShipTypeTries() {
+        if (game.getCaptain().isVillainous() && game.getWildStatus() != Wild.OnBoard) {
+            return 3;
+        } else if (game.getCaptain().isPsychopathic() || game.getWildStatus() == Wild.OnBoard) {
+            return 5;
+        } else {
+            return super.getShipTypeTries();
+        }
+    }
+
+    @Override
+    protected boolean shipTypeAcceptable(ShipType betterShip) {
+        int difficulty = game.getDifficulty().getValue();
+        int normal = Difficulty.Normal.ordinal();
+        int shipLevel = betterShip.getMinStrengthForPoliceEncounter().getStrength();
+        int difficultyModifier = (game.getDifficulty() == Difficulty.Hard || game.getDifficulty() == Difficulty.Impossible) ? difficulty - normal : 0;
+        int destinationRequirement = transit.getDestination().getPoliceStrength();
+        return destinationRequirement + difficultyModifier >= shipLevel;
+    }
+
+    @Override
+    protected int getCargoToGenerate() {
+        return 0; // I'm doing this for consistency with the original code, but it doesn't do
+                  // anything really - it gets replaced with 1 a bit later in Encounter.addCargo().
+    }
 }

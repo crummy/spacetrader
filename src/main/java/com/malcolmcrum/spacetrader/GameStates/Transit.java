@@ -36,6 +36,7 @@ public class Transit extends GameState {
         super(game);
         origin = game.getCurrentSystem();
         this.destination = destination;
+        this.destination.getMarket().determinePrices();
     }
 
     @Override

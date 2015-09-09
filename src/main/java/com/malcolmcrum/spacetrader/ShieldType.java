@@ -6,9 +6,9 @@ import static com.malcolmcrum.spacetrader.Utils.GetRandom;
  * Created by Malcolm on 8/28/2015.
  */
 public enum ShieldType {
-    EnergyShield("Energy shield", 0, 5000, TechLevel.Industrial, 70),
-    ReflectiveShield("Reflective shield", 0, 20000, TechLevel.PostIndustrial, 30),
-    LightningShield("Lightning shield", 0, 45000, TechLevel.Unattainable, 0);
+    EnergyShield("Energy shield", 100, 5000, TechLevel.Industrial, 70),
+    ReflectiveShield("Reflective shield", 200, 20000, TechLevel.PostIndustrial, 30),
+    LightningShield("Lightning shield", 350, 45000, TechLevel.Unattainable, 0);
 
     private final String name;
     private final int power;

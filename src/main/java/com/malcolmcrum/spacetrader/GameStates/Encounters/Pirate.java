@@ -20,184 +20,10 @@ import static com.malcolmcrum.spacetrader.Utils.RandomEnum;
 public class Pirate extends Encounter {
     private static final Logger logger = LoggerFactory.getLogger(Pirate.class);
 
-
     public Pirate(Game game, Transit transit) {
         super(game, transit);
-        int tries = 1 + (game.getCaptain().getWorth() / 100000);
-        int difficulty = game.getDifficulty().getValue();
-        int normal = Difficulty.Normal.getValue();
-        tries = Math.max(1, tries + difficulty - normal);
-
-        int difficultyModifier = (game.getDifficulty() == Difficulty.Hard || game.getDifficulty() == Difficulty.Impossible) ? difficulty - normal : 0;
-
-        ShipType shipType = ShipType.Gnat;
-        for (int i = 0; i < tries; ++i) {
-            ShipType betterShip;
-            int shipLevel = 0;
-            int destinationRequirement = transit.getDestination().getPirateStrength() + difficultyModifier;
-            do {
-                // TODO: Change here for other encounters
-                betterShip = ShipType.GetAdjustedRandomShip();
-                if (betterShip.getMinStrengthForPirateEncounter() == null) continue;
-                shipLevel = betterShip.getMinStrengthForPirateEncounter().getStrength();
-            } while (destinationRequirement < shipLevel);
-            if (betterShip.ordinal() > shipType.ordinal()) {
-                shipType = betterShip;
-            }
-        }
-
-        opponent = new Ship(shipType, game);
-
-        tries = Math.max(1, (game.getCaptain().getWorth() / 150000) + difficulty - normal);
-
-        int gadgetCount;
-        if (shipType.getGadgetSlots() == 0) {
-            gadgetCount = 0;
-        } else if (game.getDifficulty() != Difficulty.Impossible) {
-            gadgetCount = GetRandom(shipType.getGadgetSlots() + 1);
-            if (gadgetCount < shipType.getGadgetSlots()) {
-                if (tries > 4) {
-                    ++gadgetCount;
-                } else if (tries > 2) {
-                    gadgetCount += GetRandom(2);
-                }
-            }
-        } else {
-            gadgetCount = shipType.getGadgetSlots();
-        }
-
-        Gadget bestGadgetSoFar = Gadget.CargoBays;
-        for (int i = 0; i < gadgetCount; ++i) {
-            for (int j = 0; j < tries; ++j) {
-                Gadget randomGadget = Gadget.GetAdjustedRandomGadget();
-                if (!opponent.hasGadget(randomGadget)) {
-                    if (randomGadget.ordinal() > bestGadgetSoFar.ordinal()) {
-                        bestGadgetSoFar = randomGadget;
-                    }
-                }
-            }
-            opponent.addGadget(bestGadgetSoFar);
-        }
-
-        int cargoBays = opponent.getCargoBays();
-        if (cargoBays > 5) {
-            int cargoToGenerate;
-            // TODO: Change here for other encounters
-            if (game.getDifficulty() == Difficulty.Hard || game.getDifficulty() == Difficulty.Impossible) {
-                int m = 3 + GetRandom(cargoBays - 5);
-                cargoToGenerate = Math.min(m, 15);
-                cargoToGenerate = cargoToGenerate / difficulty;
-            } else {
-                cargoToGenerate = cargoBays;
-                cargoToGenerate = (cargoToGenerate * 4) / 5;
-            }
-            if (cargoToGenerate < 1) {
-                cargoToGenerate = 1;
-            }
-
-            for (int i = 0; i < cargoToGenerate; ++i) {
-                TradeItem item = RandomEnum(TradeItem.class);
-                opponent.addCargo(item, 1, 0);
-            }
-        }
-
-        int weapons;
-        if (shipType.getWeaponSlots() == 0) {
-            weapons = 0;
-        }  else if (shipType.getWeaponSlots() == 1) {
-            weapons = 1;
-        } else if (game.getDifficulty() != Difficulty.Impossible) {
-            weapons = 1 + GetRandom(shipType.getWeaponSlots());
-            if (weapons < shipType.getWeaponSlots()) {
-                if (tries > 4 && game.getDifficulty() == Difficulty.Hard) {
-                    ++weapons;
-                } else if (tries > 3 || game.getDifficulty() == Difficulty.Hard) {
-                    weapons += GetRandom(2);
-                }
-            }
-        } else {
-            weapons = shipType.getWeaponSlots();
-        }
-
-        Weapon bestWeaponSoFar = Weapon.PulseLaser;
-        for (int i = 0; i < weapons; ++i) {
-            for (int j = 0; j < tries; ++j) {
-                Weapon randomWeapon = Weapon.GetAdjustedRandomWeapon();
-                if (randomWeapon.ordinal() > bestWeaponSoFar.ordinal()) {
-                    bestWeaponSoFar = randomWeapon;
-                }
-            }
-            opponent.addWeapon(bestWeaponSoFar);
-        }
-
-        int shields;
-        if (shipType.getShieldSlots() == 0) {
-            shields = 0;
-        } else if (game.getDifficulty() != Difficulty.Impossible) {
-            shields = GetRandom(shipType.getShieldSlots() + 1);
-            if (shields < shipType.getShieldSlots()) {
-                if (tries > 3) {
-                    ++shields;
-                } else {
-                    shields += GetRandom(2);
-                }
-            }
-        } else {
-            shields = shipType.getShieldSlots();
-        }
-
-        ShieldType bestShieldSoFar = ShieldType.EnergyShield;
-        for (int i = 0; i < shields; ++i) {
-            for (int j = 0; j < tries; ++j) {
-                ShieldType randomShield = ShieldType.GetAdjustedRandomShield();
-                if (randomShield.ordinal() > bestShieldSoFar.ordinal()) {
-                    bestShieldSoFar = randomShield;
-                }
-            }
-            int shieldPower = 0;
-            for (int j = 0; j < 5; ++j) {
-                int randomPower = GetRandom(bestShieldSoFar.getPower());
-                if (randomPower > shieldPower) {
-                    shieldPower = randomPower;
-                }
-            }
-            opponent.addShield(bestShieldSoFar, shieldPower);
-        }
-
-        if (!opponent.hasShields() || GetRandom(10) <= 7) {
-            int strength = 0;
-            for (int i = 0; i < 5; ++i) {
-                int randomStrength = 1 + GetRandom(1 + opponent.getFullHullStrength());
-                if (randomStrength > strength) {
-                    strength = randomStrength;
-                }
-            }
-            opponent.setHullStrength(strength);
-        }
-
-        int pilotSkill = 1 + GetRandom(Game.MAX_POINTS_PER_SKILL);
-        int fighterSkill = 1 + GetRandom(Game.MAX_POINTS_PER_SKILL);
-        int traderSkill = 1 + GetRandom(Game.MAX_POINTS_PER_SKILL);
-        int engineerSkill = 1 + GetRandom(Game.MAX_POINTS_PER_SKILL);
-        if (transit.getDestination().getType() == SolarSystem.Name.Kravat && game.getWildStatus() == Wild.OnBoard && GetRandom(10) < difficulty + 1) {
-            engineerSkill = Game.MAX_POINTS_PER_SKILL;
-        }
-        opponent.addCrew(new Crew(pilotSkill, fighterSkill, traderSkill, engineerSkill));
-
-        int crew;
-        if (game.getDifficulty() != Difficulty.Impossible) {
-            crew = 1 + GetRandom(opponent.getCrewQuarters());
-            if (game.getDifficulty() == Difficulty.Hard && crew < opponent.getCrewQuarters()) {
-                ++crew;
-            }
-        } else {
-            crew = opponent.getCrewQuarters();
-        }
-
-        for (int i = 0; i < crew; ++i) {
-            opponent.addCrew(new Crew());
-        }
     }
+
 
     @Override
     public List<Method> getActions() {
@@ -278,6 +104,40 @@ public class Pirate extends Encounter {
         }
         game.getCaptain().killedAPirate();
         return super.destroyedOpponent();
+    }
+
+    @Override
+    protected boolean shipTypeAcceptable(ShipType betterShip) {
+        int difficulty = game.getDifficulty().getValue();
+        int normal = Difficulty.Normal.ordinal();
+        int shipLevel = betterShip.getMinStrengthForPirateEncounter().getStrength();
+        int difficultyModifier = (game.getDifficulty() == Difficulty.Hard || game.getDifficulty() == Difficulty.Impossible) ? difficulty - normal : 0;
+        int destinationRequirement = transit.getDestination().getPirateStrength();
+        return destinationRequirement + difficultyModifier >= shipLevel;
+    }
+
+    @Override
+    protected int getCargoToGenerate() {
+        int cargoToGenerate;
+        int cargoBays = opponent.getCargoBays();
+        int difficulty = game.getDifficulty().getValue();
+        if (game.getDifficulty() == Difficulty.Hard || game.getDifficulty() == Difficulty.Impossible) {
+            int m = 3 + GetRandom(cargoBays - 5);
+            cargoToGenerate = Math.min(m, 15);
+            cargoToGenerate = cargoToGenerate / difficulty;
+        } else {
+            cargoToGenerate = cargoBays;
+            cargoToGenerate = (cargoToGenerate * 4) / 5;
+        }
+        return cargoToGenerate;
+    }
+
+    @Override
+    protected int getShipTypeTries() {
+        int base = 1 + (game.getCaptain().getWorth() / 100000);
+        int difficulty = game.getDifficulty().getValue();
+        int normal = Difficulty.Normal.getValue();
+        return Math.max(1, base + difficulty - normal);
     }
 
     /**

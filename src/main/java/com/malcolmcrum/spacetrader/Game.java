@@ -59,13 +59,15 @@ public class Game {
             return false;
         }
 
-        galaxy = new Galaxy(this);
-        news = new News(this);
-        ship = new PlayerShip(ShipType.Gnat, this);
+        captain = new Captain(this, commanderName);
+        ship = new PlayerShip(ShipType.Flea, this);
         ship.addWeapon(Weapon.PulseLaser);
         ship.addCrew(new Crew(0));
+
+        galaxy = new Galaxy(this);
+        news = new News(this);
         currentSystem = galaxy.getStartSystem(ship.getFuelCapacity());
-        captain = new Captain(this, commanderName);
+
         rareEncounters = new RareEncounters();
         unreadAlerts = new ArrayList<>();
 
