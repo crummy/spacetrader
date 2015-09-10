@@ -53,7 +53,6 @@ public class Captain extends Crew {
     private boolean gameLoaded;
     private boolean reserveMoney;
     private boolean artifactOnBoard;
-    private boolean dangerous;
 
     public Captain(Game game, String name) {
         super(0);

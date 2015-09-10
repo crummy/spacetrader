@@ -380,7 +380,7 @@ public class Ship {
         return type.getShieldSlots();
     }
 
-    class Cargo {
+    public class Cargo {
         TradeItem item;
         int buyingPrice;
         Cargo(TradeItem item, int buyingPrice) {
@@ -389,12 +389,16 @@ public class Ship {
         }
     }
 
-    class Shield {
+    public class Shield {
         ShieldType shieldType;
         int power;
         Shield(ShieldType shieldType, int power) {
             this.shieldType = shieldType;
             this.power = power;
+        }
+
+        public String getName() {
+            return shieldType.getName();
         }
     }
 }

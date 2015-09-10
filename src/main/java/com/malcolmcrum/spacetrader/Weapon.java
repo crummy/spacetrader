@@ -54,4 +54,8 @@ public enum Weapon {
         }
         return null;
     }
+
+    public String getName() {
+        return name;
+    }
 }

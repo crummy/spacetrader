@@ -12,19 +12,12 @@ import static com.malcolmcrum.spacetrader.Utils.GetRandom;
 
 /**
  * InSystem.
- * ACTIONS:
- * - buyRepairs()
- * - buyRepairs(int amount)
- * - buyFuel()
- * - buyFuel(int amount)
- * - buyShip(ShipType type)
- * - buyEscapePod()
  * Created by Malcolm on 9/3/2015.
  */
 public class InSystem extends GameState {
     private static final Logger logger = LoggerFactory.getLogger(InSystem.class);
 
-    SolarSystem system;
+    private SolarSystem system;
     boolean alreadyPaidForNewspaper;
 
     public InSystem(Game game, SolarSystem system) {
@@ -83,6 +76,11 @@ public class InSystem extends GameState {
         alreadyPaidForNewspaper = false;
         addNewsEvents();
         return this;
+    }
+
+    @Override
+    public String getName() {
+        return "InSystem";
     }
 
     /**
@@ -356,5 +354,13 @@ public class InSystem extends GameState {
         if (alreadyPaidForNewspaper) {
             return true;
         } else return game.getCaptain().getAvailableCash() >= game.getNews().getPrice();
+    }
+
+    public SolarSystem getSystem() {
+        return system;
+    }
+
+    public PlayerShip getPlayerShip() {
+        return game.getShip();
     }
 }

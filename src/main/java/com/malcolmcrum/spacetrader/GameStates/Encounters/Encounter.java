@@ -62,6 +62,11 @@ public abstract class Encounter extends GameState {
         addCrew();
     }
 
+    @Override
+    public String getName() {
+        return "Encounter";
+    }
+
     /**
      * @return A sentence describing the encounter
      */

@@ -68,6 +68,11 @@ public class Transit extends GameState {
     }
 
     @Override
+    public String getName() {
+        return "Transit";
+    }
+
+    @Override
     public List<Method> getActions() {
         // There are no actions possible in Transit. It just serves to generate Encounters.
         return new ArrayList<>();

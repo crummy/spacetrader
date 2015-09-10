@@ -53,4 +53,8 @@ public enum ShieldType {
         }
         return null;
     }
+
+    public String getName() {
+        return name;
+    }
 }

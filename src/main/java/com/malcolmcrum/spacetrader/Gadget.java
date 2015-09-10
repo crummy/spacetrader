@@ -47,4 +47,8 @@ public enum Gadget {
         }
         return null;
     }
+
+    public String getName() {
+        return name;
+    }
 }

@@ -1,5 +1,7 @@
 package com.malcolmcrum.spacetrader;
 
+import java.util.List;
+
 /**
  * Created by Malcolm on 9/4/2015.
  */
@@ -165,5 +167,17 @@ public class PlayerShip extends Ship {
 
     public boolean hasFreeCargoBay() {
         return cargo.size() < type.getCargoBays();
+    }
+
+    public List<Weapon> getWeapons() {
+        return weapons;
+    }
+
+    public List<Shield> getShields() {
+        return shields;
+    }
+
+    public List<Gadget> getGadgets() {
+        return gadgets;
     }
 }

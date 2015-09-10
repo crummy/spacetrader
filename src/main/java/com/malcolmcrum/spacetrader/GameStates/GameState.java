@@ -18,4 +18,6 @@ public abstract class GameState {
     public abstract List<Method> getActions();
 
     public abstract GameState init();
+
+    public abstract String getName();
 }
