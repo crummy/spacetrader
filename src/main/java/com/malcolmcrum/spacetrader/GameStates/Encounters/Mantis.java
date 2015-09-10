@@ -1,6 +1,7 @@
 package com.malcolmcrum.spacetrader.GameStates.Encounters;
 
 import com.malcolmcrum.spacetrader.Game;
+import com.malcolmcrum.spacetrader.GameStates.GameState;
 import com.malcolmcrum.spacetrader.GameStates.Transit;
 
 import static com.malcolmcrum.spacetrader.Utils.Pluralize;
@@ -11,6 +12,12 @@ import static com.malcolmcrum.spacetrader.Utils.Pluralize;
 public class Mantis extends Pirate {
     public Mantis(Game game, Transit transit) {
         super(game, transit);
+        opponentStatus = Status.Attacking;
+    }
+
+    @Override
+    public GameState init() {
+        return this; // necessary to override pirate.init() behaviour
     }
 
     @Override

@@ -162,4 +162,8 @@ public class PlayerShip extends Ship {
     public boolean hasArtifactOnBoard() {
         return artifactOnBoard;
     }
+
+    public boolean hasFreeCargoBay() {
+        return cargo.size() < type.getCargoBays();
+    }
 }

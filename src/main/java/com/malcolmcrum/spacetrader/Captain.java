@@ -15,9 +15,9 @@ public class Captain extends Crew {
     private static final int KILL_POLICE_SCORE = -6;
     private static final int ATTACK_POLICE_SCORE = -3;
     private static final int FLEE_FROM_INSPECTION = -2;
-    private static final int DANGEROUS_SCORE = 300;
     private static final int KILL_TRADER_SCORE = -4;
     private static final int ATTACK_TRADER_SCORE = -2;
+    private static final int LAWFUL_SCORE = 5;
 
     private final Game game;
     private final String name;
@@ -224,11 +224,11 @@ public class Captain extends Crew {
     }
 
     public boolean isDangerous() {
-        return reputationScore >= DANGEROUS_SCORE;
+        return reputationScore >= Reputation.Dangerous.getScore();
     }
 
     public void makeDangerous() {
-        reputationScore = DANGEROUS_SCORE;
+        reputationScore = Reputation.Dangerous.getScore();
     }
 
     public void addReputation(int rep) {
@@ -254,6 +254,22 @@ public class Captain extends Crew {
         policeRecordScore = VILLAIN_SCORE;
     }
 
+    public int getEliteScore() {
+        return Reputation.Elite.getScore();
+    }
+
+    public int getReputationScore() {
+        return reputationScore;
+    }
+
+    public boolean isLawful() {
+        return policeRecordScore >= LAWFUL_SCORE;
+    }
+
+    public boolean isAverage() {
+        return reputationScore >= Reputation.Average.getScore();
+    }
+
     enum Reputation {
         Harmless("Harmless", 0),
         MostlyHarmless("Mostly harmless", 10),
@@ -266,12 +282,16 @@ public class Captain extends Crew {
         Elite("Elite", 1500);
 
         private final String name;
-        private final int value;
+        private final int score;
 
-        Reputation(String name, int value) {
+        Reputation(String name, int score) {
 
             this.name = name;
-            this.value = value;
+            this.score = score;
+        }
+
+        int getScore() {
+            return score;
         }
     }
 }

@@ -1,10 +1,7 @@
 package com.malcolmcrum.spacetrader.GameStates.Encounters;
 
-import com.malcolmcrum.spacetrader.Difficulty;
-import com.malcolmcrum.spacetrader.Game;
+import com.malcolmcrum.spacetrader.*;
 import com.malcolmcrum.spacetrader.GameStates.GameState;
-import com.malcolmcrum.spacetrader.ShipType;
-import com.malcolmcrum.spacetrader.TradeItem;
 import com.malcolmcrum.spacetrader.GameStates.Transit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +18,7 @@ import static com.malcolmcrum.spacetrader.Utils.*;
  */
 public class Trader extends Encounter {
     private static final Logger logger = LoggerFactory.getLogger(Trader.class);
+    private static final int CHANCE_OF_TRADE_IN_ORBIT = 100 ;
 
     private boolean isBuying;
     private TradeItem item;
@@ -28,8 +26,65 @@ public class Trader extends Encounter {
 
     public Trader(Game game, Transit transit) {
         super(game, transit);
-        isBuying = GetRandom(2) == 1;
-        item = getRandomItemForTrade();
+
+        if (GetRandom(1000) < CHANCE_OF_TRADE_IN_ORBIT) {
+            if (game.getShip().hasFreeCargoBay() && hasTradeableItem(opponent, transit.getDestination(), false)) {
+                isBuying = true;
+            } else if (hasTradeableItem(game.getShip(), transit.getDestination(), true)) {
+                isBuying = false;
+            } else { // Nothing suitable to trade: Ignore player
+                opponentStatus = Status.Ignoring;
+            }
+        }
+
+        item = randomItemForTrade();
+        price = randomPriceForTrade();
+
+        // If player is cloaked, they don't see him, and ignore
+        if (game.getShip().isInvisibleTo(opponent)) {
+            opponentStatus = Status.Ignoring;
+        } else if (game.getCaptain().isCriminal()) {
+            // If you're a criminal with significant reputation, traders tend to flee
+            if (GetRandom(game.getCaptain().getEliteScore()) <= (game.getCaptain().getReputationScore() * 10) / (1 + opponent.getType().ordinal())) {
+                opponentStatus = Status.Fleeing;
+            }
+        }
+    }
+
+    private boolean hasTradeableItem(Ship ship, SolarSystem destination, boolean isBuying) {
+        for (TradeItem item : TradeItem.values()) {
+            // Trade only if trader is selling and the item has a buy price on the local system
+            // OR if the trader is buying and the item has a sell price on the local system
+            boolean foundItem = false;
+            if (ship.getCargoCount(item) > 0 && !isBuying && destination.getMarket().getBuyPrice(item) > 0) {
+                foundItem = true;
+            } else if (ship.getCargoCount(item) > 0 && isBuying && destination.getMarket().getSellPrice(item) > 0) {
+                foundItem = true;
+            }
+
+            // Criminals can only buy or sell illegal goods, noncriminals cannot buy or sell illegal goods.
+            if (foundItem && game.getCaptain().isDubious()
+                    && (item == TradeItem.Narcotics || item == TradeItem.Firearms)) {
+                return true;
+            } else if (foundItem && !game.getCaptain().isDubious()
+                    && item != TradeItem.Narcotics && item != TradeItem.Firearms) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public GameState init() {
+        if (opponentStatus == Status.Ignoring || opponentStatus == Status.Awake || opponentStatus == Status.Fleeing) {
+            if (opponent.isInvisibleTo(game.getShip())) {
+                return transit;
+            }
+        }
+        return this;
+    }
+
+    private int randomPriceForTrade() {
         price = isBuying ? game.getCurrentSystem().getMarket().getSellPrice(item) : game.getCurrentSystem().getMarket().getBuyPrice(item);
         if (item == TradeItem.Narcotics || item == TradeItem.Firearms) {
             if (GetRandom(100) <= 45) {
@@ -47,6 +102,7 @@ public class Trader extends Encounter {
         price /= item.getRoundOff();
         price *= item.getRoundOff();
         price = Clamp(price, item.getMinTradePrice(), item.getMaxTradePrice());
+        return price;
     }
 
     @Override
@@ -155,7 +211,7 @@ public class Trader extends Encounter {
      * Returns a trade good for trade
      * @return The item to be traded
      */
-    public TradeItem getRandomItemForTrade() {
+    public TradeItem randomItemForTrade() {
         // First try to pick a random item
         for (int i = 0; i < 10; ++i) {
             TradeItem item = RandomEnum(TradeItem.class);

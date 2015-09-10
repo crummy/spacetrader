@@ -259,4 +259,12 @@ public class Transit extends GameState {
     public void setHadEncounter(boolean hadEncounter) {
         this.hadEncounter = hadEncounter;
     }
+
+    public boolean hasBeenInspected() {
+        return beenInspected;
+    }
+
+    public void policeInspectedPlayer() {
+        beenInspected = true;
+    }
 }

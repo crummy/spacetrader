@@ -22,6 +22,27 @@ public class Pirate extends Encounter {
 
     public Pirate(Game game, Transit transit) {
         super(game, transit);
+        if (game.getShip().isInvisibleTo(opponent)) {
+            opponentStatus = Status.Ignoring;
+        } else if (opponent.getType().ordinal() >= 7 // Pirates will mostly attack, unless your rep is too high
+                || GetRandom(game.getCaptain().getEliteScore()) > (game.getCaptain().getReputationScore() * 4) / (1 + opponent.getType().ordinal())) {
+           opponentStatus = Status.Attacking;
+        } else {
+            opponentStatus = Status.Fleeing;
+        }
+
+        // If they have a better ship, they don't flee, regardless of your rep.
+        if (opponentStatus == Status.Fleeing && opponent.getType().ordinal() > game.getShip().getType().ordinal()) {
+            opponentStatus = Status.Attacking;
+        }
+    }
+
+    @Override
+    public GameState init() {
+        if (opponentStatus != Status.Attacking && opponent.isInvisibleTo(game.getShip())) {
+            return transit;
+        }
+        return this;
     }
 
 

@@ -3,7 +3,9 @@ package com.malcolmcrum.spacetrader;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
@@ -151,6 +153,23 @@ public class GalaxyTest
             }
         }
         assertTrue("Wormhole connections are fubar!", jumps == wormholeSystems.size() - 1);
+    }
+
+    @Test
+    public void testUniqueSystems() {
+        assertEquals(galaxy.systems.size(), SolarSystem.Name.values().length);
+        Map<SolarSystem.Name, Integer> timesFound = new HashMap<>();
+        for (SolarSystem.Name name : SolarSystem.Name.values()) {
+            timesFound.put(name, 0);
+        }
+        for (SolarSystem system : galaxy.systems) {
+            SolarSystem.Name name = system.getType();
+            timesFound.put(name, timesFound.get(name) + 1);
+        }
+        for (SolarSystem.Name name : timesFound.keySet()) {
+            int instancesOfName = timesFound.get(name);
+            assertEquals(instancesOfName, 1);
+        }
     }
 
     @Test

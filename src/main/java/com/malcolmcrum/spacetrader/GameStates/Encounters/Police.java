@@ -23,6 +23,56 @@ public class Police extends Encounter {
 
     public Police(Game game, Transit transit) {
         super(game, transit);
+        if (game.getShip().isInvisibleTo(opponent)) {
+            opponentStatus = Status.Ignoring;
+        } else if (game.getCaptain().isDubious()) {
+            if (opponent.weaponStrength() == 0) {
+                if (opponent.isInvisibleTo(game.getShip())) {
+                    opponentStatus = Status.Ignoring;
+                } else {
+                    opponentStatus = Status.Fleeing;
+                }
+            }
+            if (!game.getCaptain().isAverage()) {
+                opponentStatus = Status.Attacking;
+            } else if (GetRandom(game.getCaptain().getEliteScore()) > (game.getCaptain().getReputationScore() / (1 + opponent.getType().ordinal()))) {
+                opponentStatus = Status.Attacking;
+            } else if (opponent.isInvisibleTo(game.getShip())) {
+                opponentStatus = Status.Ignoring;
+            } else {
+                opponentStatus = Status.Fleeing;
+            }
+        } else if (!game.getCaptain().isDubious() && !game.getCaptain().isClean() && transit.hasBeenInspected()) {
+            opponentStatus = Status.Awake;
+            transit.policeInspectedPlayer();
+        } else if (!game.getCaptain().isLawful()) {
+            if (GetRandom(12 - game.getDifficulty().getValue()) < 1 && !transit.hasBeenInspected()) {
+                opponentStatus = Status.Awake;
+                transit.policeInspectedPlayer();
+            }
+        } else {
+            if (GetRandom(40) == 1 && !transit.hasBeenInspected()) {
+                opponentStatus = Status.Awake;
+                transit.policeInspectedPlayer();
+            }
+        }
+
+        // Police don't flee if your ship is weaker.
+        if (opponentStatus == Status.Fleeing && opponent.getType().ordinal() > game.getShip().getType().ordinal()) {
+            if (game.getCaptain().isDubious()) {
+                opponentStatus = Status.Attacking;
+            } else {
+                opponentStatus = Status.Awake;
+            }
+        }
+    }
+
+    @Override
+    public GameState init() {
+        if (opponentStatus == Status.Ignoring && opponent.isInvisibleTo(game.getShip())) {
+            return transit;
+        }
+        return this;
     }
 
     @Override
