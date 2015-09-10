@@ -227,4 +227,8 @@ public enum TradeItem {
     public int getMaxTradePrice() {
         return maxTradePrice;
     }
+
+    public String getName() {
+        return name;
+    }
 }

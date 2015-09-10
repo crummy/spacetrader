@@ -25,7 +25,21 @@ public class InSystemSerializer extends GameStateSerializer implements JsonSeria
 
         json.add("equipment", GetEquipment(ship));
 
+        json.add("market", GetMarket(system.getMarket()));
+
         return json;
+    }
+
+    private static JsonElement GetMarket(Market market) {
+        JsonObject items = new JsonObject();
+        for (TradeItem item : TradeItem.values()) {
+            JsonObject details = new JsonObject();
+            details.addProperty("buyPrice", market.getBuyPrice(item));
+            details.addProperty("sellPrice", market.getSellPrice(item));
+            details.addProperty("quantity", market.getQuantity(item));
+            items.add(item.getName(), details);
+        }
+        return items;
     }
 
     private static JsonElement GetShipStatus(PlayerShip ship) {
@@ -34,6 +48,7 @@ public class InSystemSerializer extends GameStateSerializer implements JsonSeria
         shipStatus.addProperty("fullHull", ship.getFullHullStrength());
         shipStatus.addProperty("fuel", ship.getFuel());
         shipStatus.addProperty("fuelCapacity", ship.getFuelCapacity());
+        return shipStatus;
     }
 
     private static JsonElement GetEquipment(PlayerShip ship) {

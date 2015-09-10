@@ -29,6 +29,11 @@ public class GameOver extends GameState {
         return this;
     }
 
+    @Override
+    public String getName() {
+        return "GameOver";
+    }
+
     public GameState newGame() {
         // TODO
         return this;

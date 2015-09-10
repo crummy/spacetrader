@@ -30,6 +30,11 @@ public class ShipDestroyed extends GameState {
         }
     }
 
+    @Override
+    public String getName() {
+        return "ShipDestroyed";
+    }
+
     public GameState gameOver() {
         game.addAlert(Alert.GameOver);
         return new GameOver(game);
@@ -45,7 +50,7 @@ public class ShipDestroyed extends GameState {
             game.addAlert(Alert.AntidoteDestroyed);
             game.setJaporiDiseaseStatus(Japori.NoDisease);
         }
-        if (game.getArtifactStatus()) {
+        if (game.getArtifactOnBoard()) {
             game.addAlert(Alert.ArtifactNotSaved);
             game.setArtifactOnBoard(false);
         }

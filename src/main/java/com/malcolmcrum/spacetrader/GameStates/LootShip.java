@@ -59,6 +59,11 @@ public class LootShip extends GameState {
         return this;
     }
 
+    @Override
+    public String getName() {
+        return "LootShip";
+    }
+
     public GameState scoop() {
         game.getShip().addCargo(item, 1, 0);
         return nextState;

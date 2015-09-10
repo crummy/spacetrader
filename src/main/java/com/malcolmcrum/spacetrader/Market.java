@@ -268,4 +268,8 @@ public class Market {
     public Integer getSellPrice(TradeItem item) {
         return buyPrices.get(item);
     }
+
+    public int getQuantity(TradeItem item) {
+        return quantities.get(item);
+    }
 }

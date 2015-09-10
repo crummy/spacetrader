@@ -1,6 +1,7 @@
 package com.malcolmcrum.spacetrader;
 
 import com.malcolmcrum.spacetrader.GameStates.GameState;
+import com.malcolmcrum.spacetrader.GameStates.InSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,22 +42,19 @@ public class Game {
     private List<Alert> unreadAlerts;
 
     private GameState currentState;
-    private boolean artifactStatus;
     private boolean artifactOnBoard;
     private Jarek jarekStatus;
-    private boolean remindLoans;
+
     private boolean trackAutoOff;
     private SolarSystem trackedSystem;
-    private boolean autoRepair;
-    private boolean autoFuel;
     private int monsterHull;
 
 
-    public boolean startNewGame(String commanderName, int pilotSkill, int fighterSkill, int traderSkill, int engineerSkill, Difficulty difficulty) {
+    public GameState startNewGame(String commanderName, int pilotSkill, int fighterSkill, int traderSkill, int engineerSkill, Difficulty difficulty) {
 
         if (skillPointsDontAddUp(pilotSkill, fighterSkill, traderSkill, engineerSkill)) {
             logger.warn("Invalid skill points");
-            return false;
+            return null;
         }
 
         captain = new Captain(this, commanderName);
@@ -87,7 +85,7 @@ public class Game {
         reactorStatus = Reactor.Unavailable;
         monsterHull = ShipType.SpaceMonster.getHullStrength();
 
-        return true;
+        return new InSystem(this, currentSystem);
     }
 
     public List<SolarSystem> getSystems() {
@@ -144,10 +142,6 @@ public class Game {
 
     public void setJaporiDiseaseStatus(Japori japoriDiseaseStatus) {
         this.japoriDiseaseStatus = japoriDiseaseStatus;
-    }
-
-    public boolean getArtifactStatus() {
-        return artifactStatus;
     }
 
     public void setArtifactOnBoard(boolean artifactOnBoard) {
@@ -220,7 +214,7 @@ public class Game {
     }
 
     public boolean getRemindLoans() {
-        return remindLoans;
+        return false; // TODO
     }
 
     public boolean getTrackAutoOff() {
@@ -236,11 +230,11 @@ public class Game {
     }
 
     public boolean getAutoRepair() {
-        return autoRepair;
+        return false; // TODO
     }
 
     public boolean getAutoFuel() {
-        return autoFuel;
+        return false;//TODO
     }
 
     public void setMonsterStatus(Monster monsterStatus) {
@@ -261,5 +255,9 @@ public class Game {
 
     public void setMonsterHullStrength(int monsterHullStrength) {
         this.monsterHull = monsterHullStrength;
+    }
+
+    public boolean getArtifactOnBoard() {
+        return artifactOnBoard;
     }
 }
