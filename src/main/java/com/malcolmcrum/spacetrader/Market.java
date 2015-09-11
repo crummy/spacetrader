@@ -250,10 +250,6 @@ public class Market {
     }
 
     public boolean isBuying(TradeItem item) {
-        for (TradeItem i : quantities.keySet()) {
-            logger.error("System has item " + i + ", price " + buyPrices.get(i));
-        }
-        logger.error("Looking up item " + item + ": " + buyPrices.get(item));
         return buyPrices.get(item) != 0;
     }
 
