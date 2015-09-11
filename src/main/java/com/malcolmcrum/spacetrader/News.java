@@ -51,7 +51,7 @@ public class News {
 
         for (NotableEvent notableEvent : notableEvents) {
             String headline = notableEvent.getHeadline();
-            headline = headline.replace("{{CAPTAIN_NAME}}", captain.getCaptainName());
+            headline = headline.replace("{{CAPTAIN_NAME}}", captain.getName());
             paper.add(headline);
         }
         for (SolarSystem.SpecialEvent specialEvent : specialEvents) {
@@ -155,29 +155,29 @@ public class News {
             int diceRoll = GetRandom(4);
             switch (diceRoll) {
                 case 0:
-                    headline = "Police Warning: " + captain.getCaptainName() + " Will Dock At " + system.getType() + "!";
+                    headline = "Police Warning: " + captain.getName() + " Will Dock At " + system.getType() + "!";
                     break;
                 case 1:
-                    headline = "Notorious Criminal " + captain.getCaptainName() + " Sighted in " + system.getType() + "!";
+                    headline = "Notorious Criminal " + captain.getName() + " Sighted in " + system.getType() + "!";
                     break;
                 case 2:
-                    headline = "Locals Rally to Deny Spaceport Access to " + captain.getCaptainName() + "!";
+                    headline = "Locals Rally to Deny Spaceport Access to " + captain.getName() + "!";
                     break;
                 case 3:
-                    headline = "Terror Strikes Locals on Arrival of " + captain.getCaptainName() + "!";
+                    headline = "Terror Strikes Locals on Arrival of " + captain.getName() + "!";
                     break;
             }
         } else if (captain.isHeroic()) {
             int diceRoll = GetRandom(3);
             switch (diceRoll) {
                 case 0:
-                    headline = "Locals Welcome Visiting Hero " + captain.getCaptainName() + "!";
+                    headline = "Locals Welcome Visiting Hero " + captain.getName() + "!";
                     break;
                 case 1:
-                    headline = "Famed Hero " + captain.getCaptainName() + " to Visit System!";
+                    headline = "Famed Hero " + captain.getName() + " to Visit System!";
                     break;
                 case 2:
-                    headline = "Large Turnout At Spaceport to Welcome " + captain.getCaptainName() + "!";
+                    headline = "Large Turnout At Spaceport to Welcome " + captain.getName() + "!";
                     break;
             }
         }

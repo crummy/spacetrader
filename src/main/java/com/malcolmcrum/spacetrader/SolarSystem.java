@@ -3,7 +3,9 @@ package com.malcolmcrum.spacetrader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.malcolmcrum.spacetrader.Utils.GetRandom;
@@ -143,16 +145,16 @@ public class SolarSystem {
         visited = true;
     }
 
-    public int getPirateStrength() {
-        return getPolitics().getPirateStrength().getStrength();
+    public PirateStrength getPirateStrength() {
+        return getPolitics().getPirateStrength();
     }
 
-    public int getPoliceStrength() {
-        return getPolitics().getPoliceStrength().getStrength();
+    public PoliceStrength getPoliceStrength() {
+        return getPolitics().getPoliceStrength();
     }
 
-    public int getTraderStrength() {
-        return getPolitics().getPoliceStrength().getStrength();
+    public TraderStrength getTraderStrength() {
+        return getPolitics().getTraderStrength();
     }
 
     public void setStatus(Status status) {
@@ -171,7 +173,31 @@ public class SolarSystem {
         return market;
     }
 
-    enum SpecialResource {
+    // TODO: move to SolarSystem?
+    public Map<ShipType, Integer> getShipsForSale() {
+        Map<ShipType, Integer> shipsForSale = new HashMap<>();
+        for (ShipType type : ShipType.values()) {
+            if (type.getMinTechLevel().isBefore(techLevel)) {
+                int price = baseShipPrice(type) - game.getShip().getPrice(false, false);
+                shipsForSale.put(type, price);
+            }
+        }
+        return shipsForSale;
+    }
+
+    private int baseShipPrice(ShipType type) {
+        return (type.getPrice() * (100 - game.getShip().getTraderSkill())) / 100;
+    }
+
+    public int getLocationX() {
+        return location.x;
+    }
+
+    public int getLocationY() {
+        return location.y;
+    }
+
+    public enum SpecialResource {
         Nothing("Nothing special"),
         MineralRich("Mineral rich"),
         MineralPoor("Mineral poor"),
@@ -186,22 +212,26 @@ public class SolarSystem {
         ArtisticPopulace("Artistic populace"),
         WarlikePopulace("Warlike populace");
 
-        private String name;
+        private final String name;
 
         SpecialResource(String name) {
             this.name = name;
         }
+
+        public String getName() {
+            return name;
+        }
     }
 
-    enum Size {
+    public enum Size {
         Tiny(1, "Tiny"),
         Small(2, "Small"),
         Medium(3, "Medium"),
         Large(4, "Large"),
         Huge(5, "Huge");
 
-        private String name;
-        private int multiplier;
+        private final String name;
+        private final int multiplier;
 
         Size(int multiplier, String name) {
             this.multiplier = multiplier;
@@ -210,6 +240,10 @@ public class SolarSystem {
 
         public int getMultiplier() {
             return multiplier;
+        }
+
+        public String getName() {
+            return name;
         }
     }
 
@@ -345,7 +379,7 @@ public class SolarSystem {
         }
     }
 
-    enum Status {
+    public enum Status {
         Uneventful("UNUSED_TEXT", "under no particular pressure"),
         War("Strife and War", "at war"),
         Plague("Plague Outbreaks", "ravaged by a plague"),

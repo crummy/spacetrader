@@ -24,7 +24,6 @@ public class Captain extends Crew {
 
     // TODO: gotta move some of these variables elsewhere
     private int credits;
-    private int debt;
     private int days;
     private int policeKills;
     private int traderKills;
@@ -60,7 +59,6 @@ public class Captain extends Crew {
 
         this.name = name;
         credits = 1000;
-        debt = 0;
         policeKills = 0;
         traderKills = 0;
         pirateKills = 0;
@@ -83,7 +81,8 @@ public class Captain extends Crew {
         gameLoaded = false;
     }
 
-    public String getCaptainName() {
+    @Override
+    public String getName() {
         return name;
     }
 
@@ -131,10 +130,6 @@ public class Captain extends Crew {
         return moonBought;
     }
 
-    public int getDebt() {
-        return debt;
-    }
-
     public boolean isCriminal() {
         return policeRecordScore <= CRIMINAL_SCORE;
     }
@@ -151,7 +146,7 @@ public class Captain extends Crew {
         if (credits > creditsLost) {
             credits -= creditsLost;
         } else {
-            debt += (creditsLost - credits);
+            game.getBank().addDebt(creditsLost - credits);
             credits = 0;
         }
     }
@@ -194,23 +189,10 @@ public class Captain extends Crew {
     }
 
     public int getWorth() {
-        return game.getShip().getPrice(false) + credits - debt + (moonBought ? SolarSystem.COST_MOON : 0);
-    }
-
-    public void payInterest() {
-        if (debt > 0) {
-            int additionalDebt = Math.max(1, debt/10);
-            if (credits > additionalDebt) {
-                credits -= additionalDebt;
-            } else {
-                debt += (additionalDebt - credits);
-                credits = 0;
-            }
-        }
-    }
-
-    public void setDebt(int debt) {
-        this.debt = debt;
+        return game.getShip().getPrice(false, true)
+                + credits
+                - game.getBank().getDebt()
+                + (moonBought ? SolarSystem.COST_MOON : 0);
     }
 
     public void fledPolice() {
@@ -267,6 +249,18 @@ public class Captain extends Crew {
 
     public boolean isAverage() {
         return reputationScore >= Reputation.Average.getScore();
+    }
+
+    public int getKills() {
+        return pirateKills + policeKills + traderKills;
+    }
+
+    public int getDays() {
+        return days;
+    }
+
+    public void setCredits(int credits) {
+        this.credits = credits;
     }
 
     enum Reputation {

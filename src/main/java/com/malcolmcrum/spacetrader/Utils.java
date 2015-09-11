@@ -47,8 +47,8 @@ public class Utils {
 }
 
 class Vector2i {
-    int x;
-    int y;
+    public int x;
+    public int y;
 
     public static double Distance(Vector2i p1, Vector2i p2) {
         return Math.sqrt((p2.x - p1.x)*(p2.x - p1.x) + (p2.y - p1.y)*(p2.y - p1.y));

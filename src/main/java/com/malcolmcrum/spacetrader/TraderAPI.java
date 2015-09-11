@@ -3,7 +3,9 @@ package com.malcolmcrum.spacetrader;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.malcolmcrum.spacetrader.GameStates.InSystem;
+import com.malcolmcrum.spacetrader.Serializers.GalaxySerializer;
 import com.malcolmcrum.spacetrader.Serializers.InSystemSerializer;
+import com.malcolmcrum.spacetrader.Serializers.ShipTypesSerializer;
 
 import static spark.Spark.*;
 
@@ -17,6 +19,8 @@ public class TraderAPI {
         GsonBuilder builder = new GsonBuilder();
         builder.registerTypeAdapter(InSystem.class, new InSystemSerializer());
         builder.registerTypeAdapter(Galaxy.class, new GalaxySerializer());
+        builder.registerTypeAdapter(GameManager.ShipTypes.class, new ShipTypesSerializer());
+        builder.registerTypeAdapter(Captain.class, new CaptainSerializer());
         builder.setPrettyPrinting();
         Gson gson = builder.create();
 
@@ -28,5 +32,31 @@ public class TraderAPI {
             return gson.toJson(manager.getGalaxy());
         });
 
+        get("/ships", (request, response) -> {
+            return gson.toJson(manager.getShipTypes());
+        });
+
+        get("/captain", (request, response) -> {
+            return gson.toJson(manager.getCaptain());
+        });
+
+        post("/action/:action", (request, response) -> {
+            String action = request.params(":action");
+            if (manager.isActionValid(action)) {
+                return manager.action(action);
+            } else {
+                return gson.toJson(new APIError(404, "Invalid action: " + action));
+            }
+        });
+
+    }
+
+    private class APIError {
+        int code;
+        String message;
+        APIError(int code, String message) {
+            this.code = code;
+            this.message = message;
+        }
     }
 }

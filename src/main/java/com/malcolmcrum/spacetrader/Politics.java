@@ -262,4 +262,8 @@ public enum Politics {
     public TraderStrength getTraderStrength() {
         return traderStrength;
     }
+
+    public String getName() {
+        return name;
+    }
 }

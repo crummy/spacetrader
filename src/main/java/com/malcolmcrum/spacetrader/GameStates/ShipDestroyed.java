@@ -68,15 +68,15 @@ public class ShipDestroyed extends GameState {
             game.addAlert(Alert.TribbleSurvived);
             // unnecessary to set ship.tribbles = 0 I think
         }
-        if (game.getShip().isInsured()) {
+        if (game.getBank().hasInsurance()) {
             game.addAlert(Alert.InsurancePays);
-            int payout = game.getShip().getPriceWithoutCargo(true);
+            int payout = game.getShip().getPriceWithoutCargo(true, true);
             game.getCaptain().addCredits(payout);
         }
 
         game.addAlert(Alert.FleaBuilt);
 
-        game.getCaptain().subtractCredits(500);
+        game.getCaptain().subtractCredits(500); // Normally it costs 2000 for a flea. Hmm.
 
         game.dayPasses();
         game.dayPasses();

@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.malcolmcrum.spacetrader.Utils.GetRandom;
 
@@ -31,7 +32,7 @@ public class InSystem extends GameState {
         try {
             actions.add(InSystem.class.getMethod("buyRepairs", int.class));
             actions.add(InSystem.class.getMethod("buyFuel", int.class));
-            actions.add(InSystem.class.getMethod("buyShip", String.class));
+            actions.add(InSystem.class.getMethod("buyShip", ShipType.class));
             actions.add(InSystem.class.getMethod("buyEscapePod"));
             actions.add(InSystem.class.getMethod("buyInsurance"));
         } catch (NoSuchMethodException e) {
@@ -42,7 +43,7 @@ public class InSystem extends GameState {
 
     @Override
     public GameState init() {
-        if (game.getCaptain().getDebt() > 0 && game.getRemindLoans() && game.getDays() % 5 == 0) {
+        if (game.getBank().getDebt() > 0 && game.getDays() % 5 == 0) {
             game.addAlert(Alert.DebtReminder);
         }
 
@@ -115,9 +116,63 @@ public class InSystem extends GameState {
         }
     }
 
-    public GameState buyShip(String name) {
-        // TODO
+    /**
+     * Ensures a player is capable of purchasing a ship, and does so.
+     * Note that unique equipment may be lost in this transaction
+     * @param type
+     * @return
+     */
+    public GameState buyShip(ShipType type) {
+        Map<ShipType, Integer> shipsForSale = system.getShipsForSale();
+        if (!shipsForSale.containsKey(type)) {
+            logger.error("Tried to buy unavailable ship");
+        } else if (game.getBank().getDebt() > 0) {
+            game.addAlert(Alert.CannotPurchaseShipInDebt);
+        } else if (game.getCaptain().getCredits() < shipsForSale.get(type)) {
+            game.addAlert(Alert.CannotAffordShip);
+        } else if (game.getJarekStatus() == Jarek.OnBoard && type.getCrewQuarters() < 2) {
+            game.addAlert(Alert.PassengerNeedsQuarters);
+        } else if (game.getWildStatus() == Wild.OnBoard && type.getCrewQuarters() < 2) {
+            game.addAlert(Alert.PassengerNeedsQuarters);
+        } else if (game.getReactorStatus() != Reactor.Unavailable && game.getReactorStatus() != Reactor.Delivered) {
+            game.addAlert(Alert.CannotSellShipWithReactor);
+        } else if (cannotTransferUniqueEquipment(game.getShip(), type)) {
+            game.addAlert(Alert.CannotTransferUniqueEquipment);
+        } else {
+            int price = system.getShipsForSale().get(type);
+            game.getCaptain().subtractCredits(price);
+            PlayerShip newShip = new PlayerShip(type, game);
+            transferUniqueEquipment(game.getShip(), newShip);
+            game.setShip(newShip);
+            if (game.getScarabStatus() == Scarab.DestroyedUpgradePerformed) {
+                game.setScarabStatus(Scarab.Unavailable);
+            }
+            game.addAlert(Alert.ShipPurchased);
+        }
         return this;
+    }
+
+    private void transferUniqueEquipment(PlayerShip oldShip, PlayerShip newShip) {
+        if (oldShip.hasGadget(Gadget.FuelCompactor)) {
+            newShip.addGadget(Gadget.FuelCompactor);
+        }
+        if (oldShip.hasWeapon(Weapon.MorgansLaser)) {
+            newShip.addWeapon(Weapon.MorgansLaser);
+        }
+        if (game.getShip().hasShield(ShieldType.LightningShield)) {
+            newShip.addShield(ShieldType.LightningShield);
+        }
+    }
+
+    private boolean cannotTransferUniqueEquipment(PlayerShip ship, ShipType type) {
+        if (game.getShip().hasGadget(Gadget.FuelCompactor) && type.getGadgetSlots() == 0) {
+            return false;
+        } else if (game.getShip().hasWeapon(Weapon.MorgansLaser) && type.getWeaponSlots() == 0) {
+            return false;
+        } else if (game.getShip().hasShield(ShieldType.LightningShield) && type.getShieldSlots() == 0) {
+            return false;
+        }
+        return true;
     }
 
     public GameState buyInsurance() {
@@ -264,7 +319,7 @@ public class InSystem extends GameState {
         }
 
         // Check for large debt
-        if (game.getCaptain().getDebt() > Game.DEBT_TOO_LARGE) {
+        if (game.getBank().veryLargeDebt()) {
             game.addAlert(Alert.DebtTooLargeForTravel);
             return this;
         }
@@ -278,7 +333,7 @@ public class InSystem extends GameState {
 
         // Check for enough money to pay for insurance
         int insuranceCost = game.getShip().getInsuranceCost();
-        if (game.getShip().isInsured()
+        if (game.getBank().hasInsurance()
                 && (insuranceCost + mercenaryCost > game.getCaptain().getCredits())) {
             game.addAlert(Alert.CantAffordInsuranceBill);
             return this;

@@ -360,4 +360,8 @@ public class Galaxy {
     public boolean wormholeExistsBetween(SolarSystem system, SolarSystem destination) {
         return system.getWormholeDestination() == destination;
     }
+
+    public List<SolarSystem> getSystems() {
+        return systems;
+    }
 }

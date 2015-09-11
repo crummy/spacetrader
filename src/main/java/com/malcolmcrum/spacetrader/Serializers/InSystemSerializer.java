@@ -5,6 +5,7 @@ import com.malcolmcrum.spacetrader.*;
 import com.malcolmcrum.spacetrader.GameStates.InSystem;
 
 import java.lang.reflect.Type;
+import java.util.Map;
 
 /**
  * Created by Malcolm on 9/10/2015.
@@ -17,17 +18,57 @@ public class InSystemSerializer extends GameStateSerializer implements JsonSeria
         SolarSystem system = inSystem.getSystem();
 
         JsonObject json = GetGameStateJsonObject(inSystem);
-        json.addProperty("systemName", system.getName());
+        json.add("system", GetProperties(system));
 
+        JsonObject shipObj = new JsonObject();
         PlayerShip ship = inSystem.getPlayerShip();
-
-        json.add("shipStatus", GetShipStatus(ship));
-
-        json.add("equipment", GetEquipment(ship));
+        shipObj.addProperty("type", ship.getType().getName());
+        shipObj.add("status", GetShipStatus(ship));
+        shipObj.add("equipment", GetEquipment(ship));
+        shipObj.add("crew", GetCrew(ship));
+        json.add("ship", shipObj);
 
         json.add("market", GetMarket(system.getMarket()));
+        json.add("shipsForSale", GetShipsForSale(system.getShipsForSale()));
 
         return json;
+    }
+
+    private JsonArray GetShipsForSale(Map<ShipType, Integer> shipsForSale) {
+        JsonArray ships = new JsonArray();
+        for (ShipType type : shipsForSale.keySet()) {
+            JsonObject shipForSale = new JsonObject();
+            shipForSale.addProperty("type", type.getName());
+            shipForSale.addProperty("price", shipsForSale.get(type));
+            ships.add(shipForSale);
+        }
+        return ships;
+    }
+
+    private JsonObject GetProperties(SolarSystem system) {
+        JsonObject properties = new JsonObject();
+        properties.addProperty("name", system.getName());
+        properties.addProperty("size", system.getSize().getName());
+        properties.addProperty("techLevel", system.getTechLevel().getName());
+        properties.addProperty("government", system.getPolitics().getName());
+        properties.addProperty("resources", system.getSpecialResource().getName());
+        properties.addProperty("police", system.getPoliceStrength().getName());
+        properties.addProperty("pirates", system.getPirateStrength().getName());
+        properties.addProperty("status", system.getStatus().getTitle());
+        return properties;
+    }
+
+    private JsonElement GetCrew(PlayerShip ship) {
+        JsonObject crew = new JsonObject();
+        for (Crew c : ship.getCrew()) {
+            JsonObject crewMember = new JsonObject();
+            crewMember.addProperty("fighter", c.getFighterSkill());
+            crewMember.addProperty("engineer", c.getEngineerSkill());
+            crewMember.addProperty("trader", c.getTraderSkill());
+            crewMember.addProperty("pilot", c.getPilotSkill());
+            crew.add(c.getName(), crewMember);
+        }
+        return crew;
     }
 
     private static JsonElement GetMarket(Market market) {

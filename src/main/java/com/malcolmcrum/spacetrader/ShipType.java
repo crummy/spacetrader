@@ -171,21 +171,31 @@ public enum ShipType {
         return minStrengthForTraderEncounter;
     }
 
-    enum Size {
-        Tiny(0),
-        Small(1),
-        Medium(2),
-        Large(3),
-        Huge(4);
+    public TechLevel getMinTechLevel() {
+        return minTechLevel;
+    }
+
+    public enum Size {
+        Tiny(0, "Tiny"),
+        Small(1, "Small"),
+        Medium(2, "Medium"),
+        Large(3, "Large"),
+        Huge(4, "Huge");
 
         private final int value;
+        private final String name;
 
-        Size(int value) {
+        Size(int value, String name) {
             this.value = value;
+            this.name = name;
         }
 
         public int getValue() {
             return value;
+        }
+
+        public String getName() {
+            return name;
         }
     }
 }

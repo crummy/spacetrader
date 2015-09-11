@@ -70,8 +70,12 @@ public class Crew {
         return engineer;
     }
 
-    public Name getName() {
+    public Name getType() {
         return name;
+    }
+
+    public String getName() {
+        return name.getTitle();
     }
 
     protected enum Name {

@@ -188,7 +188,7 @@ public class GalaxyTest
 
     private int systemsWithMercenaryNamed(Crew.Name name) {
         return (int)galaxy.systems.stream()
-                .filter(s -> s.getMercenary() != null && s.getMercenary().getName() == name)
+                .filter(s -> s.getMercenary() != null && s.getMercenary().getType() == name)
                 .count();
     }
 }

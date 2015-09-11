@@ -17,10 +17,8 @@ public class Game {
     public static final int MAX_POINTS_PER_SKILL = 10;
     private static final int MAX_SKILL_POINTS_TOTAL = 20;
     private static final int MIN_POINTS_PER_SKILL = 1;
-    public static final int DEBT_TOO_LARGE = 100000;
     public static final int MAX_TRIBBLES = 100000;
 
-    private boolean reserveMoney;
     private Experiment experimentStatus;
     private Monster monsterStatus;
     private int fabricRipProbability;
@@ -36,12 +34,12 @@ public class Game {
     private Captain captain;
     private PlayerShip ship;
     private SolarSystem currentSystem;
+    private Bank bank;
     private Difficulty difficulty = Difficulty.Normal;
     private News news;
     private RareEncounters rareEncounters;
     private List<Alert> unreadAlerts;
 
-    private GameState currentState;
     private boolean artifactOnBoard;
     private Jarek jarekStatus;
 
@@ -57,6 +55,7 @@ public class Game {
             return null;
         }
 
+        bank = new Bank(this);
         captain = new Captain(this, commanderName);
         ship = new PlayerShip(ShipType.Flea, this);
         ship.addWeapon(Weapon.PulseLaser);
@@ -259,5 +258,9 @@ public class Game {
 
     public boolean getArtifactOnBoard() {
         return artifactOnBoard;
+    }
+
+    public Bank getBank() {
+        return bank;
     }
 }

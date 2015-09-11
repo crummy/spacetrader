@@ -10,7 +10,6 @@ public class PlayerShip extends Ship {
 
     private int tribbles;
     private boolean hasEscapePod;
-    private boolean hasInsurance;
     private int daysWithoutClaim;
     private boolean artifactOnBoard;
 
@@ -18,12 +17,14 @@ public class PlayerShip extends Ship {
         super(type, game);
         tribbles = 0;
         hasEscapePod = false;
-        hasInsurance = false;
-        daysWithoutClaim = 0;
         artifactOnBoard = false;
     }
 
-    public int getPriceWithoutCargo(boolean forInsurance) {
+    // TODO: Maybe forInsurance and includeUniqueEquipment are tied together - remove one?
+    // I added includeUniqueEquipment because I transfer over unique equipment to the new
+    // ship when the player buys a new one, and I don't want the equipment's value being
+    // included in the cost of selling their old ship.
+    public int getPriceWithoutCargo(boolean forInsurance, boolean includeUniqueEquipment) {
         // Trade-in value is three-quarters the original price
         // OR one-quarter if tribbles are involved and it's not for insurance purposes.
         int tradeinPrice = (type.getPrice() * (tribbles > 0 && !forInsurance? 1 : 3)) / 4;
@@ -34,24 +35,30 @@ public class PlayerShip extends Ship {
 
         int weaponsPrice = 0;
         for (Weapon weapon : weapons) {
-            weaponsPrice += weapon.getSellPrice();
+            if (weapon != Weapon.MorgansLaser || includeUniqueEquipment) {
+                weaponsPrice += weapon.getSellPrice();
+            }
         }
 
         int shieldsPrice = 0;
         for (Shield shield : shields) {
-            shieldsPrice += shield.shieldType.getSellPrice();
+            if (shield.shieldType != ShieldType.LightningShield || includeUniqueEquipment) {
+                shieldsPrice += shield.shieldType.getSellPrice();
+            }
         }
 
         int gadgetsPrice = 0;
         for (Gadget gadget : gadgets) {
-            gadgetsPrice += gadget.getSellPrice();
+            if (gadget != Gadget.FuelCompactor || includeUniqueEquipment) {
+                gadgetsPrice += gadget.getSellPrice();
+            }
         }
 
         return tradeinPrice - repairCosts - refillFuel + weaponsPrice + shieldsPrice + gadgetsPrice;
     }
 
-    public int getPrice(boolean forInsurance) {
-        int curPrice = getPriceWithoutCargo(forInsurance);
+    public int getPrice(boolean forInsurance, boolean includeUniqueEquipment) {
+        int curPrice = getPriceWithoutCargo(forInsurance, includeUniqueEquipment);
         for (Cargo c : cargo) {
             curPrice += c.buyingPrice;
         }
@@ -106,16 +113,12 @@ public class PlayerShip extends Ship {
     }
 
     public int getInsuranceCost() {
-        if (hasInsurance) {
+        if (game.getBank().hasInsurance()) {
             return 0;
         } else {
-            return Math.max(1, (((getPriceWithoutCargo(true) * 5) / 2000) *
+            return Math.max(1, (((getPriceWithoutCargo(true, true) * 5) / 2000) *
                     (100-Math.min(daysWithoutClaim, 90)) / 100));
         }
-    }
-
-    public boolean isInsured() {
-        return hasInsurance;
     }
 
     public boolean hasEscapePod() {
@@ -141,11 +144,6 @@ public class PlayerShip extends Ship {
         } else {
             return type.getHullStrength();
         }
-    }
-
-    public void cancelInsurance() {
-        hasInsurance = false;
-        daysWithoutClaim = 0;
     }
 
     public int getMercenaryCount() {
@@ -179,5 +177,9 @@ public class PlayerShip extends Ship {
 
     public List<Gadget> getGadgets() {
         return gadgets;
+    }
+
+    public List<Crew> getCrew() {
+        return crew;
     }
 }

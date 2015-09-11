@@ -124,11 +124,11 @@ public class Transit extends GameState {
             boolean encounterPirate = false;
             boolean encounterPolice = false;
             boolean encounterTrader = false;
-            if (encounterTest < destination.getPirateStrength() && !beenRaided) {
+            if (encounterTest < destination.getPirateStrength().getStrength() && !beenRaided) {
                 encounterPirate = true;
-            } else if (encounterTest < destination.getPirateStrength() + policeStrength()) {
+            } else if (encounterTest < destination.getPirateStrength().getStrength() + policeStrength()) {
                 encounterPolice = true;
-            } else if (encounterTest < destination.getPirateStrength() + policeStrength() + destination.getTraderStrength()) {
+            } else if (encounterTest < destination.getPirateStrength().getStrength() + policeStrength() + destination.getTraderStrength().getStrength()) {
                 encounterTrader = true;
             } else if (game.getWildStatus() == Wild.OnBoard
                     && destination.getType() == SolarSystem.Name.Kravat) {
@@ -244,11 +244,11 @@ public class Transit extends GameState {
      */
     private int policeStrength() {
         if (game.getCaptain().isPsychopathic()) {
-            return 3 * destination.getPoliceStrength();
+            return 3 * destination.getPoliceStrength().getStrength();
         } else if (game.getCaptain().isVillainous()) {
-            return 2 * destination.getPoliceStrength();
+            return 2 * destination.getPoliceStrength().getStrength();
         } else {
-            return destination.getPoliceStrength();
+            return destination.getPoliceStrength().getStrength();
         }
 
     }

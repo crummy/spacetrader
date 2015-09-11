@@ -133,7 +133,7 @@ public class Pirate extends Encounter {
         int normal = Difficulty.Normal.ordinal();
         int shipLevel = betterShip.getMinStrengthForPirateEncounter().getStrength();
         int difficultyModifier = (game.getDifficulty() == Difficulty.Hard || game.getDifficulty() == Difficulty.Impossible) ? difficulty - normal : 0;
-        int destinationRequirement = transit.getDestination().getPirateStrength();
+        int destinationRequirement = transit.getDestination().getPirateStrength().getStrength();
         return destinationRequirement + difficultyModifier >= shipLevel;
     }
 

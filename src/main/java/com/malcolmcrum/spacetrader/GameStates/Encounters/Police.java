@@ -240,9 +240,9 @@ public class Police extends Encounter {
             game.getShip().removeCargo(TradeItem.Firearms, firearmsOnBoard);
         }
 
-        if (game.getShip().isInsured()) {
+        if (game.getBank().hasInsurance()) {
             game.addAlert(Alert.InsuranceLost);
-            game.getShip().cancelInsurance();
+            game.getBank().cancelInsurance();
         }
 
         if (game.getShip().getMercenaryCount() > 0) {
@@ -287,20 +287,20 @@ public class Police extends Encounter {
         game.getCaptain().makeDubious();
 
         credits = game.getCaptain().getCredits();
-        int debt = game.getCaptain().getDebt();
+        int debt = game.getBank().getDebt();
         if (debt > 0) {
             if (credits >= debt) {
                 game.getCaptain().subtractCredits(debt);
-                game.getCaptain().setDebt(0);
+                game.getBank().setDebt(0);
             } else {
-                game.getCaptain().setDebt(debt - credits);
+                game.getBank().setDebt(debt - credits);
                 game.getCaptain().subtractCredits(credits);
             }
         }
 
         for (int i = 0; i < imprisonment; ++i) {
             game.dayPasses();
-            game.getCaptain().payInterest();
+            game.getBank().payInterest();
         }
     }
 
@@ -324,7 +324,7 @@ public class Police extends Encounter {
         int normal = Difficulty.Normal.ordinal();
         int shipLevel = betterShip.getMinStrengthForPoliceEncounter().getStrength();
         int difficultyModifier = (game.getDifficulty() == Difficulty.Hard || game.getDifficulty() == Difficulty.Impossible) ? difficulty - normal : 0;
-        int destinationRequirement = transit.getDestination().getPoliceStrength();
+        int destinationRequirement = transit.getDestination().getPoliceStrength().getStrength();
         return destinationRequirement + difficultyModifier >= shipLevel;
     }
 
