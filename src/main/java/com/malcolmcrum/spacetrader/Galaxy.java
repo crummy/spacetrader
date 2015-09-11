@@ -172,10 +172,10 @@ public class Galaxy {
     private boolean addScarabWormhole() {
         SolarSystem system = systems.stream()
                 .filter(s -> s.hasWormhole()
-                        && !s.hasSpecialEvent()
-                        && s != systemNamed(SolarSystem.Name.Daled)
-                        && s != systemNamed(SolarSystem.Name.Nix)
-                        && s != systemNamed(SolarSystem.Name.Gemulon))
+                        && !s.getWormholeDestination().hasSpecialEvent()
+                        && s.getWormholeDestination() != systemNamed(SolarSystem.Name.Daled)
+                        && s.getWormholeDestination() != systemNamed(SolarSystem.Name.Nix)
+                        && s.getWormholeDestination() != systemNamed(SolarSystem.Name.Gemulon))
                 .findFirst()
                 .get();
         if (system != null) {
@@ -267,7 +267,7 @@ public class Galaxy {
                     neighbourTooClose = (Math.pow(nearestSystemDistance, 2) <= Math.pow(MIN_DISTANCE+1, 2));
                     neighbourTooFar = (nearestSystemDistance >= CLOSE_DISTANCE);
                 }
-            } while(i > MAX_WORM_HOLES && (neighbourTooClose || neighbourTooFar));
+            } while(i > 0 && (neighbourTooClose || neighbourTooFar));
 
             SolarSystem system = new SolarSystem(game, i);
             system.setLocation(location);

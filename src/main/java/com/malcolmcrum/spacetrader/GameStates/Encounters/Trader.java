@@ -29,16 +29,17 @@ public class Trader extends Encounter {
 
         if (GetRandom(1000) < CHANCE_OF_TRADE_IN_ORBIT) {
             if (game.getShip().hasFreeCargoBay() && hasTradeableItem(opponent, transit.getDestination(), false)) {
+                item = randomItemForTrade();
+                price = randomPriceForTrade();
                 isBuying = true;
             } else if (hasTradeableItem(game.getShip(), transit.getDestination(), true)) {
+                item = randomItemForTrade();
+                price = randomPriceForTrade();
                 isBuying = false;
             } else { // Nothing suitable to trade: Ignore player
                 opponentStatus = Status.Ignoring;
             }
         }
-
-        item = randomItemForTrade();
-        price = randomPriceForTrade();
 
         // If player is cloaked, they don't see him, and ignore
         if (game.getShip().isInvisibleTo(opponent)) {

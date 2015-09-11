@@ -250,11 +250,11 @@ public class Market {
     }
 
     public boolean isBuying(TradeItem item) {
-        return buyPrices.get(item) != 0;
+        return sellPrices.containsKey(item) && buyPrices.get(item) != 0;
     }
 
     public boolean isSelling(TradeItem item) {
-        return sellPrices.get(item) != 0;
+        return sellPrices.containsKey(item) && sellPrices.get(item) != 0;
     }
 
     public Integer getBuyPrice(TradeItem item) {
