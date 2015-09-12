@@ -71,6 +71,10 @@ public class GameManager {
         return game.getCaptain();
     }
 
+    public Bank getBank() {
+        return game.getBank();
+    }
+
     public class ShipTypes {
         public ShipType[] types;
         ShipTypes() {

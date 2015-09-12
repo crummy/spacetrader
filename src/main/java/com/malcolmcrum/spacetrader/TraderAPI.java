@@ -21,6 +21,7 @@ public class TraderAPI {
         builder.registerTypeAdapter(Galaxy.class, new GalaxySerializer());
         builder.registerTypeAdapter(GameManager.ShipTypes.class, new ShipTypesSerializer());
         builder.registerTypeAdapter(Captain.class, new CaptainSerializer());
+        builder.registerTypeAdapter(Bank.class, new BankSerializer());
         builder.setPrettyPrinting();
         Gson gson = builder.create();
 
@@ -39,6 +40,10 @@ public class TraderAPI {
         get("/captain", (request, response) -> {
             return gson.toJson(manager.getCaptain());
         });
+
+        get("/bank", (request, response) -> {
+            return gson.toJson(manager.getBank());
+        })
 
         post("/action/:action", (request, response) -> {
             String action = request.params(":action");

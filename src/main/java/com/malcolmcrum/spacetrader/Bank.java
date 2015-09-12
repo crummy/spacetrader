@@ -88,4 +88,21 @@ public class Bank {
         hasInsurance = false;
         daysWithoutClaim = 0;
     }
+
+    public int getInsuranceCost() {
+        if (game.getBank().hasInsurance()) {
+            return 0;
+        } else {
+            return Math.max(1, (((game.getShip().getPriceWithoutCargo(true, true) * 5) / 2000) *
+                    (100-Math.min(daysWithoutClaim, 90)) / 100));
+        }
+    }
+
+    public void incrementNoClaim() {
+        daysWithoutClaim++;
+    }
+
+    public int getDaysWithoutClaim() {
+        return daysWithoutClaim;
+    }
 }

@@ -160,6 +160,10 @@ public class Game {
     }
 
     public void dayPasses() {
+        bank.payInterest();
+        if (bank.hasInsurance()) {
+            bank.incrementNoClaim();
+        }
         days++;
     }
 

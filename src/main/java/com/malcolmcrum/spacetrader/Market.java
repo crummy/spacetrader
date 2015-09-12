@@ -268,4 +268,8 @@ public class Market {
     public int getQuantity(TradeItem item) {
         return quantities.get(item);
     }
+
+    public void resetTradeCountdown() {
+        tradeResetCountdown = initialTradeResetCountdown();
+    }
 }

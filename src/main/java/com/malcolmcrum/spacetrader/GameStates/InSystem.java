@@ -332,7 +332,7 @@ public class InSystem extends GameState {
         }
 
         // Check for enough money to pay for insurance
-        int insuranceCost = game.getShip().getInsuranceCost();
+        int insuranceCost = game.getBank().getInsuranceCost();
         if (game.getBank().hasInsurance()
                 && (insuranceCost + mercenaryCost > game.getCaptain().getCredits())) {
             game.addAlert(Alert.CantAffordInsuranceBill);
@@ -346,11 +346,15 @@ public class InSystem extends GameState {
             return this;
         }
 
+        game.getNews().resetNewsEvents();
         if (!viaSingularity) {
             game.getCaptain().subtractCredits(wormholeCost);
             game.getCaptain().subtractCredits(mercenaryCost);
             game.getCaptain().subtractCredits(insuranceCost);
+            game.dayPasses();
         }
+
+        system.getMarket().resetTradeCountdown();
 
         return new Transit(game, destination, viaSingularity);
     }

@@ -112,15 +112,6 @@ public class PlayerShip extends Ship {
         return cost;
     }
 
-    public int getInsuranceCost() {
-        if (game.getBank().hasInsurance()) {
-            return 0;
-        } else {
-            return Math.max(1, (((getPriceWithoutCargo(true, true) * 5) / 2000) *
-                    (100-Math.min(daysWithoutClaim, 90)) / 100));
-        }
-    }
-
     public boolean hasEscapePod() {
         return hasEscapePod;
     }

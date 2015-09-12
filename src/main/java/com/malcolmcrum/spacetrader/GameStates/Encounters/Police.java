@@ -300,7 +300,6 @@ public class Police extends Encounter {
 
         for (int i = 0; i < imprisonment; ++i) {
             game.dayPasses();
-            game.getBank().payInterest();
         }
     }
 

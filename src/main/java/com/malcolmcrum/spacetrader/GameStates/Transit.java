@@ -37,10 +37,15 @@ public class Transit extends GameState {
         origin = game.getCurrentSystem();
         this.destination = destination;
         this.destination.getMarket().determinePrices();
+
+        if (viaSingularity) {
+            game.getNews().addNotableEvent(News.NotableEvent.ArrivalViaSingularity);
+        }
     }
 
     @Override
     public GameState init() {
+
         clicksRemaining = 21;
         totalClicks = clicksRemaining;
         beenRaided = false;

@@ -56,6 +56,7 @@ public class MarieCeleste extends Encounter {
 
     public GameState actionBoard() {
         // TODO
+        // remember to set justLootedMarie
         return this;
     }
 
