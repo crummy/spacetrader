@@ -117,7 +117,7 @@ public class SolarSystem {
         return wormholeDestination;
     }
 
-    Crew getMercenary() {
+    public Crew getMercenary() {
         return mercenary;
     }
 

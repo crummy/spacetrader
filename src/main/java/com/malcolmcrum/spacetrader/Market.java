@@ -272,4 +272,18 @@ public class Market {
     public void resetTradeCountdown() {
         tradeResetCountdown = initialTradeResetCountdown();
     }
+
+    public void buyItem(TradeItem item, int quantity) {
+        quantities.put(item, quantities.get(item) - quantity);
+        int cost = quantity * buyPrices.get(item);
+        game.getCaptain().subtractCredits(cost);
+        game.getShip().addCargo(item, quantity, buyPrices.get(item));
+    }
+
+    public void sellItem(TradeItem item, int quantity) {
+        quantities.put(item, quantities.get(item) + quantity);
+        int price = quantity * sellPrices.get(item);
+        game.getCaptain().addCredits(price);
+        game.getShip().removeCargo(item, quantity);
+    }
 }

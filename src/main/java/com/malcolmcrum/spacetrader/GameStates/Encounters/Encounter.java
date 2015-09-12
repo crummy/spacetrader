@@ -38,7 +38,7 @@ public abstract class Encounter extends GameState {
         this.transit = transit;
         this.isPlayerFleeing = false;
         this.playerWasHit = false;
-        this.tribblesOnScreen = 0;
+        this.tribblesOnScreen = getTribbles();;
         this.opponentStatus = Status.Awake;
 
         int tries = getShipTypeTries();
@@ -118,13 +118,6 @@ public abstract class Encounter extends GameState {
         } else {
             return "It ignores you.";
         }
-    }
-
-
-    @Override
-    public GameState init() {
-        tribblesOnScreen = getTribbles();
-        return this;
     }
 
     int getTribbles() {

@@ -2,6 +2,7 @@ package com.malcolmcrum.spacetrader;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.malcolmcrum.spacetrader.GameStates.GameOver;
 import com.malcolmcrum.spacetrader.GameStates.InSystem;
 import com.malcolmcrum.spacetrader.Serializers.GalaxySerializer;
 import com.malcolmcrum.spacetrader.Serializers.InSystemSerializer;
@@ -22,6 +23,7 @@ public class TraderAPI {
         builder.registerTypeAdapter(GameManager.ShipTypes.class, new ShipTypesSerializer());
         builder.registerTypeAdapter(Captain.class, new CaptainSerializer());
         builder.registerTypeAdapter(Bank.class, new BankSerializer());
+        builder.registerTypeAdapter(GameOver.class, new GameOverSerializer());
         builder.setPrettyPrinting();
         Gson gson = builder.create();
 
@@ -43,7 +45,7 @@ public class TraderAPI {
 
         get("/bank", (request, response) -> {
             return gson.toJson(manager.getBank());
-        })
+        });
 
         post("/action/:action", (request, response) -> {
             String action = request.params(":action");

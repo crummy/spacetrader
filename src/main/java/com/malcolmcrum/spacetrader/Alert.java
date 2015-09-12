@@ -11,7 +11,7 @@ public enum Alert {
     WildArrested,
     TribbleSurvived,
     InsurancePays,
-    GameOver,
+    GameOverKilled,
     WildWontGo,
     DebtTooLargeForTravel,
     MustPayMercenaries,

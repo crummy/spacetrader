@@ -58,4 +58,8 @@ public enum Weapon {
     public String getName() {
         return name;
     }
+
+    public TechLevel getTechLevelRequired() {
+        return techLevel;
+    }
 }

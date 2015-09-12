@@ -51,4 +51,12 @@ public enum Gadget {
     public String getName() {
         return name;
     }
+
+    public TechLevel getTechLevelRequired() {
+        return techLevel;
+    }
+
+    public int getPrice() {
+        return price;
+    }
 }

@@ -51,7 +51,12 @@ public class GameManager {
         for (Method m : actions) {
             if (m.getName().equals(action)) {
                 try {
+                    GameState previousState = state;
                     state = (GameState)m.invoke(state);
+                    while (state != previousState) { // Some states are just transition states.
+                        previousState = state;
+                        state = state.init();
+                    }
                 } catch (IllegalAccessException e) {
                     logger.error("IllegalAccessException? Dang.");
                 } catch (InvocationTargetException e) {

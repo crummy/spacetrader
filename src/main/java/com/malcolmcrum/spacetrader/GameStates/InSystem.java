@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,11 +20,43 @@ public class InSystem extends GameState {
     private static final Logger logger = LoggerFactory.getLogger(InSystem.class);
 
     private SolarSystem system;
-    boolean alreadyPaidForNewspaper;
+    private boolean alreadyPaidForNewspaper;
 
     public InSystem(Game game, SolarSystem system) {
         super(game);
         this.system = system;
+    }
+
+    public Map<String, Integer> getEquipmentForSale() {
+        Map<String, Integer> equipment = new HashMap<>();
+        for (Weapon weapon : Weapon.values()) {
+            if (!weapon.getTechLevelRequired().isBeyond(system.getTechLevel())) {
+                equipment.put(weapon.getName(), equipmentPrice(weapon.getTechLevelRequired(), weapon.getPrice()));
+            }
+        }
+        for (Gadget gadget : Gadget.values()) {
+            if (!gadget.getTechLevelRequired().isBeyond(system.getTechLevel())) {
+                equipment.put(gadget.getName(), equipmentPrice(gadget.getTechLevelRequired(), gadget.getPrice()));
+            }
+        }
+        for (ShieldType shield : ShieldType.values()) {
+            if (!shield.getTechLevelRequired().isBeyond(system.getTechLevel())) {
+                equipment.put(shield.getName(), equipmentPrice(shield.getTechLevelRequired(), shield.getPrice()));
+            }
+        }
+        return equipment;
+    }
+
+    private int equipmentPrice(TechLevel techLevel, int price) {
+        if (techLevel.isBeyond(system.getTechLevel())) {
+            return 0;
+        } else {
+            return (price * (100 - game.getCaptain().getTraderSkill())) / 100;
+        }
+    }
+
+    public List<String> getNews() {
+        return game.getNews().getNewspaper();
     }
 
     @Override
@@ -35,6 +68,10 @@ public class InSystem extends GameState {
             actions.add(InSystem.class.getMethod("buyShip", ShipType.class));
             actions.add(InSystem.class.getMethod("buyEscapePod"));
             actions.add(InSystem.class.getMethod("buyInsurance"));
+            actions.add(InSystem.class.getMethod("buyNewspaper"));
+            actions.add(InSystem.class.getMethod("buyTradeItem", TradeItem.class, int.class));
+            actions.add(InSystem.class.getMethod("sellTradeItem", TradeItem.class, int.class));
+            actions.add(InSystem.class.getMethod("warpTo", SolarSystem.class, boolean.class));
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
@@ -84,6 +121,32 @@ public class InSystem extends GameState {
         return "InSystem";
     }
 
+    public GameState buyTradeItem(TradeItem item, int quantity) {
+        if (system.getMarket().getBuyPrice(item) == null) {
+            logger.error("Trying to buy an item with no buy price!");
+            return this;
+        } else if (system.getMarket().getQuantity(item) < quantity) {
+            logger.error("Trying to buy more items than are for sale!");
+            return this;
+        } else {
+            system.getMarket().buyItem(item, quantity);
+            return this;
+        }
+    }
+
+    public GameState sellTradeItem(TradeItem item, int quantity) {
+        if (system.getMarket().getSellPrice(item) == null) {
+            logger.error("Trying to sell an item with no sell price!");
+            return this;
+        } else if (game.getShip().getCargoCount(item) < quantity) {
+            logger.error("Trying to sell more items than ship has!");
+            return this;
+        } else {
+            system.getMarket().sellItem(item, quantity);
+            return this;
+        }
+    }
+
     /**
      * There's an easter egg that can give the player a lightning shield
      */
@@ -107,6 +170,7 @@ public class InSystem extends GameState {
     /**
      * If autoRepair setting is enabled for player, try to repair the whole ship
      */
+    // TODO: consider leaving in UI level, removing from here
     private void autoRepair() {
         if (game.getAutoRepair()) {
             boolean repairsCompleted = buyRepairs();
@@ -165,11 +229,11 @@ public class InSystem extends GameState {
     }
 
     private boolean cannotTransferUniqueEquipment(PlayerShip ship, ShipType type) {
-        if (game.getShip().hasGadget(Gadget.FuelCompactor) && type.getGadgetSlots() == 0) {
+        if (ship.hasGadget(Gadget.FuelCompactor) && type.getGadgetSlots() == 0) {
             return false;
-        } else if (game.getShip().hasWeapon(Weapon.MorgansLaser) && type.getWeaponSlots() == 0) {
+        } else if (ship.hasWeapon(Weapon.MorgansLaser) && type.getWeaponSlots() == 0) {
             return false;
-        } else if (game.getShip().hasShield(ShieldType.LightningShield) && type.getShieldSlots() == 0) {
+        } else if (ship.hasShield(ShieldType.LightningShield) && type.getShieldSlots() == 0) {
             return false;
         }
         return true;
@@ -310,7 +374,7 @@ public class InSystem extends GameState {
         // TribbleMessage = False?
     }
 
-    GameState warpTo(SolarSystem destination, boolean viaSingularity) {
+    public GameState warpTo(SolarSystem destination, boolean viaSingularity) {
         // If wild is aboard, make sure ship is armed!
         if (game.getWildStatus() == Wild.OnBoard) {
             game.addAlert(Alert.WildWontGo);
@@ -409,6 +473,14 @@ public class InSystem extends GameState {
         system.setVisited();
     }
 
+    // When the player buys a newspaper and the gamestate is serialized, the news is included.
+    public GameState buyNewspaper() {
+        if (canAffordNewspaper()) {
+            alreadyPaidForNewspaper = true;
+        }
+        return this;
+    }
+
     private boolean canAffordNewspaper() {
         if (alreadyPaidForNewspaper) {
             return true;
@@ -421,5 +493,9 @@ public class InSystem extends GameState {
 
     public PlayerShip getPlayerShip() {
         return game.getShip();
+    }
+
+    public boolean alreadyBoughtNewspaper() {
+        return alreadyPaidForNewspaper;
     }
 }

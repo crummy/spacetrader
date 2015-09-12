@@ -5,6 +5,7 @@ import com.malcolmcrum.spacetrader.*;
 import com.malcolmcrum.spacetrader.GameStates.InSystem;
 
 import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,8 +31,47 @@ public class InSystemSerializer extends GameStateSerializer implements JsonSeria
 
         json.add("market", GetMarket(system.getMarket()));
         json.add("shipsForSale", GetShipsForSale(system.getShipsForSale()));
+        json.add("equipmentForSale", GetEquipmentForSale(inSystem.getEquipmentForSale()));
+
+        if (inSystem.alreadyBoughtNewspaper()) {
+            json.add("news", GetNews(inSystem.getNews()));
+        }
+
+        if (system.hasMercenary()) {
+            json.add("mercenaryForHire", GetMercenary(system.getMercenary()));
+        }
 
         return json;
+    }
+
+    private JsonArray GetEquipmentForSale(Map<String, Integer> equipmentForSale) {
+        JsonArray equipment = new JsonArray();
+        for (String name : equipmentForSale.keySet()) {
+            JsonObject item = new JsonObject();
+            item.addProperty("name", name);
+            item.addProperty("price", equipmentForSale.get(name));
+            equipment.add(item);
+        }
+        return equipment;
+    }
+
+    private JsonObject GetMercenary(Crew mercenary) {
+        JsonObject merc = new JsonObject();
+        merc.addProperty("name", mercenary.getName());
+        merc.addProperty("fighter", mercenary.getFighterSkill());
+        merc.addProperty("engineer", mercenary.getEngineerSkill());
+        merc.addProperty("pilot", mercenary.getPilotSkill());
+        merc.addProperty("trader", mercenary.getTraderSkill());
+        merc.addProperty("dailyCost", mercenary.getDailyCost());
+        return merc;
+    }
+
+    private JsonArray GetNews(List<String> headlines) {
+        JsonArray news = new JsonArray();
+        for (String headline : headlines) {
+            news.add(new JsonPrimitive(headline));
+        }
+        return news;
     }
 
     private JsonArray GetShipsForSale(Map<ShipType, Integer> shipsForSale) {

@@ -16,8 +16,6 @@ public class Crew {
     private int trader;
     private int engineer;
 
-    private int dailyCost;
-
     public Crew() {
         this.name = null;
         this.pilot = 1 + GetRandom(Game.MAX_POINTS_PER_SKILL);
@@ -51,7 +49,7 @@ public class Crew {
     }
 
     public int getDailyCost() {
-        return dailyCost;
+        return (getPilotSkill() + getFighterSkill() + getTraderSkill() + getEngineerSkill()) * 3;
     }
 
     public int getPilotSkill() {

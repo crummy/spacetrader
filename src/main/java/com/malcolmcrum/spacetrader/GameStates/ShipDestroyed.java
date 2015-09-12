@@ -36,8 +36,8 @@ public class ShipDestroyed extends GameState {
     }
 
     public GameState gameOver() {
-        game.addAlert(Alert.GameOver);
-        return new GameOver(game);
+        game.addAlert(Alert.GameOverKilled);
+        return new GameOver(game, GameOver.endStatus.Killed);
     }
 
     public GameState escapeWithPod() {

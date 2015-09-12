@@ -57,4 +57,8 @@ public enum ShieldType {
     public String getName() {
         return name;
     }
+
+    public TechLevel getTechLevelRequired() {
+        return techLevelRequiredForSale;
+    }
 }
