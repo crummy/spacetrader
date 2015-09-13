@@ -1,11 +1,15 @@
 package com.malcolmcrum.spacetrader;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.malcolmcrum.spacetrader.GameStates.GameState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.List;
 
 /**
@@ -36,7 +40,8 @@ public class GameManager {
         return game.getGalaxy();
     }
 
-    public boolean isActionValid(String action) {
+    // TODO: Make this check parameters as well
+    public boolean isActionValid(String action, String body) {
         List<Method> actions = state.getActions();
         for (Method m : actions) {
             if (m.getName().equals(action)) {
@@ -46,10 +51,11 @@ public class GameManager {
         return false;
     }
 
-    public GameState action(String action) {
+    public GameState action(String action, String body) {
         List<Method> actions = state.getActions();
         for (Method m : actions) {
             if (m.getName().equals(action)) {
+                Class<?>[] parameters = getParametersForMethod(body, m);
                 try {
                     GameState previousState = state;
                     state = (GameState)m.invoke(state);
@@ -66,6 +72,28 @@ public class GameManager {
         }
         logger.error("Could not find action " + action);
         return state;
+    }
+
+    private Object[] getParametersForMethod(String body, Method m) {
+        if (body.length() == 0) {
+            return new Object[0];
+        }
+        JsonObject json = new JsonParser().parse(body).getAsJsonObject();
+        if (!json.has("parameters")) {
+            logger.warn("Passed in JSON for action with content but no parameters");
+            return new Object[0];
+        }
+
+        JsonObject userParameters = json.getAsJsonObject("parameters");
+        Object[] returnedParameters
+        for (Parameter parameter : m.getParameters()) {
+            String name = parameter.getName();
+            String type = parameter.getType().getName();
+            if (userParameters.get(name).getAsString().equals(type)) {
+
+            }
+        }
+
     }
 
     public ShipTypes getShipTypes() {

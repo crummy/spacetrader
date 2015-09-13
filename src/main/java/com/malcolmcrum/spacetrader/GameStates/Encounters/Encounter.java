@@ -63,6 +63,11 @@ public abstract class Encounter extends GameState {
     }
 
     @Override
+    public GameState init() {
+        return this;
+    }
+
+    @Override
     public String getName() {
         return "Encounter";
     }

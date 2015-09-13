@@ -49,8 +49,8 @@ public class TraderAPI {
 
         post("/action/:action", (request, response) -> {
             String action = request.params(":action");
-            if (manager.isActionValid(action)) {
-                return manager.action(action);
+            if (manager.isActionValid(action, request.body())) {
+                return manager.action(action, request.body());
             } else {
                 return gson.toJson(new APIError(404, "Invalid action: " + action));
             }

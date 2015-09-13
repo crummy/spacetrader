@@ -22,8 +22,8 @@ public class Transit extends GameState {
     private final SolarSystem origin;
     private SolarSystem destination;
 
-    private boolean possibleToGoThroughRip = false;
-    private boolean beenRaided = false;
+    private boolean possibleToGoThroughRip;
+    private boolean beenRaided;
     private int clicksRemaining;
     private int totalClicks;
     private boolean arrivedViaWormhole;
@@ -37,20 +37,25 @@ public class Transit extends GameState {
         origin = game.getCurrentSystem();
         this.destination = destination;
         this.destination.getMarket().determinePrices();
+        this.possibleToGoThroughRip = true;
+        this.beenRaided = false;
 
         if (viaSingularity) {
             game.getNews().addNotableEvent(News.NotableEvent.ArrivalViaSingularity);
         }
-    }
-
-    @Override
-    public GameState init() {
+        arrivedViaWormhole = viaSingularity || origin.getWormholeDestination() == destination;
 
         clicksRemaining = 21;
         totalClicks = clicksRemaining;
         beenRaided = false;
         beenInspected = false;
         litterWarning = false;
+
+        game.setMonsterHullStrength((game.getMonsterHullStrength() * 105)/100);
+        if (game.getMonsterHullStrength() > ShipType.SpaceMonster.getHullStrength()) {
+            game.setMonsterHullStrength(ShipType.SpaceMonster.getHullStrength());
+        }
+
         if (game.getDays() % 3 == 0 && game.getCaptain().isClean()) {
             game.getCaptain().addPoliceScore(-1);
         } else if (game.getCaptain().isDubious()){
@@ -61,6 +66,7 @@ public class Transit extends GameState {
                 game.getCaptain().addPoliceScore(1);
             }
         }
+
         int fabricRipProbability = game.getFabricRipProbability();
         if (game.getExperimentStatus() == Experiment.Performed
                 && fabricRipProbability > 0) {
@@ -69,7 +75,6 @@ public class Transit extends GameState {
                 this.destination = game.getGalaxy().getRandomSystem();
             }
         }
-        return this;
     }
 
     @Override
@@ -83,7 +88,12 @@ public class Transit extends GameState {
         return new ArrayList<>();
     }
 
-    public GameState Travel() {
+    @Override
+    public GameState init() {
+        return travel();
+    }
+
+    public GameState travel() {
         --clicksRemaining;
         while (clicksRemaining > 0) {
             int engineerSkill = game.getCaptain().getEngineerSkill(); // TODO: Check entire ship, not captain?
