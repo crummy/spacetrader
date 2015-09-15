@@ -173,11 +173,11 @@ public class SolarSystem {
         return market;
     }
 
-    // TODO: move to SolarSystem?
+    // TODO: move to InSystem?
     public Map<ShipType, Integer> getShipsForSale() {
         Map<ShipType, Integer> shipsForSale = new HashMap<>();
         for (ShipType type : ShipType.values()) {
-            if (type.getMinTechLevel().isBefore(techLevel)) {
+            if (!type.getMinTechLevel().isBeyond(techLevel)) {
                 int price = baseShipPrice(type) - game.getShip().getPrice(false, false);
                 shipsForSale.put(type, price);
             }

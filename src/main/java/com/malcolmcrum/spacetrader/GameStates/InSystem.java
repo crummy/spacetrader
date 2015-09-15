@@ -184,7 +184,7 @@ public class InSystem extends GameState {
      * Ensures a player is capable of purchasing a ship, and does so.
      * Note that unique equipment may be lost in this transaction
      * @param type
-     * @return
+     * @return Updated GameState, with alerts if necessary
      */
     public GameState buyShip(ShipType type) {
         Map<ShipType, Integer> shipsForSale = system.getShipsForSale();
@@ -200,13 +200,16 @@ public class InSystem extends GameState {
             game.addAlert(Alert.PassengerNeedsQuarters);
         } else if (game.getReactorStatus() != Reactor.Unavailable && game.getReactorStatus() != Reactor.Delivered) {
             game.addAlert(Alert.CannotSellShipWithReactor);
-        } else if (cannotTransferUniqueEquipment(game.getShip(), type)) {
+        } else if (!canTransferUniqueEquipment(game.getShip(), type)) {
             game.addAlert(Alert.CannotTransferUniqueEquipment);
+        } else if (game.getShip().getCrew().size() > type.getCrewQuarters()) {
+            game.addAlert(Alert.TooManyCrewMembers);
         } else {
             int price = system.getShipsForSale().get(type);
             game.getCaptain().subtractCredits(price);
             PlayerShip newShip = new PlayerShip(type, game);
             transferUniqueEquipment(game.getShip(), newShip);
+            transferCrew(game.getShip(), newShip);
             game.setShip(newShip);
             if (game.getScarabStatus() == Scarab.DestroyedUpgradePerformed) {
                 game.setScarabStatus(Scarab.Unavailable);
@@ -214,6 +217,12 @@ public class InSystem extends GameState {
             game.addAlert(Alert.ShipPurchased);
         }
         return this;
+    }
+
+    private void transferCrew(PlayerShip ship, PlayerShip newShip) {
+        for (int i = 0; i < ship.getCrew().size(); ++i) {
+            newShip.addCrew(ship.getCrew().get(i));
+        }
     }
 
     private void transferUniqueEquipment(PlayerShip oldShip, PlayerShip newShip) {
@@ -228,7 +237,7 @@ public class InSystem extends GameState {
         }
     }
 
-    private boolean cannotTransferUniqueEquipment(PlayerShip ship, ShipType type) {
+    private boolean canTransferUniqueEquipment(PlayerShip ship, ShipType type) {
         if (ship.hasGadget(Gadget.FuelCompactor) && type.getGadgetSlots() == 0) {
             return false;
         } else if (ship.hasWeapon(Weapon.MorgansLaser) && type.getWeaponSlots() == 0) {

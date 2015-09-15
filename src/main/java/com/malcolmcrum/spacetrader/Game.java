@@ -57,7 +57,7 @@ public class Game {
 
         bank = new Bank(this);
         captain = new Captain(this, commanderName);
-        ship = new PlayerShip(ShipType.Flea, this);
+        ship = new PlayerShip(ShipType.Gnat, this);
         ship.addWeapon(Weapon.PulseLaser);
         ship.addCrew(new Crew(0));
 

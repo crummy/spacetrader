@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -55,14 +56,15 @@ public class GameManager {
         List<Method> actions = state.getActions();
         for (Method m : actions) {
             if (m.getName().equals(action)) {
-                Class<?>[] parameters = getParametersForMethod(body, m);
+                Object[] parameters = getParametersForMethod(body, m);
                 try {
                     GameState previousState = state;
-                    state = (GameState)m.invoke(state);
+                    state = (GameState)m.invoke(state, parameters);
                     while (state != previousState) { // Some states are just transition states.
                         previousState = state;
                         state = state.init();
                     }
+                    return state;
                 } catch (IllegalAccessException e) {
                     logger.error("IllegalAccessException? Dang.");
                 } catch (InvocationTargetException e) {
@@ -85,15 +87,28 @@ public class GameManager {
         }
 
         JsonObject userParameters = json.getAsJsonObject("parameters");
-        Object[] returnedParameters
+        List<Object> returnedParameters = new ArrayList<>();
         for (Parameter parameter : m.getParameters()) {
             String name = parameter.getName();
             String type = parameter.getType().getName();
-            if (userParameters.get(name).getAsString().equals(type)) {
-
+            if (userParameters.has(name)) {
+                returnedParameters.add(paramToType(name, type));
             }
         }
+        return returnedParameters.toArray();
+    }
 
+    private Object paramToType(String name, String type) {
+        if (type.equals("int")) {
+            return Integer.parseInt(name);
+        } else if (type.equals("String")) {
+            return name;
+        } else if (type.equals(ShipType.class.getName())) {
+            return ShipType.Get(name);
+        } else {
+            logger.error("Could not decode parameter " + name + " into object of type " + type);
+            return "????";
+        }
     }
 
     public ShipTypes getShipTypes() {

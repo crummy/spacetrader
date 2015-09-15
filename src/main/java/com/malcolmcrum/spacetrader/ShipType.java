@@ -1,5 +1,8 @@
 package com.malcolmcrum.spacetrader;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static com.malcolmcrum.spacetrader.Utils.GetRandom;
 
 /**
@@ -22,6 +25,7 @@ public enum ShipType {
     Scarab("Scarab",            20, 2, 0, 0, 2, 1,  TechLevel.Unattainable,   1, 500000, 0, 0, 400, null, null, null, 1, Size.Large),
     Bottle("Bottle",            0, 0, 0, 0, 0, 1,   TechLevel.Unattainable,   1, 100, 0, 0, 10, null, null, null, 1, Size.Small);
 
+    private static Map<String, ShipType> ShipMap;
     private final String name;
     private final int cargoBays;
     private final int weaponSlots;
@@ -40,6 +44,13 @@ public enum ShipType {
     private final TraderStrength minStrengthForTraderEncounter;
     private final int repairCost;
     private final Size size;
+
+    static {
+        ShipMap = new HashMap<>();
+        for (ShipType type : ShipType.values()) {
+            ShipMap.put(type.getName(), type);
+        }
+    }
 
     ShipType(String name,
              int cargoBays,
@@ -173,6 +184,10 @@ public enum ShipType {
 
     public TechLevel getMinTechLevel() {
         return minTechLevel;
+    }
+
+    public static ShipType Get(String name) {
+        return ShipMap.get(name);
     }
 
     public enum Size {

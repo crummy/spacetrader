@@ -63,5 +63,5 @@ public enum Alert {
     CannotSellShipWithReactor,
     PassengerNeedsQuarters,
     CannotTransferUniqueEquipment,
-    FleaBuilt
+    TooManyCrewMembers, FleaBuilt
 }
