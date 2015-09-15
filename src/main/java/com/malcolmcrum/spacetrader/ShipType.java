@@ -22,8 +22,7 @@ public enum ShipType {
     SpaceMonster("Space Monster", 0, 3, 0, 0, 1, 1, TechLevel.Unattainable,   1, 500000, 0, 0, 500, null, null, null, 1, Size.Huge),
     Dragonfly("Dragonfly",      0, 2, 3, 2, 1, 1,   TechLevel.Unattainable,   1, 500000, 0, 0, 10, null, null, null, 1, Size.Small),
     Mantis("Mantis",            0, 3, 1, 3, 3, 1,   TechLevel.Unattainable,   1, 500000, 0, 0, 300, null, null, null, 1, Size.Medium),
-    Scarab("Scarab",            20, 2, 0, 0, 2, 1,  TechLevel.Unattainable,   1, 500000, 0, 0, 400, null, null, null, 1, Size.Large),
-    Bottle("Bottle",            0, 0, 0, 0, 0, 1,   TechLevel.Unattainable,   1, 100, 0, 0, 10, null, null, null, 1, Size.Small);
+    Scarab("Scarab",            20, 2, 0, 0, 2, 1,  TechLevel.Unattainable,   1, 500000, 0, 0, 400, null, null, null, 1, Size.Large);
 
     private static Map<String, ShipType> ShipMap;
     private final String name;

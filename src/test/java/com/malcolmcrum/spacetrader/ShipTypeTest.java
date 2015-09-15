@@ -15,7 +15,6 @@ public class ShipTypeTest {
             ShipType type = ShipType.GetAdjustedRandomShip();
             assertTrue(type != ShipType.Dragonfly);
             assertTrue(type != ShipType.Scarab);
-            assertTrue(type != ShipType.Bottle);
             assertTrue(type != ShipType.Mantis);
             assertTrue(type != ShipType.SpaceMonster);
         }
