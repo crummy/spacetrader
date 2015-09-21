@@ -50,7 +50,7 @@ public class GalaxyTest
         for (int i = 0; i < Crew.getMaxCrew(); ++i) {
             Crew.Name name = Crew.Name.values()[i];
             int count = systemsWithMercenaryNamed(name);
-            if (i == 0 || i == Crew.getMaxCrew() - 1) { // captain or zeethibal
+            if (i == Crew.getMaxCrew() - 1) { // captain or zeethibal
                 assertTrue(name + " found on " + count + " systems", count == 0);
             } else {
                 assertTrue(name + " found on " + count + " systems", count == 1);
