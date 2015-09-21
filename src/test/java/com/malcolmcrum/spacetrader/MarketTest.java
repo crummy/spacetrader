@@ -21,10 +21,7 @@ public class MarketTest {
 
     @Test
     public void testBannedItems() {
-        int i = 0;
         for (SolarSystem s : game.getGalaxy().getSystems()) {
-            System.out.println(i);
-            i++;
             Market m = s.getMarket();
             if (!s.getPolitics().getDrugsOK()) {
                 assertTrue("no selling of drugs", !m.getSellPrice(TradeItem.Narcotics).isPresent());
