@@ -57,9 +57,9 @@ public class Trader extends Encounter {
             // Trade only if trader is selling and the item has a buy price on the local system
             // OR if the trader is buying and the item has a sell price on the local system
             boolean foundItem = false;
-            if (ship.getCargoCount(item) > 0 && !isBuying && destination.getMarket().getBuyPrice(item) > 0) {
+            if (ship.getCargoCount(item) > 0 && !isBuying && destination.getMarket().getBuyPrice(item).isPresent()) {
                 foundItem = true;
-            } else if (ship.getCargoCount(item) > 0 && isBuying && destination.getMarket().getSellPrice(item) > 0) {
+            } else if (ship.getCargoCount(item) > 0 && isBuying && destination.getMarket().getSellPrice(item).isPresent()) {
                 foundItem = true;
             }
 
@@ -86,7 +86,9 @@ public class Trader extends Encounter {
     }
 
     private int randomPriceForTrade() {
-        price = isBuying ? game.getCurrentSystem().getMarket().getSellPrice(item) : game.getCurrentSystem().getMarket().getBuyPrice(item);
+        price = isBuying
+                ? game.getCurrentSystem().getMarket().getSellPrice(item).get()
+                : game.getCurrentSystem().getMarket().getBuyPrice(item).get();
         if (item == TradeItem.Narcotics || item == TradeItem.Firearms) {
             if (GetRandom(100) <= 45) {
                 price *= isBuying? 0.8 : 1.1;

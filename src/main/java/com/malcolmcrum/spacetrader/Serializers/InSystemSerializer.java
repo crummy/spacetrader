@@ -115,8 +115,8 @@ public class InSystemSerializer extends GameStateSerializer implements JsonSeria
         JsonObject items = new JsonObject();
         for (TradeItem item : TradeItem.values()) {
             JsonObject details = new JsonObject();
-            details.addProperty("buyPrice", market.getBuyPrice(item));
-            details.addProperty("sellPrice", market.getSellPrice(item));
+            details.addProperty("buyPrice", market.getBuyPrice(item).get());
+            details.addProperty("sellPrice", market.getSellPrice(item).get());
             details.addProperty("quantity", market.getQuantity(item));
             items.add(item.getName(), details);
         }

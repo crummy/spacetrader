@@ -9,18 +9,14 @@ public class PlayerShip extends Ship {
     private static final int UPGRADED_HULL = 50;
 
     private int tribbles;
-    private boolean hasEscapePod;
-    private int daysWithoutClaim;
     private boolean artifactOnBoard;
 
     public PlayerShip(ShipType type, Game game) {
         super(type, game);
         tribbles = 0;
-        hasEscapePod = false;
         artifactOnBoard = false;
     }
 
-    // TODO: Maybe forInsurance and includeUniqueEquipment are tied together - remove one?
     // I added includeUniqueEquipment because I transfer over unique equipment to the new
     // ship when the player buys a new one, and I don't want the equipment's value being
     // included in the cost of selling their old ship.
@@ -87,21 +83,8 @@ public class PlayerShip extends Ship {
         }
     }
 
-    public boolean hasReflectiveShield() {
-        return shields.stream()
-                .anyMatch(shield -> shield.shieldType == ShieldType.ReflectiveShield);
-    }
-
-    public boolean hasMilitaryLaser() {
-        return weapons.contains(Weapon.MilitaryLaser);
-    }
-
     public int getTribbles() {
         return tribbles;
-    }
-
-    public void setEscapePod(boolean escapePod) {
-        this.hasEscapePod = escapePod;
     }
 
     public int getMercenaryDailyCost() {
@@ -110,10 +93,6 @@ public class PlayerShip extends Ship {
             cost += member.getDailyCost();
         }
         return cost;
-    }
-
-    public boolean hasEscapePod() {
-        return hasEscapePod;
     }
 
     public void setTribbles(int tribbles) {

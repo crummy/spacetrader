@@ -195,7 +195,7 @@ public class Transit extends GameState {
                         }
                         break;
                     case 1:
-                        if (game.getShip().hasReflectiveShield()
+                        if (game.getShip().hasShield(ShieldType.ReflectiveShield)
                                 && game.getCaptain().getPilotSkill() < 10
                                 && !game.getCaptain().isCriminal()
                                 && !game.getRareEncounters().ahab()) {
@@ -204,7 +204,7 @@ public class Transit extends GameState {
                         }
                         break;
                     case 2:
-                        if (game.getShip().hasMilitaryLaser()
+                        if (game.getShip().hasWeapon(Weapon.MilitaryLaser)
                                 && game.getCaptain().getTraderSkill() < 10
                                 && !game.getCaptain().isCriminal()
                                 && !game.getRareEncounters().conrad()) {
@@ -213,7 +213,7 @@ public class Transit extends GameState {
                         }
                         break;
                     case 3:
-                        if (game.getShip().hasMilitaryLaser()
+                        if (game.getShip().hasWeapon(Weapon.MilitaryLaser)
                                 && game.getCaptain().getTraderSkill() < 10
                                 && !game.getCaptain().isCriminal()
                                 && !game.getRareEncounters().huie()) {

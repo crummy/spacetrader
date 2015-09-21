@@ -207,7 +207,7 @@ public class Galaxy {
 
 
     private void addMercenaries() {
-        for (int i = 1; i < Crew.getMaxCrew() - 1; ++i) { // skip captain, skip zeethibal
+        for (int i = 0; i < Crew.getMaxCrew() - 1; ++i) { // skip zeethibal
             SolarSystem system = getRandomSystem();
             while (system.hasMercenary() || system == systemNamed(SolarSystem.Name.Kravat)) {
                 system = getRandomSystem();

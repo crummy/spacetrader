@@ -59,7 +59,7 @@ public class Game {
         captain = new Captain(this, commanderName);
         ship = new PlayerShip(ShipType.Gnat, this);
         ship.addWeapon(Weapon.PulseLaser);
-        ship.addCrew(new Crew(0));
+        ship.addCrew(captain);
 
         galaxy = new Galaxy(this);
         news = new News(this);

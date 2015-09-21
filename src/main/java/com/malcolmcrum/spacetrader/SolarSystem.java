@@ -89,8 +89,10 @@ public class SolarSystem {
         return name.getTitle();
     }
 
+    // When a mercenary is hired, they are not actually removed from the system.
+    // That way, if they are fired, they return to their home system.
     public boolean hasMercenary() {
-        return mercenary != null;
+        return mercenary != null && !game.getShip().getCrew().contains(mercenary);
     }
 
     public void addMercenary(Crew mercenary) {

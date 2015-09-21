@@ -105,4 +105,8 @@ public class Bank {
     public int getDaysWithoutClaim() {
         return daysWithoutClaim;
     }
+
+    public void setInsurance(boolean insurance) {
+        this.hasInsurance = insurance;
+    }
 }

@@ -52,17 +52,30 @@ public class TraderAPI {
             if (manager.isActionValid(action, request.body())) {
                 return gson.toJson(manager.action(action, request.body()));
             } else {
-                return gson.toJson(new APIError(404, "Invalid action: " + action));
+                throw new APIError("No action found called " + action);
             }
+        });
+
+        exception(IllegalArgumentException.class, (e, request, response) -> {
+            response.status(400);
+            response.body(gson.toJson(new APIError(e.getMessage())));
+        });
+
+        after((request, response) -> {
+            response.type("application/json");
         });
 
     }
 
-    private class APIError {
+    private class APIError extends IllegalArgumentException {
         int code;
         String message;
         APIError(int code, String message) {
             this.code = code;
+            this.message = message;
+        }
+        APIError(String message) {
+            this.code = 400;
             this.message = message;
         }
     }

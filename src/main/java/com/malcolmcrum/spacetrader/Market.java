@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.malcolmcrum.spacetrader.Utils.GetRandom;
 
@@ -35,8 +36,8 @@ public class Market {
 
     public void initializeQuantities() {
         for (TradeItem item : TradeItem.values()) {
-            boolean bannedItem = (item == TradeItem.Narcotics && narcoticsOK()) ||
-                    (item == TradeItem.Firearms && firearmsOK());
+            boolean bannedItem = (item == TradeItem.Narcotics && !narcoticsOK()) ||
+                    (item == TradeItem.Firearms && !firearmsOK());
             boolean itemTooAdvanced = item.getTechLevelRequiredForProduction().isBeyond(techLevel());
 
             if (bannedItem || itemTooAdvanced) {
@@ -80,12 +81,10 @@ public class Market {
      * Called when LEAVING a system on the DESTINATION - seems odd, but it's necessary
      * because traders have to know what stuff was available at the destination
      */
-    public void determinePrices() { // TODO: Consider putting this in InSystem?
+    public void determinePrices() {
         for (TradeItem item : TradeItem.values()) {
-            int buyingPrice = getStandardPrice(item);
-            if (buyingPrice <= 0) {
-                buyPrices.put(item, 0);
-            } else {
+            Integer buyingPrice = getStandardPrice(item);
+            if (buyingPrice != null) {
                 // In case of a special status, adjust price accordingly
                 if (item.getDoublePriceTrigger() == status()) {
                     buyingPrice = (buyingPrice * 3) >> 1;
@@ -95,17 +94,17 @@ public class Market {
                 buyingPrice = buyingPrice + GetRandom(item.getPriceVariance()) - GetRandom(item.getPriceVariance());
 
                 if (buyingPrice <= 0) {
-                    logger.error("Buying price is <= 0!!");
+                    logger.error("Buying price is <= 0!");
                 }
+            }
 
-                buyPrices.put(item, buyingPrice);
+            buyPrices.put(item, buyingPrice);
 
-                // Criminals have to pay off an intermediary
-                if (game.getCaptain().isDubious()) {
-                    sellPrices.put(item, (buyingPrice * 90) / 100);
-                } else {
-                    sellPrices.put(item, buyingPrice);
-                }
+            // Criminals have to pay off an intermediary
+            if (game.getCaptain().isDubious() && buyingPrice != null) {
+                sellPrices.put(item, (buyingPrice * 90) / 100);
+            } else {
+                sellPrices.put(item, buyingPrice);
             }
         }
         recalculateBuyPrice();
@@ -159,12 +158,12 @@ public class Market {
 
     private void recalculateBuyPrice() {
         for (TradeItem item : TradeItem.values()) {
-            int buyPrice;
+            Integer buyPrice;
             if (techLevel().isBefore(item.getTechLevelRequiredForProduction())) {
-                buyPrice = 0;
+                buyPrice = null;
             } else if ((item == TradeItem.Narcotics && narcoticsOK())
                     || (item == TradeItem.Firearms && firearmsOK())) {
-                buyPrice = 0;
+                buyPrice = null;
             } else {
                 int sellPrice = sellPrices.get(item);
                 if (game.getCaptain().isDubious()) {
@@ -183,14 +182,14 @@ public class Market {
         }
     }
 
-    private int getStandardPrice(TradeItem item) {
-        int price;
+    private Integer getStandardPrice(TradeItem item) {
+        Integer price;
 
-        if ((item == TradeItem.Narcotics && narcoticsOK())
-                || (item == TradeItem.Firearms && firearmsOK())) {
-            price = 0;
+        if ((item == TradeItem.Narcotics && !narcoticsOK())
+                || (item == TradeItem.Firearms && !firearmsOK())) {
+            price = null;
         } else if (techLevel().isBefore(item.getTechLevelRequiredForUsage())) {
-            price = 0;
+            price = null;
         } else {
             // Determine base price on TechLevel of system
             price = item.getPriceAtLowestTech() + (techLevel().getEra() * item.getPriceIncreasePerTechLevel());
@@ -213,11 +212,12 @@ public class Market {
             if (item.getExpensiveResourceTrigger() == specialResource()) {
                 price = (price * 4) / 3;
             }
+
+            if (price < 0) {
+                price = null;
+            }
         }
 
-        if (price < 0) {
-            price = 0;
-        }
         return price;
     }
 
@@ -257,15 +257,15 @@ public class Market {
         return sellPrices.containsKey(item) && sellPrices.get(item) != 0;
     }
 
-    public Integer getBuyPrice(TradeItem item) {
-        return buyPrices.get(item);
+    public Optional<Integer> getBuyPrice(TradeItem item) {
+        return Optional.of(buyPrices.get(item));
     }
 
-    public Integer getSellPrice(TradeItem item) {
-        return buyPrices.get(item);
+    public Optional<Integer> getSellPrice(TradeItem item) {
+        return Optional.of(sellPrices.get(item));
     }
 
-    public int getQuantity(TradeItem item) {
+    public Integer getQuantity(TradeItem item) {
         return quantities.get(item);
     }
 

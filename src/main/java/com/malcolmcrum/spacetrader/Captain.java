@@ -52,6 +52,7 @@ public class Captain extends Crew {
     private boolean gameLoaded;
     private boolean reserveMoney;
     private boolean artifactOnBoard;
+    private boolean hasEscapePod;
 
     public Captain(Game game, String name) {
         super(0);
@@ -79,6 +80,7 @@ public class Captain extends Crew {
         justLootedMarie = false;
         canSuperWarp = false;
         gameLoaded = false;
+        hasEscapePod = false;
     }
 
     @Override
@@ -261,6 +263,14 @@ public class Captain extends Crew {
 
     public void setCredits(int credits) {
         this.credits = credits;
+    }
+
+    public boolean hasEscapePod() {
+        return hasEscapePod;
+    }
+
+    public void setEscapePod(boolean escapePod) {
+        this.hasEscapePod = escapePod;
     }
 
     enum Reputation {

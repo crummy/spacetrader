@@ -23,7 +23,7 @@ public class ShipDestroyed extends GameState {
 
     @Override
     public GameState init() {
-        if (game.getShip().hasEscapePod()) {
+        if (game.getCaptain().hasEscapePod()) {
             return escapeWithPod();
         } else {
             return gameOver();

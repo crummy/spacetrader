@@ -5,10 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.malcolmcrum.spacetrader.Utils.GetRandom;
 
@@ -68,7 +65,10 @@ public class InSystem extends GameState {
             actions.add(InSystem.class.getMethod("buyShip", ShipType.class));
             actions.add(InSystem.class.getMethod("buyEscapePod"));
             actions.add(InSystem.class.getMethod("buyInsurance"));
+            actions.add(InSystem.class.getMethod("cancelInsurance"));
             actions.add(InSystem.class.getMethod("buyNewspaper"));
+            actions.add(InSystem.class.getMethod("hireCrewmember"));
+            actions.add(InSystem.class.getMethod("fireCrewmember", String.class));
             actions.add(InSystem.class.getMethod("buyTradeItem", TradeItem.class, int.class));
             actions.add(InSystem.class.getMethod("sellTradeItem", TradeItem.class, int.class));
             actions.add(InSystem.class.getMethod("warpTo", SolarSystem.class, boolean.class));
@@ -102,9 +102,6 @@ public class InSystem extends GameState {
         }
 
         multiplyTribbles();
-
-        autoRepair();
-        autoFuel();
 
         easterEgg();
 
@@ -163,19 +160,6 @@ public class InSystem extends GameState {
                 for (TradeItem item : TradeItem.values()) {
                     game.getShip().removeCargo(item, 1);
                 }
-            }
-        }
-    }
-
-    /**
-     * If autoRepair setting is enabled for player, try to repair the whole ship
-     */
-    // TODO: consider leaving in UI level, removing from here
-    private void autoRepair() {
-        if (game.getAutoRepair()) {
-            boolean repairsCompleted = buyRepairs();
-            if (!repairsCompleted) {
-                game.addAlert(Alert.RepairsIncomplete);
             }
         }
     }
@@ -249,18 +233,27 @@ public class InSystem extends GameState {
     }
 
     public GameState buyInsurance() {
-        // TODO
+        if (!game.getCaptain().hasEscapePod()) {
+            game.addAlert(Alert.NoEscapePod);
+        } else {
+            game.getBank().setInsurance(true);
+        }
+        return this;
+    }
+
+    public GameState cancelInsurance() {
+        game.getBank().cancelInsurance();
         return this;
     }
 
     public GameState buyEscapePod() {
-        // TODO
+        if (game.getCaptain().getCredits() >= 2000) {
+            game.getCaptain().subtractCredits(2000);
+            game.getCaptain().setEscapePod(true);
+        } else {
+            game.addAlert(Alert.CannotAffordEscapePod);
+        }
         return this;
-    }
-
-    public boolean buyRepairs() {
-        int spend = -(game.getShip().getHullStrength() - game.getShip().getFullHullStrength()) * game.getShip().getRepairCost();
-        return buyRepairs(spend);
     }
 
     /**
@@ -286,28 +279,6 @@ public class InSystem extends GameState {
         game.getShip().repair(repairsBought);
         game.getCaptain().subtractCredits(repairsBought * game.getShip().getRepairCost());
         return success;
-    }
-
-    /**
-     * If autoFuel setting is enabled for the player, try to fill up the tank
-     */
-    public void autoFuel() {
-        game.getShip().repair(game.getShip().getEngineerSkill());
-        if (game.getAutoFuel()) {
-            boolean fullTanks = buyFuel();
-            if (!fullTanks) {
-                game.addAlert(Alert.NoFullTanks);
-            }
-        }
-    }
-
-    /**
-     * Buys max amount of fuel
-     * @return True if all fuel requested was purchased
-     */
-    public boolean buyFuel() {
-        int spend = -(game.getShip().getFuel() - game.getShip().getFuelCapacity()) * game.getShip().getCostToFillFuelTank();
-        return buyFuel(spend);
     }
 
     /**
@@ -384,11 +355,15 @@ public class InSystem extends GameState {
     }
 
     public GameState warpTo(SolarSystem destination, boolean viaSingularity) {
+        if (game.getGalaxy().distanceBetween(system, destination) > game.getShip().getFuel()) {
+            game.addAlert(Alert.WarpDestinationOutOfRange);
+            return this;
+        }
+
         // If wild is aboard, make sure ship is armed!
         if (game.getWildStatus() == Wild.OnBoard) {
             game.addAlert(Alert.WildWontGo);
             return this;
-            // TODO: Allow player to kick Wild out if they want to leave anyway
         }
 
         // Check for large debt
@@ -506,5 +481,31 @@ public class InSystem extends GameState {
 
     public boolean alreadyBoughtNewspaper() {
         return alreadyPaidForNewspaper;
+    }
+
+    public GameState fireCrewmember(String name) {
+        Optional<Crew> firedCrew = game.getShip().getCrew()
+                .stream()
+                .filter(s -> s.getName().equals(name))
+                .findFirst();
+        if (!firedCrew.isPresent()) {
+            game.addAlert(Alert.CannotFireCrewDoesntExist);
+        } else if (firedCrew.get() == game.getCaptain()) {
+            game.addAlert(Alert.CannotFireYourself);
+        } else {
+            game.getShip().getCrew().remove(firedCrew.get());
+        }
+        return this;
+    }
+
+    public GameState hireCrewmember() {
+        if (!system.hasMercenary()) {
+            game.addAlert(Alert.NoMercenaryForHire);
+        } else if (game.getShip().getCrew().size() == game.getShip().getCrewQuarters()) {
+            game.addAlert(Alert.NoRoomForMercenary);
+        } else {
+            game.getShip().addCrew(system.getMercenary());
+        }
+        return this;
     }
 }

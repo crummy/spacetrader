@@ -77,7 +77,6 @@ public class Crew {
     }
 
     protected enum Name {
-        Captain("You"),
         Alyssa("Alyssa"),
         Armatur("Armatur"),
         Bentos("Bentos"),

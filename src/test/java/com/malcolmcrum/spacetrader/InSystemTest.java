@@ -1,14 +1,13 @@
 package com.malcolmcrum.spacetrader;
 
+import com.malcolmcrum.spacetrader.GameStates.GameState;
 import com.malcolmcrum.spacetrader.GameStates.InSystem;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created by Malcolm on 9/7/2015.
@@ -64,46 +63,121 @@ public class InSystemTest extends GameStateTest {
         previousShip = game.getShip().getType();
         inSystem.buyShip(ShipType.Dragonfly);
         assertEquals("cannot buy unattainable ship", game.getShip().getType(), previousShip);
+
+        game.getShip().addCrew(new Crew(1));
+        game.getShip().addCrew(new Crew(2));
+        inSystem.buyShip(ShipType.Flea);
+        assertEquals("cannot buy ship without room for crew", game.getShip().getType(), previousShip);
+
+        inSystem.buyShip(ShipType.Termite);
+        assertTrue("crew were transferred", game.getShip().getCrew().size() == 3);
+        assertTrue("new ship has captain", game.getShip().getCrew().stream().anyMatch(c -> c == game.getCaptain()));
+    }
+
+    @Test
+    public void testBuyTradeItem() {
+        game.getCaptain().setCredits(999999);
+        SolarSystem systemWithFood = game.getGalaxy().getSystems()
+                .stream()
+                .filter(s -> s.getMarket().getQuantity(TradeItem.Food) > 0)
+                .findAny()
+                .get();
+        InSystem inSystem = new InSystem(game, systemWithFood);
+        int foodAvailable = inSystem.getSystem().getMarket().getQuantity(TradeItem.Food);
+        int foodOnBoard = game.getShip().getCargoCount(TradeItem.Food);
+        inSystem.buyTradeItem(TradeItem.Food, 1);
+        assertEquals("can buy food", game.getShip().getCargoCount(TradeItem.Food), foodOnBoard + 1);
+        assertTrue("food costs money", game.getCaptain().getCredits()< 999999);
+        assertTrue("food removed from market", inSystem.getSystem().getMarket().getQuantity(TradeItem.Food) == foodAvailable - 1);
     }
 
     @Test
     public void testBuyInsurance() throws Exception {
+        InSystem inSystem = new InSystem(game, game.getGalaxy().getRandomSystem());
+        game.getCaptain().setEscapePod(true);
+        inSystem.buyInsurance();
+        assertTrue("buy insurance", game.getBank().hasInsurance());
+        game.getBank().cancelInsurance();
+        game.getCaptain().setEscapePod(false);
+        inSystem.buyInsurance();
+        assertFalse("can't buy insurance without escape pod", game.getBank().hasInsurance());
+    }
 
+    @Test
+    public void testCancelInsurance() throws Exception {
+        InSystem inSystem = new InSystem(game, game.getGalaxy().getRandomSystem());
+        inSystem.cancelInsurance();
+        assertFalse(game.getBank().hasInsurance());
     }
 
     @Test
     public void testBuyEscapePod() throws Exception {
+        InSystem inSystem = new InSystem(game, game.getGalaxy().getRandomSystem());
+        game.getCaptain().setEscapePod(false);
+        game.getCaptain().setCredits(0);
+        inSystem.buyEscapePod();
+        assertFalse("can't afford escape pod", game.getCaptain().hasEscapePod());
 
+        game.getCaptain().setCredits(99999999);
+        inSystem.buyEscapePod();
+        assertTrue("buy escape pod", game.getCaptain().hasEscapePod());
     }
 
     @Test
     public void testBuyRepairs() throws Exception {
+        InSystem inSystem = new InSystem(game, game.getGalaxy().getRandomSystem());
+        game.getShip().takeDamage(10);
+        inSystem.buyRepairs(10);
+        assertEquals(game.getShip().getHullStrength(), game.getShip().getFullHullStrength());
 
+        inSystem.buyRepairs(9999);
+        assertEquals(game.getShip().getHullStrength(), game.getShip().getFullHullStrength());
     }
 
     @Test
-    public void testBuyRepairs1() throws Exception {
-
+    public void testFireCrew() {
+        SolarSystem hiTechSystem = game.getGalaxy().getSystems()
+                .stream()
+                .filter(s -> s.getTechLevel() == TechLevel.HiTech)
+                .findAny()
+                .get();
+        InSystem inSystem = new InSystem(game, hiTechSystem);
+        game.getCaptain().setCredits(999999);
+        inSystem.buyShip(ShipType.Beetle);
+        Crew crew = new Crew(2);
+        game.getShip().addCrew(crew);
+        inSystem.fireCrewmember(crew.getName());
+        assertEquals("fired crewmember", game.getShip().getCrew().size(), 1);
+        inSystem.fireCrewmember("You");
+        assertEquals("can't fire captain", game.getShip().getCrew().size(), 1);
+        inSystem.fireCrewmember(Crew.Name.Dane.getTitle());
+        assertTrue("can't fire someone that doesn't exist", game.getShip().getCrew().size() == 1);
     }
 
 
     @Test
     public void testWarpTo() throws Exception {
+        InSystem inSystem = new InSystem(game, game.getGalaxy().getRandomSystem());
+        game.getShip().addFuel(999);
+        SolarSystem destination = game.getGalaxy().getSystems()
+                .stream()
+                .filter(s -> game.getGalaxy().distanceBetween(s, inSystem.getSystem()) < game.getShip().getFuel())
+                .findAny()
+                .get();
+        GameState newState = inSystem.warpTo(destination, false);
+        assertNotEquals("successful warp", inSystem, newState);
 
+        SolarSystem farDestination = game.getGalaxy().getSystems()
+                .stream()
+                .filter(s -> game.getGalaxy().distanceBetween(s, inSystem.getSystem()) > game.getShip().getFuel())
+                .findAny()
+                .get();
+        newState = inSystem.warpTo(farDestination, false);
+        assertEquals("can't warp too far", inSystem, newState);
     }
 
     @Test
     public void testBuyNewspaper() throws Exception {
-
-    }
-
-    @Test
-    public void testGetSystem() throws Exception {
-
-    }
-
-    @Test
-    public void testGetPlayerShip() throws Exception {
 
     }
 }
