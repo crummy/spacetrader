@@ -239,7 +239,7 @@ public class Galaxy {
         for (int i = 0; i < MAX_WORM_HOLES - 1; ++i) {
             do {
                 destination = getRandomSystem();
-            } while (destination.hasWormhole() && source == destination);
+            } while (destination.hasWormhole() || source == destination);
             source.setWormhole(destination);
             logger.debug("Pointed wormhole from " + source.getName() + " to " + destination.getName());
             source = destination;
