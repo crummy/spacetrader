@@ -17,6 +17,7 @@ public class ShipTypeTest {
             assertTrue(type != ShipType.Scarab);
             assertTrue(type != ShipType.Mantis);
             assertTrue(type != ShipType.SpaceMonster);
+            assertTrue(type != null);
         }
     }
 }

@@ -14,6 +14,7 @@ public class GadgetTest {
         for (int i = 0; i < 10; ++i) {
             Gadget g = Gadget.GetAdjustedRandomGadget();
             assertTrue(g != Gadget.FuelCompactor);
+            assertTrue(g != null);
         }
     }
 }

@@ -173,6 +173,10 @@ public abstract class Encounter extends GameState {
         return actionResult();
     }
 
+    public Ship getOpponent() {
+        return opponent;
+    }
+
     /**
      * Sends out warnings if attacking would be foolish, and sets opponent status
      * to attacking.
