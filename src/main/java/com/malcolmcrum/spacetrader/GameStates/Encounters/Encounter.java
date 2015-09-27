@@ -313,6 +313,10 @@ public abstract class Encounter extends GameState {
             }
         }
 
+        if (damage <= 0) {
+            return false;
+        }
+
         defender.takeDamage(damage);
         return true;
     }
@@ -522,6 +526,10 @@ public abstract class Encounter extends GameState {
         int difficulty = game.getDifficulty().getValue();
         int normal = Difficulty.Normal.getValue();
         return Math.max(1, (game.getCaptain().getWorth() / 150000) + difficulty - normal);
+    }
+
+    public Status getStatus() {
+        return opponentStatus;
     }
 
     public enum Status {

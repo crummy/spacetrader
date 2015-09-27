@@ -38,7 +38,8 @@ public class PirateTest extends GameStateTest {
 			if (attacks == 100) break;
 			currentState = (GameState)attack.invoke(encounter);
 			System.out.println("Ship health: " + game.getShip().getHullStrength()
-					+ ", enemy health: " + encounter.getOpponent().getHullStrength());
+					+ ", enemy health: " + encounter.getOpponent().getHullStrength()
+					+ ", enemy state: " + encounter.getStatus());
 		}
 		System.out.println("state following attack: " + currentState.getClass());
 		assertTrue(attacks < 100);

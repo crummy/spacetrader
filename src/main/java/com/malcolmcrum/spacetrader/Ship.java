@@ -270,7 +270,7 @@ public class Ship {
     public void takeDamage(int damage) {
         // First, shields get depleted
         for (Shield shield : shields) {
-            if (shield.power > damage) {
+            if (shield.power >= damage) {
                 shield.power -= damage;
                 damage = 0;
                 break;
@@ -291,7 +291,7 @@ public class Ship {
             // At least 2 shots on Normal level are needed to destroy the hull
             // (3 on Easy, 4 on Beginner, 1 on Hard or Impossible). For opponents,
             // it is always 2.
-            damage = Math.min(damage, (getHullStrength()/minDamage()));
+            damage = Math.min(damage, (getFullHullStrength()/minDamage()));
 
             hullStrength = hullStrength - damage;
             if (hullStrength < 0) {
