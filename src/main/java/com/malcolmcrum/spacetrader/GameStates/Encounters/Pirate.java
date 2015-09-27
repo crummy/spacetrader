@@ -2,6 +2,7 @@ package com.malcolmcrum.spacetrader.GameStates.Encounters;
 
 import com.malcolmcrum.spacetrader.*;
 import com.malcolmcrum.spacetrader.GameStates.GameState;
+import com.malcolmcrum.spacetrader.GameStates.PlunderState;
 import com.malcolmcrum.spacetrader.GameStates.Transit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,8 +88,12 @@ public class Pirate extends Encounter {
     }
 
     public GameState actionPlunder() {
-        // TODO
-        return this;
+        if (opponentStatus == Status.Surrendered) {
+            return new PlunderState(game, transit, opponent);
+        } else {
+            logger.error("Cannot plunder unless opponent is surrendered");
+            return this;
+        }
     }
 
     @Override

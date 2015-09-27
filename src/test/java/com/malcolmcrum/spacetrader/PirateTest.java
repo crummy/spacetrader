@@ -1,7 +1,9 @@
 package com.malcolmcrum.spacetrader;
 
+import com.malcolmcrum.spacetrader.GameStates.Encounters.Encounter;
 import com.malcolmcrum.spacetrader.GameStates.Encounters.Pirate;
 import com.malcolmcrum.spacetrader.GameStates.GameState;
+import com.malcolmcrum.spacetrader.GameStates.PlunderState;
 import com.malcolmcrum.spacetrader.GameStates.Transit;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,6 +29,7 @@ public class PirateTest extends GameStateTest {
 	public void testDestroyPirate() throws InvocationTargetException, IllegalAccessException {
 		Pirate encounter = new Pirate(game, transit);
 		game.getShip().addWeapon(Weapon.MilitaryLaser);
+		game.getShip().getShields().clear();
 		game.getShip().addShield(ShieldType.LightningShield);
 
 		Method attack = findMethodNamed("actionAttack", encounter.getActions());
@@ -37,12 +40,33 @@ public class PirateTest extends GameStateTest {
 			++attacks;
 			if (attacks == 100) break;
 			currentState = (GameState)attack.invoke(encounter);
-			System.out.println("Ship health: " + game.getShip().getHullStrength()
-					+ ", enemy health: " + encounter.getOpponent().getHullStrength()
-					+ ", enemy state: " + encounter.getStatus());
 		}
-		System.out.println("state following attack: " + currentState.getClass());
 		assertTrue(attacks < 100);
+	}
+
+	@Test
+	public void testPirateSurrender() throws InvocationTargetException, IllegalAccessException {
+		Pirate encounter = new Pirate(game, transit);
+		game.setShip(new PlayerShip(ShipType.Beetle, game));
+		game.getShip().addCrew(game.getCaptain());
+		game.getShip().addWeapon(Weapon.PulseLaser);
+		game.getShip().addShield(ShieldType.LightningShield);
+
+		Method attack = findMethodNamed("actionAttack", encounter.getActions());
+
+		int attacks = 0;
+		GameState currentState = encounter;
+		while (encounter.getStatus() != Encounter.Status.Surrendered) {
+			++attacks;
+			if (attacks == 100) break;
+			game.getShip().repair(999);
+
+			currentState = (GameState) attack.invoke(currentState);
+		}
+
+		Method plunder = findMethodNamed("actionPlunder", encounter.getActions());
+		currentState = (GameState)plunder.invoke(currentState);
+		assertTrue(currentState.getClass() == PlunderState.class);
 	}
 
 }

@@ -152,4 +152,8 @@ public class PlayerShip extends Ship {
     public List<Crew> getCrew() {
         return crew;
     }
+
+    public int getFreeCargoBays() {
+        return getCargoBays() - cargo.size();
+    }
 }
