@@ -266,4 +266,8 @@ public enum Politics {
     public String getName() {
         return name;
     }
+
+    public BribeLevel getBribeLevel() {
+        return bribeLevel;
+    }
 }

@@ -335,4 +335,25 @@ public class Police extends Encounter {
         return 0; // I'm doing this for consistency with the original code, but it doesn't do
                   // anything really - it gets replaced with 1 a bit later in Encounter.addCargo().
     }
+
+    public int getBribeCost() {
+        int difficultyModifier = Difficulty.Impossible.getValue() - game.getDifficulty().getValue();
+        int bribeDifficultyModifier = transit.getDestination().getPolitics().getBribeLevel().getValue();
+        int bribe = game.getCaptain().getWorth() / ((10 + 5 * difficultyModifier) * bribeDifficultyModifier);
+        if (bribe % 100 != 0) {
+            bribe += (100 - (bribe % 100));
+        }
+        boolean hasWild = game.getWildStatus() == Wild.OnBoard;
+        boolean hasReactor = game.getReactorStatus() != Reactor.Unavailable && game.getReactorStatus() != Reactor.Delivered;
+        if (hasWild || hasReactor) {
+            if (game.getDifficulty() == Difficulty.Hard || game.getDifficulty() == Difficulty.Impossible) {
+                bribe *= 3;
+            } else {
+                bribe *= 2;
+            }
+        }
+        bribe = Utils.Clamp(bribe, 100, 10000);
+
+        return bribe;
+    }
 }

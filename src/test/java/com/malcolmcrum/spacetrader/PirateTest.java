@@ -1,6 +1,7 @@
 package com.malcolmcrum.spacetrader;
 
 import com.malcolmcrum.spacetrader.GameStates.Encounters.Encounter;
+import com.malcolmcrum.spacetrader.GameStates.Encounters.InvalidOpponentAction;
 import com.malcolmcrum.spacetrader.GameStates.Encounters.Pirate;
 import com.malcolmcrum.spacetrader.GameStates.GameState;
 import com.malcolmcrum.spacetrader.GameStates.PlunderState;
@@ -45,14 +46,12 @@ public class PirateTest extends GameStateTest {
 	}
 
 	@Test
-	public void testPirateSurrender() throws InvocationTargetException, IllegalAccessException {
+	public void testPirateSurrender() throws InvalidOpponentAction {
 		Pirate encounter = new Pirate(game, transit);
 		game.setShip(new PlayerShip(ShipType.Beetle, game));
 		game.getShip().addCrew(game.getCaptain());
 		game.getShip().addWeapon(Weapon.PulseLaser);
 		game.getShip().addShield(ShieldType.LightningShield);
-
-		Method attack = findMethodNamed("actionAttack", encounter.getActions());
 
 		int attacks = 0;
 		GameState currentState = encounter;
@@ -61,12 +60,35 @@ public class PirateTest extends GameStateTest {
 			if (attacks == 100) break;
 			game.getShip().repair(999);
 
-			currentState = (GameState) attack.invoke(currentState);
+			currentState = encounter.actionAttack();
 		}
 
 		Method plunder = findMethodNamed("actionPlunder", encounter.getActions());
-		currentState = (GameState)plunder.invoke(currentState);
+		currentState = encounter.actionAttack();
 		assertTrue(currentState.getClass() == PlunderState.class);
+	}
+
+	@Test
+	public void testSurrenderToPirate() {
+		Pirate encounter = new Pirate(game, transit);
+		
+		game.setWildStatus(Wild.OnBoard);
+		game.setReactorStatus(Reactor.ElevenDaysLeft);
+		game.getShip().addCargo(TradeItem.Food, 1, 0);
+		game.getShip().addCargo(TradeItem.Robots, 2, 2);
+		GameState state = encounter.actionSurrender();
+		assertTrue("pirates plundered food", game.getShip().getCargoCount(TradeItem.Food) == 0);
+		assertTrue("pirates plundered robots", game.getShip().getCargoCount(TradeItem.Robots) == 0);
+		assertTrue("wild goes with pirates", game.getWildStatus() == Wild.Unavailable);
+		assertTrue("reactor untouched", game.getReactorStatus() == Reactor.ElevenDaysLeft);
+		assertTrue("transitioned to next state after surrender", state != encounter);
+
+		encounter = new Pirate(game, transit);
+
+		int credits = game.getCaptain().getCredits();
+		int debt = game.getBank().getDebt();
+		encounter.actionSurrender();
+		assertTrue("pirates took blackmail money", credits > game.getCaptain().getCredits() || debt < game.getBank().getDebt());
 	}
 
 }
