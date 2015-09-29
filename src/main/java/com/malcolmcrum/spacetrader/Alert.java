@@ -63,5 +63,5 @@ public enum Alert {
     CannotSellShipWithReactor,
     PassengerNeedsQuarters,
     CannotTransferUniqueEquipment,
-    TooManyCrewMembers, NoEscapePod, CannotAffordEscapePod, WarpDestinationOutOfRange, CannotFireYourself, CannotFireCrewDoesntExist, NoMercenaryForHire, NoRoomForMercenary, FleaBuilt
+    TooManyCrewMembers, NoEscapePod, CannotAffordEscapePod, WarpDestinationOutOfRange, CannotFireYourself, CannotFireCrewDoesntExist, NoMercenaryForHire, NoRoomForMercenary, NoMoneyForBribe, BribeNotPossible, FinedAndLostCargo, NoIllegalGoods, FleaBuilt
 }

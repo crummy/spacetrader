@@ -20,7 +20,6 @@ import static com.malcolmcrum.spacetrader.Utils.Pluralize;
 public class Police extends Encounter {
     private static final Logger logger = LoggerFactory.getLogger(Police.class);
 
-
     public Police(Game game, Transit transit) {
         super(game, transit);
         if (game.getShip().isInvisibleTo(opponent)) {
@@ -113,7 +112,28 @@ public class Police extends Encounter {
     }
 
     public GameState actionSubmit() {
-        // TODO
+        int drugs = game.getShip().getCargoCount(TradeItem.Narcotics);
+        int guns = game.getShip().getCargoCount(TradeItem.Firearms);
+        if (drugs > 0 || guns > 0) {
+            // caught with illegal goods
+            game.addAlert(Alert.FinedAndLostCargo);
+            game.getShip().removeCargo(TradeItem.Narcotics, drugs);
+            game.getShip().removeCargo(TradeItem.Firearms, guns);
+            game.getCaptain().subtractCredits(getIllegalGoodsFine());
+            game.getCaptain().caughtTrafficking();
+        } else if (game.getWildStatus() != Wild.OnBoard) {
+            // no illegal goods
+            game.addAlert(Alert.NoIllegalGoods);
+            game.getCaptain().passedInspection();
+        }
+        if (game.getWildStatus() == Wild.OnBoard) {
+            arrestPlayer();
+            return new InSystem(game, transit.getDestination());
+        }
+        if (game.getReactorStatus() != Reactor.Unavailable && game.getReactorStatus() != Reactor.Delivered) {
+            game.addAlert(Alert.PoliceConfiscateReactorAlert);
+            game.setReactorStatus(Reactor.Unavailable);
+        }
         return this;
     }
 
@@ -215,8 +235,16 @@ public class Police extends Encounter {
     }
 
     public GameState actionBribe() {
-        // TODO;
-        return this;
+        if (game.getCaptain().getCredits() < getBribeCost()) {
+            game.addAlert(Alert.NoMoneyForBribe);
+            return this;
+        } else if (transit.getDestination().getPolitics().getBribeLevel() == BribeLevel.Impossible) {
+            game.addAlert(Alert.BribeNotPossible);
+            return this;
+        } else {
+            game.getCaptain().subtractCredits(getBribeCost());
+            return transit;
+        }
     }
 
     private void arrestPlayer() {
@@ -355,5 +383,15 @@ public class Police extends Encounter {
         bribe = Utils.Clamp(bribe, 100, 10000);
 
         return bribe;
+    }
+
+    public int getIllegalGoodsFine() {
+        int difficultyModifier = Difficulty.Impossible.getValue() + 2 - game.getDifficulty().getValue();
+        int fine = game.getCaptain().getWorth() / (difficultyModifier * 10);
+        if (fine % 50 != 0) {
+            fine += (50 - (fine % 50));
+        }
+        fine = Utils.Clamp(fine, 100, 10000);
+        return fine;
     }
 }

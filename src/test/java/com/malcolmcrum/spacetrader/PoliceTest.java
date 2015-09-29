@@ -16,6 +16,7 @@ public class PoliceTest extends GameStateTest {
         SolarSystem unbribeableSystem = game.getGalaxy().getSystems()
                 .stream()
                 .filter(system -> system.getPolitics().getBribeLevel() == BribeLevel.Impossible)
+                .filter(system -> system.getPolitics().getPoliceStrength() != PoliceStrength.Absent)
                 .findAny()
                 .get();
         Police encounter = new Police(game, new Transit(game, unbribeableSystem, false));
@@ -31,6 +32,7 @@ public class PoliceTest extends GameStateTest {
         SolarSystem bribeableSystem = game.getGalaxy().getSystems()
                 .stream()
                 .filter(system -> system.getPolitics().getBribeLevel() != BribeLevel.Impossible)
+                .filter(system -> system.getPolitics().getPoliceStrength() != PoliceStrength.Absent)
                 .findAny()
                 .get();
         Police encounter = new Police(game, new Transit(game, bribeableSystem, false));
@@ -46,6 +48,7 @@ public class PoliceTest extends GameStateTest {
         SolarSystem bribeableSystem = game.getGalaxy().getSystems()
                 .stream()
                 .filter(system -> system.getPolitics().getBribeLevel() != BribeLevel.Impossible)
+                .filter(system -> system.getPolitics().getPoliceStrength() != PoliceStrength.Absent)
                 .findAny()
                 .get();
         Police encounter = new Police(game, new Transit(game, bribeableSystem, false));
@@ -56,5 +59,45 @@ public class PoliceTest extends GameStateTest {
         GameState nextState = encounter.actionBribe();
         assertTrue("successful bribe", nextState != encounter);
         assertTrue("handed over cash", game.getCaptain().getCredits() == initialCredits - bribeCost);
+    }
+
+    @Test
+    public void testUneventfulSubmit() {
+        SolarSystem systemWithCops = game.getGalaxy().getSystems()
+                .stream()
+                .filter(system -> system.getPolitics().getPoliceStrength() != PoliceStrength.Absent)
+                .findAny()
+                .get();
+        Transit transit = new Transit(game, systemWithCops, false);
+        Police encounter = new Police(game, transit);
+
+        int policeRecord = game.getCaptain().getPoliceRecordScore();
+        int cargoSpace = game.getShip().getFreeCargoBays();
+        GameState nextState = encounter.actionSubmit();
+        assertTrue("no illegal goods", nextState == transit);
+        assertTrue("police score boost", game.getCaptain().getPoliceRecordScore() > policeRecord);
+        assertTrue("no cargo taken", game.getShip().getFreeCargoBays() == cargoSpace);
+    }
+
+    @Test
+    public void testSubmitWithIllegalGoods() {
+        SolarSystem systemWithCops = game.getGalaxy().getSystems()
+                .stream()
+                .filter(system -> system.getPolitics().getPoliceStrength() != PoliceStrength.Absent)
+                .findAny()
+                .get();
+        Transit transit = new Transit(game, systemWithCops, false);
+        Police encounter = new Police(game, transit);
+
+        game.getShip().addCargo(TradeItem.Firearms, 1, 0);
+        game.getShip().addCargo(TradeItem.Narcotics, 2, 0);
+        int credits = game.getCaptain().getCredits();
+        int policeScore = game.getCaptain().getPoliceRecordScore();
+        GameState nextState = encounter.actionSubmit();
+        assertTrue(nextState == transit);
+        assertTrue("lose money", game.getCaptain().getCredits() == credits - encounter.getIllegalGoodsFine());
+        assertTrue("lose firearms", game.getShip().getCargoCount(TradeItem.Firearms) == 0);
+        assertTrue("lose narcotics", game.getShip().getCargoCount(TradeItem.Narcotics) == 0);
+        assertTrue("lose police score", game.getCaptain().getPoliceRecordScore() < policeScore);
     }
 }

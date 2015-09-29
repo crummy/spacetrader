@@ -18,6 +18,7 @@ public class Captain extends Crew {
     private static final int KILL_TRADER_SCORE = -4;
     private static final int ATTACK_TRADER_SCORE = -2;
     private static final int LAWFUL_SCORE = 5;
+    private static final int TRAFFICKING_SCORE = -1;
 
     private final Game game;
     private final String name;
@@ -271,6 +272,14 @@ public class Captain extends Crew {
 
     public void setEscapePod(boolean escapePod) {
         this.hasEscapePod = escapePod;
+    }
+
+    public void caughtTrafficking() {
+        policeRecordScore += TRAFFICKING_SCORE;
+    }
+
+    public void passedInspection() {
+        policeRecordScore -= TRAFFICKING_SCORE;
     }
 
     enum Reputation {
