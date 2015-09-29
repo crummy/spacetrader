@@ -134,7 +134,7 @@ public class Police extends Encounter {
             game.addAlert(Alert.PoliceConfiscateReactorAlert);
             game.setReactorStatus(Reactor.Unavailable);
         }
-        return this;
+        return transit;
     }
 
     @Override
@@ -235,11 +235,11 @@ public class Police extends Encounter {
     }
 
     public GameState actionBribe() {
-        if (game.getCaptain().getCredits() < getBribeCost()) {
-            game.addAlert(Alert.NoMoneyForBribe);
-            return this;
-        } else if (transit.getDestination().getPolitics().getBribeLevel() == BribeLevel.Impossible) {
+        if (transit.getDestination().getPolitics().getBribeLevel() == BribeLevel.Impossible) {
             game.addAlert(Alert.BribeNotPossible);
+            return this;
+        } else if (game.getCaptain().getCredits() < getBribeCost()) {
+            game.addAlert(Alert.NoMoneyForBribe);
             return this;
         } else {
             game.getCaptain().subtractCredits(getBribeCost());

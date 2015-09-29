@@ -287,4 +287,8 @@ public class Transit extends GameState {
     public void policeInspectedPlayer() {
         beenInspected = true;
     }
+
+    public void hasBeenRaided() {
+        this.beenRaided = true;
+    }
 }

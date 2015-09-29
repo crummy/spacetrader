@@ -97,11 +97,14 @@ public class Ship {
     }
 
     public void removeCargo(TradeItem item, int amount) {
-        if (amount > getCargoCount(item)) {
+        if (amount == 0) {
+            logger.info("Trying to remove 0 cargo??");
+        } else if (amount > getCargoCount(item)) {
             logger.error("Trying to remove more cargo than we have!");
+            amount = getCargoCount(item);
         }
 
-        for (Iterator<Cargo> iterator = cargo.iterator(); iterator.hasNext() && amount > 0;) {
+        for (Iterator<Cargo> iterator = cargo.iterator(); iterator.hasNext() && amount > 0; ) {
             Cargo c = iterator.next();
             if (c.item == item) {
                 iterator.remove();
@@ -380,6 +383,10 @@ public class Ship {
         return type.getShieldSlots();
     }
 
+    public int getFreeCargoBays() {
+        return getCargoBays() - cargo.size();
+    }
+
     public class Cargo {
         TradeItem item;
         int buyingPrice;
@@ -387,18 +394,19 @@ public class Ship {
             this.item = item;
             this.buyingPrice = buyingPrice;
         }
-    }
 
+    }
     public class Shield {
         ShieldType shieldType;
         int power;
+
         Shield(ShieldType shieldType, int power) {
             this.shieldType = shieldType;
             this.power = power;
         }
-
         public String getName() {
             return shieldType.getName();
         }
+
     }
 }

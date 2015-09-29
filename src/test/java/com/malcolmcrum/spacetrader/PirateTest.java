@@ -60,18 +60,17 @@ public class PirateTest extends GameStateTest {
 			if (attacks == 100) break;
 			game.getShip().repair(999);
 
-			currentState = encounter.actionAttack();
+			encounter.actionAttack();
 		}
 
-		Method plunder = findMethodNamed("actionPlunder", encounter.getActions());
-		currentState = encounter.actionAttack();
-		assertTrue(currentState.getClass() == PlunderState.class);
+		currentState = encounter.actionPlunder();
+		assertTrue("plunder pirate after they surrender", currentState.getClass() == PlunderState.class);
 	}
 
 	@Test
 	public void testSurrenderToPirate() {
 		Pirate encounter = new Pirate(game, transit);
-		
+
 		game.setWildStatus(Wild.OnBoard);
 		game.setReactorStatus(Reactor.ElevenDaysLeft);
 		game.getShip().addCargo(TradeItem.Food, 1, 0);
@@ -79,16 +78,18 @@ public class PirateTest extends GameStateTest {
 		GameState state = encounter.actionSurrender();
 		assertTrue("pirates plundered food", game.getShip().getCargoCount(TradeItem.Food) == 0);
 		assertTrue("pirates plundered robots", game.getShip().getCargoCount(TradeItem.Robots) == 0);
-		assertTrue("wild goes with pirates", game.getWildStatus() == Wild.Unavailable);
+		assertTrue("wild goes with pirates if they have space", encounter.getOpponent().getCrewQuarters() == 1 || game.getWildStatus() == Wild.Unavailable);
 		assertTrue("reactor untouched", game.getReactorStatus() == Reactor.ElevenDaysLeft);
 		assertTrue("transitioned to next state after surrender", state != encounter);
 
 		encounter = new Pirate(game, transit);
 
+		game.getCaptain().setCredits(1);
 		int credits = game.getCaptain().getCredits();
 		int debt = game.getBank().getDebt();
 		encounter.actionSurrender();
-		assertTrue("pirates took blackmail money", credits > game.getCaptain().getCredits() || debt < game.getBank().getDebt());
+		assertTrue("can't afford blackmail? lose cash", credits > game.getCaptain().getCredits());
+		assertTrue("can't afford blackmail? gain debt", debt < game.getBank().getDebt());
 	}
 
 }

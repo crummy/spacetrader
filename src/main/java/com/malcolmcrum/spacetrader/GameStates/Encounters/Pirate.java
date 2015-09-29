@@ -83,8 +83,47 @@ public class Pirate extends Encounter {
     }
 
     public GameState actionSurrender() {
-        // TODO
-        return this;
+        transit.hasBeenRaided();
+        int cargo = game.getShip().getCargoBays() - game.getShip().getFreeCargoBays();
+        if (cargo == 0) {
+            game.addAlert(Alert.PiratesFindNoCargo);
+            int blackmail = Utils.Clamp(game.getCaptain().getWorth() / 20, 500, 25000);
+            if (game.getCaptain().getCredits() >= blackmail) {
+                game.getCaptain().subtractCredits(blackmail);
+            } else {
+                game.getBank().addDebt(blackmail - game.getCaptain().getCredits());
+                game.getCaptain().setCredits(0);
+            }
+        } else {
+            game.addAlert(Alert.PiratesPlunder);
+
+            // If they have the space, pirates steal everything.
+            if (opponent.getFreeCargoBays() >= cargo) {
+                for (TradeItem item : TradeItem.values()) {
+                    game.getShip().removeCargo(item, game.getShip().getCargoCount(item));
+                }
+            } else {
+                // Otherwise, they steal all they can hold.
+                while (opponent.getFreeCargoBays() > 0) {
+                    TradeItem randomItem = RandomEnum(TradeItem.class);
+                    if (game.getShip().getCargoCount(randomItem) > 0) {
+                        game.getShip().removeCargo(randomItem, 1);
+                        opponent.addCargo(randomItem, 1, 0);
+                    }
+                }
+            }
+        }
+
+        if (game.getWildStatus() == Wild.OnBoard && opponent.getCrewQuarters() > 1) {
+            game.addAlert(Alert.WildGoesWithPirates);
+            game.setWildStatus(Wild.Unavailable);
+        } else if (game.getWildStatus() == Wild.OnBoard) {
+            game.addAlert(Alert.WildStaysAboard);
+        }
+        if (game.getReactorStatus() != Reactor.Unavailable && game.getReactorStatus() != Reactor.Delivered) {
+            game.addAlert(Alert.PiratesDontStealReactor);
+        }
+        return transit;
     }
 
     public GameState actionPlunder() {
@@ -98,7 +137,7 @@ public class Pirate extends Encounter {
 
     @Override
     protected void surrenderToPlayer() {
-
+        // TODO;
     }
 
     @Override

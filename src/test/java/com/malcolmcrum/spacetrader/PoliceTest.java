@@ -94,7 +94,7 @@ public class PoliceTest extends GameStateTest {
         int credits = game.getCaptain().getCredits();
         int policeScore = game.getCaptain().getPoliceRecordScore();
         GameState nextState = encounter.actionSubmit();
-        assertTrue(nextState == transit);
+        assertTrue("after submission, return to transit", nextState == transit);
         assertTrue("lose money", game.getCaptain().getCredits() == credits - encounter.getIllegalGoodsFine());
         assertTrue("lose firearms", game.getShip().getCargoCount(TradeItem.Firearms) == 0);
         assertTrue("lose narcotics", game.getShip().getCargoCount(TradeItem.Narcotics) == 0);
