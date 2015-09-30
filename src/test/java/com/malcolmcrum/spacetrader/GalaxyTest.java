@@ -47,10 +47,10 @@ public class GalaxyTest
 
     @Test
     public void verifyMercenaries() {
-        for (int i = 0; i < Crew.getMaxCrew(); ++i) {
-            Crew.Name name = Crew.Name.values()[i];
+        for (int i = 0; i < Mercenary.getTotalMercenaries(); ++i) {
+            Mercenary.Name name = Mercenary.Name.values()[i];
             int count = systemsWithMercenaryNamed(name);
-            if (i == Crew.getMaxCrew() - 1) { // captain or zeethibal
+            if (i == Mercenary.getTotalMercenaries() - 1) { // captain or zeethibal
                 assertTrue(name + " found on " + count + " systems", count == 0);
             } else {
                 assertTrue(name + " found on " + count + " systems", count == 1);
@@ -186,7 +186,7 @@ public class GalaxyTest
                 .count();
     }
 
-    private int systemsWithMercenaryNamed(Crew.Name name) {
+    private int systemsWithMercenaryNamed(Mercenary.Name name) {
         return (int)galaxy.systems.stream()
                 .filter(s -> s.getMercenary() != null && s.getMercenary().getType() == name)
                 .count();

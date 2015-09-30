@@ -27,7 +27,6 @@ public class CaptainSerializer implements JsonSerializer {
         json.addProperty("policeRecord", captain.getPoliceRecordScore());
         json.addProperty("difficulty", "");
         json.addProperty("kills", captain.getKills());
-        json.addProperty("days", captain.getDays());
         json.addProperty("cash", captain.getCredits());
 
         return json;

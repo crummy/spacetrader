@@ -3,9 +3,7 @@ package com.malcolmcrum.spacetrader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static com.malcolmcrum.spacetrader.Utils.GetRandom;
@@ -29,7 +27,7 @@ public class SolarSystem {
     private boolean visited;
     private SpecialEvent specialEvent;
     private SolarSystem wormholeDestination;
-    private Crew mercenary;
+    private Mercenary mercenary;
     private Game game;
 
     SolarSystem(Game game, int index) {
@@ -95,9 +93,12 @@ public class SolarSystem {
         return mercenary != null && !game.getShip().getCrew().contains(mercenary);
     }
 
-    public void addMercenary(Crew mercenary) {
-        assert(this.mercenary == null);
-        this.mercenary = mercenary;
+    public void addMercenary(Mercenary mercenary) {
+        if (hasMercenary()) {
+            logger.error("Trying to add mercenary to system that already has one! Ignoring.");
+        } else {
+            this.mercenary = mercenary;
+        }
     }
 
     public SpecialEvent getSpecialEvent() {
@@ -119,7 +120,7 @@ public class SolarSystem {
         return wormholeDestination;
     }
 
-    public Crew getMercenary() {
+    public Mercenary getMercenary() {
         return mercenary;
     }
 

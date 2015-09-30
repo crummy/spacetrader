@@ -55,7 +55,7 @@ public class InSystemSerializer extends GameStateSerializer implements JsonSeria
         return equipment;
     }
 
-    private JsonObject GetMercenary(Crew mercenary) {
+    private JsonObject GetMercenary(Mercenary mercenary) {
         JsonObject merc = new JsonObject();
         merc.addProperty("name", mercenary.getName());
         merc.addProperty("fighter", mercenary.getFighterSkill());

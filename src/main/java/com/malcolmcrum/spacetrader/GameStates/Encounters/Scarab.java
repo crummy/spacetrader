@@ -1,11 +1,8 @@
 package com.malcolmcrum.spacetrader.GameStates.Encounters;
 
-import com.malcolmcrum.spacetrader.Crew;
-import com.malcolmcrum.spacetrader.Game;
+import com.malcolmcrum.spacetrader.*;
 import com.malcolmcrum.spacetrader.GameStates.GameState;
 import com.malcolmcrum.spacetrader.GameStates.Transit;
-import com.malcolmcrum.spacetrader.Ship;
-import com.malcolmcrum.spacetrader.ShipType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

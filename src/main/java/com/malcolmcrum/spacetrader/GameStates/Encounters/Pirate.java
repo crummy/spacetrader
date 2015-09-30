@@ -136,11 +136,6 @@ public class Pirate extends Encounter {
     }
 
     @Override
-    protected void surrenderToPlayer() {
-        // TODO;
-    }
-
-    @Override
     public String getTitle() {
         return "pirate ship";
     }

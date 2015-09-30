@@ -227,7 +227,8 @@ public abstract class Encounter extends GameState {
     }
 
     protected void surrenderToPlayer() throws InvalidOpponentAction {
-
+        // If the opponent surrenders, they do nothing for that turn. It's up to the player to decide
+        // whether they will continue attacking or plunder them.
     }
 
     private void fleePlayer() {

@@ -489,7 +489,7 @@ public class InSystem extends GameState {
                 .filter(s -> s.getName().equals(name))
                 .findFirst();
         if (!firedCrew.isPresent()) {
-            game.addAlert(Alert.CannotFireCrewDoesntExist);
+            logger.error("Tried to fire someone that isn't on board");
         } else if (firedCrew.get() == game.getCaptain()) {
             game.addAlert(Alert.CannotFireYourself);
         } else {

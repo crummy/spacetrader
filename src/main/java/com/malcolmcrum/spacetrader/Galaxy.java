@@ -207,12 +207,12 @@ public class Galaxy {
 
 
     private void addMercenaries() {
-        for (int i = 0; i < Crew.getMaxCrew() - 1; ++i) { // skip zeethibal
+        for (int i = 0; i < Mercenary.getTotalMercenaries() - 1; ++i) { // skip zeethibal
             SolarSystem system = getRandomSystem();
             while (system.hasMercenary() || system == systemNamed(SolarSystem.Name.Kravat)) {
                 system = getRandomSystem();
             }
-            system.addMercenary(new Crew(i));
+            system.addMercenary(new Mercenary(i));
         }
     }
 

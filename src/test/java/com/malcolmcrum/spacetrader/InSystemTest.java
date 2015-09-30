@@ -64,8 +64,8 @@ public class InSystemTest extends GameStateTest {
         inSystem.buyShip(ShipType.Dragonfly);
         assertEquals("cannot buy unattainable ship", game.getShip().getType(), previousShip);
 
-        game.getShip().addCrew(new Crew(1));
-        game.getShip().addCrew(new Crew(2));
+        game.getShip().addCrew(new Mercenary(1));
+        game.getShip().addCrew(new Mercenary(2));
         inSystem.buyShip(ShipType.Flea);
         assertEquals("cannot buy ship without room for crew", game.getShip().getType(), previousShip);
 
@@ -144,13 +144,13 @@ public class InSystemTest extends GameStateTest {
         InSystem inSystem = new InSystem(game, hiTechSystem);
         game.getCaptain().setCredits(999999);
         inSystem.buyShip(ShipType.Beetle);
-        Crew crew = new Crew(2);
+        Mercenary crew = new Mercenary(2);
         game.getShip().addCrew(crew);
         inSystem.fireCrewmember(crew.getName());
         assertEquals("fired crewmember", game.getShip().getCrew().size(), 1);
         inSystem.fireCrewmember("You");
         assertEquals("can't fire captain", game.getShip().getCrew().size(), 1);
-        inSystem.fireCrewmember(Crew.Name.Dane.getTitle());
+        inSystem.fireCrewmember(Mercenary.Name.Dane.getTitle());
         assertTrue("can't fire someone that doesn't exist", game.getShip().getCrew().size() == 1);
     }
 

@@ -25,40 +25,29 @@ public class Captain extends Crew {
 
     // TODO: gotta move some of these variables elsewhere
     private int credits;
-    private int days;
     private int policeKills;
     private int traderKills;
     private int pirateKills;
     private int policeRecordScore;
     private int reputationScore;
-    private int monsterStatus;
-    private int dragonflyStatus;
-    private int scarabStatus;
     private int japoriDiseaseStatus;
     private boolean moonBought;
-    private boolean tribbleMessage;
     private int jarekStatus;
     private int invasionStatus;
     private int experimentStatus;
     private boolean possibleToGoThroughRip;
     private boolean arrivedViaWormhole;
     private int veryRareEncounter;
-    private int wildStatus;
-    private int reactorStatus;
     private int trackedSystem;
     private boolean showTrackedRange;
-    private boolean justLootedMarie;
-    private int chanceOfAVeryRareEncounter;
     private boolean canSuperWarp;
-    private boolean gameLoaded;
-    private boolean reserveMoney;
     private boolean artifactOnBoard;
     private boolean hasEscapePod;
+    private boolean reserveMoney;
 
-    public Captain(Game game, String name) {
-        super(0);
+    public Captain(Game game, String name, int pilot, int fighter, int trader, int engineer) {
+        super(pilot, fighter, trader, engineer);
         this.game = game;
-
         this.name = name;
         credits = 1000;
         policeKills = 0;
@@ -69,22 +58,17 @@ public class Captain extends Crew {
         japoriDiseaseStatus = 0;
         moonBought = false;
         artifactOnBoard = false;
-        tribbleMessage = false;
         jarekStatus = 0;
         invasionStatus = 0;
         arrivedViaWormhole = false;
         veryRareEncounter = 0;
-        wildStatus = 0;
-        reactorStatus = 0;
         trackedSystem = -1;
         showTrackedRange = false;
-        justLootedMarie = false;
         canSuperWarp = false;
-        gameLoaded = false;
         hasEscapePod = false;
+        reserveMoney = false;
     }
 
-    @Override
     public String getName() {
         return name;
     }
@@ -256,10 +240,6 @@ public class Captain extends Crew {
 
     public int getKills() {
         return pirateKills + policeKills + traderKills;
-    }
-
-    public int getDays() {
-        return days;
     }
 
     public void setCredits(int credits) {
