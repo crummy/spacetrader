@@ -176,7 +176,6 @@ public class SolarSystem {
         return market;
     }
 
-    // TODO: move to InSystem?
     public Map<ShipType, Integer> getShipsForSale() {
         Map<ShipType, Integer> shipsForSale = new HashMap<>();
         for (ShipType type : ShipType.values()) {

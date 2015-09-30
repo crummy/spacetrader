@@ -216,9 +216,6 @@ public class Game {
         return rareEncounters;
     }
 
-    public boolean getRemindLoans() {
-        return false; // TODO
-    }
 
     public boolean getTrackAutoOff() {
         return trackAutoOff;
@@ -230,14 +227,6 @@ public class Game {
 
     public void setTrackedSystem(SolarSystem trackedSystem) {
         this.trackedSystem = trackedSystem;
-    }
-
-    public boolean getAutoRepair() {
-        return false; // TODO
-    }
-
-    public boolean getAutoFuel() {
-        return false;//TODO
     }
 
     public void setMonsterStatus(Monster monsterStatus) {

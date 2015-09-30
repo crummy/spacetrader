@@ -142,10 +142,10 @@ public class Market {
      */
     private void boostQuantitiesSlightly() {
         for (TradeItem item : TradeItem.values()) {
-            boolean itemNotAllowed = (item == TradeItem.Narcotics && !narcoticsOK())
-                    || (item == TradeItem.Firearms && !firearmsOK())
-                    || (techLevel().isBefore(item.getTechLevelForTopProduction()));
-            if (!itemNotAllowed) { // TODO get rid of double negative
+            boolean itemAllowed = (item != TradeItem.Narcotics || narcoticsOK())
+                    && (item != TradeItem.Firearms || firearmsOK())
+                    && (!techLevel().isBefore(item.getTechLevelRequiredForProduction()));
+            if (itemAllowed) {
                 int currentQuantity = quantities.get(item);
                 int newQuantity = currentQuantity + GetRandom(5) - GetRandom(5);
                 if (newQuantity < 0) {
