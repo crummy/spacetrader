@@ -1,13 +1,19 @@
 package com.malcolmcrum.spacetrader;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 
 /**
  * Created by Malcolm on 9/4/2015.
  */
 public class PlayerShip extends Ship {
+    private static final Logger logger = LoggerFactory.getLogger(PlayerShip.class);
+
     private static final int UPGRADED_HULL = 50;
 
+    private int fuel;
     private int tribbles;
     private boolean artifactOnBoard;
 
@@ -15,6 +21,7 @@ public class PlayerShip extends Ship {
         super(type, game);
         tribbles = 0;
         artifactOnBoard = false;
+        fuel = type.getFuelTanks();
     }
 
     // I added includeUniqueEquipment because I transfer over unique equipment to the new
@@ -23,11 +30,11 @@ public class PlayerShip extends Ship {
     public int getPriceWithoutCargo(boolean forInsurance, boolean includeUniqueEquipment) {
         // Trade-in value is three-quarters the original price
         // OR one-quarter if tribbles are involved and it's not for insurance purposes.
-        int tradeinPrice = (type.getPrice() * (tribbles > 0 && !forInsurance? 1 : 3)) / 4;
+        final int tradeInPrice = (type.getPrice() * (tribbles > 0 && !forInsurance? 1 : 3)) / 4;
 
-        int repairCosts = (getFullHullStrength() - type.getHullStrength()) * type.getRepairCost();
+        final int repairCosts = (getFullHullStrength() - type.getHullStrength()) * type.getRepairCost();
 
-        int refillFuel = (type.getFuelTanks() - getFuel()) * type.getCostToFillFuelTank();
+        final int refillFuel = (type.getFuelTanks() - getFuel()) * type.getCostToFillFuelTank();
 
         int weaponsPrice = 0;
         for (Weapon weapon : weapons) {
@@ -50,7 +57,7 @@ public class PlayerShip extends Ship {
             }
         }
 
-        return tradeinPrice - repairCosts - refillFuel + weaponsPrice + shieldsPrice + gadgetsPrice;
+        return tradeInPrice - repairCosts - refillFuel + weaponsPrice + shieldsPrice + gadgetsPrice;
     }
 
     public int getPrice(boolean forInsurance, boolean includeUniqueEquipment) {
@@ -59,6 +66,26 @@ public class PlayerShip extends Ship {
             curPrice += c.buyingPrice;
         }
         return curPrice;
+    }
+
+    public int getCostToFillFuelTank() {
+        return type.getCostToFillFuelTank();
+    }
+
+    public int getFuelCapacity() {
+        return type.getFuelTanks();
+    }
+
+    public int getFuel() {
+        return fuel;
+    }
+
+    public void addFuel(int unitsOfFuelBought) {
+        fuel += unitsOfFuelBought;
+        if (fuel > type.getFuelTanks()) {
+            logger.error("Ship is overflowing with fuel");
+            fuel = type.getFuelTanks();
+        }
     }
 
     public void repair(int repairs) {

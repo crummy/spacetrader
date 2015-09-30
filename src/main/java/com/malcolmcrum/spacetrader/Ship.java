@@ -25,7 +25,6 @@ public class Ship {
     protected List<Shield> shields;
     protected List<Crew> crew;
 
-    private int fuel;
     protected int hullStrength;
     final Game game;
 
@@ -37,7 +36,6 @@ public class Ship {
         gadgets = new ArrayList<>(type.getGadgetSlots());
         shields = new ArrayList<>(type.getShieldSlots());
         crew = new ArrayList<>(type.getCrewQuarters());
-        fuel = type.getFuelTanks();
         hullStrength = type.getHullStrength();
     }
 
@@ -47,18 +45,6 @@ public class Ship {
 
     public void addWeapon(Weapon weapon) {
         weapons.add(weapon);
-    }
-
-    public int getFuel() {
-        return fuel;
-    }
-
-    public int getFuelCapacity() {
-        return type.getFuelTanks();
-    }
-
-    public int getCostToFillFuelTank() {
-        return type.getCostToFillFuelTank();
     }
 
     public int getPrice() {
@@ -208,14 +194,6 @@ public class Ship {
             }
         }
         return count;
-    }
-
-    public void addFuel(int unitsOfFuelBought) {
-        fuel += unitsOfFuelBought;
-        if (fuel > type.getFuelTanks()) {
-            logger.error("Ship is overflowing with fuel");
-            fuel = type.getFuelTanks();
-        }
     }
 
     /**

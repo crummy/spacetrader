@@ -138,7 +138,7 @@ public enum ShipType {
         return costToFillFuelTank;
     }
 
-    public Size getSize() { // TODO: return int?
+    public Size getSize() {
         return size;
     }
 

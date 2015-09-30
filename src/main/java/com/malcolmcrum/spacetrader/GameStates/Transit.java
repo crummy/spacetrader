@@ -96,7 +96,7 @@ public class Transit extends GameState {
     public GameState travel() {
         --clicksRemaining;
         while (clicksRemaining > 0) {
-            int engineerSkill = game.getCaptain().getEngineerSkill(); // TODO: Check entire ship, not captain?
+            int engineerSkill = game.getShip().getEngineerSkill();
             int repairsAmount = GetRandom(engineerSkill) >> 1;
             game.getShip().repair(repairsAmount);
 

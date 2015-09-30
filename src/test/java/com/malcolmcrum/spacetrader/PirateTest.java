@@ -2,6 +2,7 @@ package com.malcolmcrum.spacetrader;
 
 import com.malcolmcrum.spacetrader.GameStates.Encounters.Encounter;
 import com.malcolmcrum.spacetrader.GameStates.Encounters.InvalidOpponentAction;
+import com.malcolmcrum.spacetrader.GameStates.Encounters.InvalidPlayerAction;
 import com.malcolmcrum.spacetrader.GameStates.Encounters.Pirate;
 import com.malcolmcrum.spacetrader.GameStates.GameState;
 import com.malcolmcrum.spacetrader.GameStates.PlunderState;
@@ -90,6 +91,18 @@ public class PirateTest extends GameStateTest {
 		encounter.actionSurrender();
 		assertTrue("can't afford blackmail? lose cash", credits > game.getCaptain().getCredits());
 		assertTrue("can't afford blackmail? gain debt", debt < game.getBank().getDebt());
+	}
+
+	@Test
+	public void testFleePirate() throws InvalidPlayerAction, InvalidOpponentAction {
+		Pirate pirate = new Pirate(game, transit);
+
+		game.getShip().setHullStrength(9999);
+		GameState state = pirate;
+		while (state.getClass() == Pirate.class) {
+			state = pirate.actionFlee();
+		}
+		assertTrue("escaped pirate", state.getClass() == Transit.class);
 	}
 
 }
