@@ -81,11 +81,6 @@ public abstract class FamousCaptain extends Encounter {
         return actions;
     }
 
-    public GameState actionMeet() {
-        // TODO
-        return this;
-    }
-
     @Override
     public String getTitle() {
         return "Captain";

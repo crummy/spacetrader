@@ -262,6 +262,27 @@ public class Captain extends Crew {
         policeRecordScore -= TRAFFICKING_SCORE;
     }
 
+    public void addPilotSkills(int amount) {
+        this.pilot += amount;
+        if (pilot > Game.MAX_POINTS_PER_SKILL) {
+            pilot = Game.MAX_POINTS_PER_SKILL;
+        }
+    }
+
+    public void addEngineerSkills(int amount) {
+        this.engineer += amount;
+        if (engineer > Game.MAX_POINTS_PER_SKILL) {
+            engineer = Game.MAX_POINTS_PER_SKILL;
+        }
+    }
+
+    public void addTraderSkills(int amount) {
+        trader += amount;
+        if (trader > Game.MAX_POINTS_PER_SKILL) {
+            trader = Game.MAX_POINTS_PER_SKILL;
+        }
+    }
+
     enum Reputation {
         Harmless("Harmless", 0),
         MostlyHarmless("Mostly harmless", 10),

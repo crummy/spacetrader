@@ -366,8 +366,8 @@ public class Ship {
     }
 
     public class Cargo {
-        TradeItem item;
-        int buyingPrice;
+        final TradeItem item;
+        final int buyingPrice;
         Cargo(TradeItem item, int buyingPrice) {
             this.item = item;
             this.buyingPrice = buyingPrice;
@@ -375,7 +375,7 @@ public class Ship {
 
     }
     public class Shield {
-        ShieldType shieldType;
+        private final ShieldType shieldType;
         int power;
 
         Shield(ShieldType shieldType, int power) {
@@ -384,6 +384,10 @@ public class Ship {
         }
         public String getName() {
             return shieldType.getName();
+        }
+
+        public ShieldType getType() {
+            return shieldType;
         }
 
     }

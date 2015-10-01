@@ -63,5 +63,5 @@ public enum Alert {
     CannotSellShipWithReactor,
     PassengerNeedsQuarters,
     CannotTransferUniqueEquipment,
-    TooManyCrewMembers, NoEscapePod, CannotAffordEscapePod, WarpDestinationOutOfRange, CannotFireYourself, CannotFireCrewDoesntExist, NoMercenaryForHire, NoRoomForMercenary, NoMoneyForBribe, BribeNotPossible, FinedAndLostCargo, NoIllegalGoods, PiratesFindNoCargo, PiratesPlunder, WildGoesWithPirates, WildStaysAboard, PiratesDontStealReactor, FleaBuilt
+    TooManyCrewMembers, NoEscapePod, CannotAffordEscapePod, WarpDestinationOutOfRange, CannotFireYourself, CannotFireCrewDoesntExist, NoMercenaryForHire, NoRoomForMercenary, NoMoneyForBribe, BribeNotPossible, FinedAndLostCargo, NoIllegalGoods, PiratesFindNoCargo, PiratesPlunder, WildGoesWithPirates, WildStaysAboard, PiratesDontStealReactor, ArtifactStolen, TrainingCompleted, FleaBuilt
 }

@@ -1,5 +1,6 @@
 package com.malcolmcrum.spacetrader.GameStates.Encounters;
 
+import com.malcolmcrum.spacetrader.Alert;
 import com.malcolmcrum.spacetrader.Game;
 import com.malcolmcrum.spacetrader.GameStates.GameState;
 import com.malcolmcrum.spacetrader.GameStates.Transit;
@@ -31,6 +32,18 @@ public class Mantis extends Pirate {
         String destination = transit.getDestination().getName();
         String ship = opponent.getName();
         return "At " + clicks + " from " + destination + ", you encounter an alien " + ship + ".";
+    }
+
+    @Override
+    public GameState actionSurrender() {
+        if (game.getArtifactOnBoard()) {
+            game.addAlert(Alert.ArtifactStolen);
+            game.setArtifactOnBoard(false);
+            return transit;
+        } else {
+            game.addAlert(Alert.NoSurrender);
+            return this;
+        }
     }
 
     @Override

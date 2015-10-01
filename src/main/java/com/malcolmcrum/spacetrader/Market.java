@@ -156,7 +156,7 @@ public class Market {
         }
     }
 
-    private void recalculateBuyPrice() {
+    public void recalculateBuyPrice() {
         for (TradeItem item : TradeItem.values()) {
             Integer buyPrice;
             if (techLevel().isBefore(item.getTechLevelRequiredForProduction())) {
