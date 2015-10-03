@@ -110,4 +110,6 @@ public abstract class FamousCaptain extends Encounter {
         }
         captain.policeRecord.attackedTrader();
     }
+
+    public abstract GameState actionMeet();
 }

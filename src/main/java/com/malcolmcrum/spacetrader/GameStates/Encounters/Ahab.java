@@ -25,7 +25,6 @@ public class Ahab extends FamousCaptain {
     public String getEncounterDescription() {
         String clicks = Pluralize(transit.getClicksRemaining(), "click");
         String destination = transit.getDestination().getName();
-        String ship = opponent.getName();
         return "At " + clicks + " from " + destination + ", you encounter the famous Captain Ahab.";
     }
 
@@ -41,6 +40,7 @@ public class Ahab extends FamousCaptain {
         return super.destroyedOpponent();
     }
 
+    @Override
     public GameState actionMeet() {
         Optional<Ship.Shield> reflective = game.getShip().getShields()
                 .stream()

@@ -24,7 +24,6 @@ public class Conrad extends FamousCaptain {
     public String getEncounterDescription() {
         String clicks = Pluralize(transit.getClicksRemaining(), "click");
         String destination = transit.getDestination().getName();
-        String ship = opponent.getName();
         return "At " + clicks + " from " + destination + ", you encounter Captain Conrad.";
     }
 
@@ -40,6 +39,7 @@ public class Conrad extends FamousCaptain {
         return super.destroyedOpponent();
     }
 
+    @Override
     public GameState actionMeet() {
         Optional<Weapon> military = game.getShip().getWeapons()
                 .stream()
@@ -54,7 +54,7 @@ public class Conrad extends FamousCaptain {
             }
             game.addAlert(Alert.TrainingCompleted);
         } else {
-            logger.error("Trying to trade with Captain Huie but have no military laser!");
+            logger.error("Trying to trade with Captain Conrad but have no military laser!");
         }
         game.getCurrentSystem().getMarket().recalculateBuyPrice();
         return transit;

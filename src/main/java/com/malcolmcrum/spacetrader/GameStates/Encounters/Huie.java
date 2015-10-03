@@ -25,7 +25,6 @@ public class Huie extends FamousCaptain {
     public String getEncounterDescription() {
         String clicks = Pluralize(transit.getClicksRemaining(), "click");
         String destination = transit.getDestination().getName();
-        String ship = opponent.getName();
         return "At " + clicks + " from " + destination + ", you encounter Captain Huie.";
     }
 
@@ -41,6 +40,7 @@ public class Huie extends FamousCaptain {
         return super.destroyedOpponent();
     }
 
+    @Override
     public GameState actionMeet() {
         Optional<Weapon> military = game.getShip().getWeapons()
                 .stream()
@@ -55,7 +55,7 @@ public class Huie extends FamousCaptain {
             }
             game.addAlert(Alert.TrainingCompleted);
         } else {
-            logger.error("Trying to trade with Captain Ahab but have no reflective shield!");
+            logger.error("Trying to trade with Captain Huie but have no military laser!");
         }
         return transit;
     }

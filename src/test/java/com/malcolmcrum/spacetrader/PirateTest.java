@@ -80,7 +80,7 @@ public class PirateTest extends GameStateTest {
 		assertTrue("pirates plundered food", game.getShip().getCargoCount(TradeItem.Food) == 0);
 		assertTrue("pirates plundered robots", game.getShip().getCargoCount(TradeItem.Robots) == 0);
 		assertTrue("wild goes with pirates if they have space", encounter.getOpponent().getCrewQuarters() == 1 || !game.getQuests().isWildOnBoard());
-		assertTrue("reactor untouched", game.getQuests().getReactorDays() == 20);
+		assertTrue("reactor untouched", game.getQuests().isReactorOnBoard());
 		assertTrue("transitioned to next state after surrender", state != encounter);
 
 		encounter = new Pirate(game, transit);

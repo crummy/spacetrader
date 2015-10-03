@@ -42,6 +42,7 @@ public class Game {
             return null;
         }
 
+        quests = new Quests();
         captain = new Captain(commanderName, pilotSkill, fighterSkill, traderSkill, engineerSkill, this);
         ship = new PlayerShip(ShipType.Gnat, quests, difficulty);
         ship.addWeapon(Weapon.PulseLaser);
@@ -58,7 +59,6 @@ public class Game {
             currentSystem.setSpecialEvent(SolarSystem.SpecialEvent.LotteryWinner);
         }
 
-        quests = new Quests();
         days = 0;
         monsterHull = ShipType.SpaceMonster.getHullStrength();
 

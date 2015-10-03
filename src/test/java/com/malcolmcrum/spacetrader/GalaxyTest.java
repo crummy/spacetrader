@@ -22,6 +22,7 @@ public class GalaxyTest
         Difficulty difficulty = Difficulty.Easy;
         Captain captain = new Captain("Bob", 5, 5, 5, 5, new Game());
         PlayerShip ship = new PlayerShip(ShipType.Beetle, new Quests(), difficulty);
+        ship.addCrew(captain);
         galaxy = new Galaxy(captain, ship, difficulty);
     }
 
