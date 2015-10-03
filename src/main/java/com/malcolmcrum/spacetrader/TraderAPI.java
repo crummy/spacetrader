@@ -4,10 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.malcolmcrum.spacetrader.GameStates.GameOver;
 import com.malcolmcrum.spacetrader.GameStates.InSystem;
-import com.malcolmcrum.spacetrader.Serializers.GalaxySerializer;
-import com.malcolmcrum.spacetrader.Serializers.GameOverSerializer;
-import com.malcolmcrum.spacetrader.Serializers.InSystemSerializer;
-import com.malcolmcrum.spacetrader.Serializers.ShipTypesSerializer;
+import com.malcolmcrum.spacetrader.Serializers.*;
 
 import static spark.Spark.*;
 

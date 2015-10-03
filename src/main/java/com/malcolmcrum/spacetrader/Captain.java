@@ -1,67 +1,52 @@
 package com.malcolmcrum.spacetrader;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Created by Malcolm on 8/28/2015.
  */
 public class Captain extends Crew {
-    private static final int PSYCHOPATH_SCORE = -70;
-    private static final int VILLAIN_SCORE = -30;
-    private static final int CRIMINAL_SCORE = -10;
-    private static final int HERO_SCORE = 75;
-    private static final int CAUGHT_WITH_WILD_SCORE = -4;
-    private static final int DUBIOUS_SCORE = -5;
-    private static final int CLEAN_SCORE = 0;
-    private static final int KILL_PIRATE_SCORE = 1;
-    private static final int KILL_POLICE_SCORE = -6;
-    private static final int ATTACK_POLICE_SCORE = -3;
-    private static final int FLEE_FROM_INSPECTION = -2;
-    private static final int KILL_TRADER_SCORE = -4;
-    private static final int ATTACK_TRADER_SCORE = -2;
-    private static final int LAWFUL_SCORE = 5;
-    private static final int TRAFFICKING_SCORE = -1;
+    private static final Logger logger = LoggerFactory.getLogger(Captain.class);
 
-    private final Game game;
     private final String name;
+    private final Game game;
+    public final Bank bank;
+    public final Reputation reputation;
+    public final PoliceRecord policeRecord;
 
     // TODO: gotta move some of these variables elsewhere
-    private int credits;
     private int policeKills;
     private int traderKills;
     private int pirateKills;
     private int policeRecordScore;
     private int reputationScore;
-    private int japoriDiseaseStatus;
     private boolean moonBought;
-    private int jarekStatus;
-    private int invasionStatus;
-    private int experimentStatus;
     private boolean possibleToGoThroughRip;
     private boolean arrivedViaWormhole;
-    private int veryRareEncounter;
     private int trackedSystem;
     private boolean showTrackedRange;
     private boolean canSuperWarp;
     private boolean artifactOnBoard;
     private boolean hasEscapePod;
     private boolean reserveMoney;
+    private int credits;
 
-    public Captain(Game game, String name, int pilot, int fighter, int trader, int engineer) {
+    public Captain(String name, int pilot, int fighter, int trader, int engineer, Game game) {
         super(pilot, fighter, trader, engineer);
         this.game = game;
         this.name = name;
-        credits = 1000;
+        this.bank = new Bank(this, game);
+        this.reputation = new Reputation();
+        this.policeRecord = new PoliceRecord(game.getDifficulty());
         policeKills = 0;
         traderKills = 0;
         pirateKills = 0;
+        credits = 1000;
         policeRecordScore = 0;
         reputationScore = 0;
-        japoriDiseaseStatus = 0;
         moonBought = false;
-        artifactOnBoard = false;
-        jarekStatus = 0;
-        invasionStatus = 0;
         arrivedViaWormhole = false;
-        veryRareEncounter = 0;
         trackedSystem = -1;
         showTrackedRange = false;
         canSuperWarp = false;
@@ -73,40 +58,18 @@ public class Captain extends Crew {
         return name;
     }
 
-    public boolean isVillainous() {
-        return policeRecordScore <= VILLAIN_SCORE;
+    public void addCredits(int additionalCredits) {
+        credits += additionalCredits;
     }
 
-    public boolean isPsychopathic() {
-        return policeRecordScore <= PSYCHOPATH_SCORE;
-    }
-
-    public boolean isHeroic() {
-        return policeRecordScore == HERO_SCORE;
-    }
-
-    public boolean isClean() {
-        return policeRecordScore > CLEAN_SCORE;
-    }
-
-    public int getJaporiDiseaseStatus() {
-        return japoriDiseaseStatus;
-    }
-
-    public boolean getArtifactOnBoard() {
-        return artifactOnBoard;
-    }
-
-    public int getJarekStatus() {
-        return jarekStatus;
-    }
-
-    public int getInvasionStatus() {
-        return invasionStatus;
-    }
-
-    public int getExperimentStatus() {
-        return experimentStatus;
+    public void subtractCredits(int creditsLost) {
+        if (credits > creditsLost) {
+            credits -= creditsLost;
+        } else {
+            logger.info("Lost more credits than we have - increasing debt.");
+            bank.addDebt(creditsLost - credits);
+            credits = 0;
+        }
     }
 
     public int getCredits() {
@@ -117,125 +80,26 @@ public class Captain extends Crew {
         return moonBought;
     }
 
-    public boolean isCriminal() {
-        return policeRecordScore <= CRIMINAL_SCORE;
-    }
-
-    public void caughtWithWild() {
-        policeRecordScore += CAUGHT_WITH_WILD_SCORE;
-    }
-
-    public void addCredits(int additionalCredits) {
-        credits += additionalCredits;
-    }
-
-    public void subtractCredits(int creditsLost) {
-        if (credits > creditsLost) {
-            credits -= creditsLost;
-        } else {
-            game.getBank().addDebt(creditsLost - credits);
-            credits = 0;
-        }
-    }
-
-    public boolean isDubious() {
-        return policeRecordScore < DUBIOUS_SCORE;
-    }
-
-    public int getAvailableCash() {
-        if (!reserveMoney) {
-            return credits;
-        } else {
-            return Math.max(0, credits - game.getShip().getMercenaryDailyCost() - game.getBank().getInsuranceCost());
-        }
-    }
-
-    public void addPoliceScore(int i) {
-        policeRecordScore += i;
-    }
-
-    public void attackedPolice() {
-        policeRecordScore += ATTACK_POLICE_SCORE;
-    }
-
-    public void attackedTrader() {
-        policeRecordScore += ATTACK_TRADER_SCORE;
-    }
-
-    public void makeCriminal() {
-        policeRecordScore = CRIMINAL_SCORE;
-    }
-
-    public void makeDubious() {
-        policeRecordScore = DUBIOUS_SCORE;
-    }
-
-
-    public int getPoliceRecordScore() {
-        return policeRecordScore;
-    }
-
     public int getWorth() {
         return game.getShip().getPrice(false, true)
                 + credits
-                - game.getBank().getDebt()
+                - bank.getDebt()
                 + (moonBought ? SolarSystem.COST_MOON : 0);
-    }
-
-    public void fledPolice() {
-        if (policeRecordScore > DUBIOUS_SCORE) {
-            boolean easierThanNormal = game.getDifficulty() == Difficulty.Beginner || game.getDifficulty() == Difficulty.Easy;
-            policeRecordScore = DUBIOUS_SCORE - (easierThanNormal ? 0 : 1);
-        } else {
-            policeRecordScore += FLEE_FROM_INSPECTION;
-        }
-    }
-
-    public boolean isDangerous() {
-        return reputationScore >= Reputation.Dangerous.getScore();
-    }
-
-    public void makeDangerous() {
-        reputationScore = Reputation.Dangerous.getScore();
-    }
-
-    public void addReputation(int rep) {
-        reputationScore += rep;
     }
 
     public void killedACop() {
         ++policeKills;
-        addPoliceScore(KILL_POLICE_SCORE);
+        policeRecord.add(PoliceRecord.Actions.KillPolice.modifier);
     }
 
     public void killedAPirate() {
         ++pirateKills;
-        addPoliceScore(KILL_PIRATE_SCORE);
+        policeRecord.add(PoliceRecord.Actions.KillPirate.modifier);
     }
 
     public void killedATrader() {
         ++traderKills;
-        addPoliceScore(KILL_TRADER_SCORE);
-    }
-
-    public void makeVillain() {
-        policeRecordScore = VILLAIN_SCORE;
-    }
-
-    public int getEliteScore() {
-        return Reputation.Elite.getScore();
-    }
-
-    public int getReputationScore() {
-        return reputationScore;
-    }
-
-    public boolean isLawful() {
-        return policeRecordScore >= LAWFUL_SCORE;
-    }
-
-    public boolean isAverage() {
-        return reputationScore >= Reputation.Average.getScore();
+        policeRecord.add(PoliceRecord.Actions.KillTrader.modifier);
     }
 
     public int getKills() {
@@ -254,57 +118,43 @@ public class Captain extends Crew {
         this.hasEscapePod = escapePod;
     }
 
-    public void caughtTrafficking() {
-        policeRecordScore += TRAFFICKING_SCORE;
-    }
-
-    public void passedInspection() {
-        policeRecordScore -= TRAFFICKING_SCORE;
-    }
-
-    public void addPilotSkills(int amount) {
+    public boolean addPilotSkills(int amount) {
         this.pilot += amount;
         if (pilot > Game.MAX_POINTS_PER_SKILL) {
             pilot = Game.MAX_POINTS_PER_SKILL;
+            return false;
+        } else {
+            return true;
         }
     }
 
-    public void addEngineerSkills(int amount) {
+    public boolean addEngineerSkills(int amount) {
         this.engineer += amount;
         if (engineer > Game.MAX_POINTS_PER_SKILL) {
             engineer = Game.MAX_POINTS_PER_SKILL;
+            return false;
+        } else {
+            return true;
         }
     }
 
-    public void addTraderSkills(int amount) {
+    public boolean addTraderSkills(int amount) {
         trader += amount;
         if (trader > Game.MAX_POINTS_PER_SKILL) {
             trader = Game.MAX_POINTS_PER_SKILL;
+            return false;
+        } else {
+            return true;
         }
     }
 
-    enum Reputation {
-        Harmless("Harmless", 0),
-        MostlyHarmless("Mostly harmless", 10),
-        Poor("Poor", 20),
-        Average("Average", 40),
-        AboveAverage("Above average", 80),
-        Competent("Competent", 150),
-        Dangerous("Dangerous", 300),
-        Deadly("Deadly", 600),
-        Elite("Elite", 1500);
-
-        private final String name;
-        private final int score;
-
-        Reputation(String name, int score) {
-
-            this.name = name;
-            this.score = score;
-        }
-
-        int getScore() {
-            return score;
+    public boolean addFighterSkills(int amount) {
+        fighter += amount;
+        if (fighter > Game.MAX_POINTS_PER_SKILL) {
+            fighter = Game.MAX_POINTS_PER_SKILL;
+            return false;
+        } else {
+            return true;
         }
     }
 }

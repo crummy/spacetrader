@@ -16,9 +16,11 @@ public class PlayerShip extends Ship {
     private int fuel;
     private int tribbles;
     private boolean artifactOnBoard;
+    private final Quests quests;
 
-    public PlayerShip(ShipType type, Game game) {
-        super(type, game);
+    public PlayerShip(ShipType type, Quests quests, Difficulty difficulty) {
+        super(type, difficulty);
+        this.quests = quests;
         tribbles = 0;
         artifactOnBoard = false;
         fuel = type.getFuelTanks();
@@ -45,8 +47,8 @@ public class PlayerShip extends Ship {
 
         int shieldsPrice = 0;
         for (Shield shield : shields) {
-            if (shield.shieldType != ShieldType.LightningShield || includeUniqueEquipment) {
-                shieldsPrice += shield.shieldType.getSellPrice();
+            if (shield.getType() != ShieldType.LightningShield || includeUniqueEquipment) {
+                shieldsPrice += shield.getType().getSellPrice();
             }
         }
 
@@ -101,9 +103,9 @@ public class PlayerShip extends Ship {
         repairs = 2 * repairs;
         for (Shield shield : shields) {
             shield.power += repairs;
-            if (shield.power > shield.shieldType.getPower()) {
-                repairs = shield.power - shield.shieldType.getPower();
-                shield.power = shield.shieldType.getPower();
+            if (shield.power > shield.getType().getPower()) {
+                repairs = shield.power - shield.getType().getPower();
+                shield.power = shield.getType().getPower();
             } else {
                 repairs = 0;
             }
@@ -128,7 +130,7 @@ public class PlayerShip extends Ship {
 
     @Override
     int minDamage() {
-        return Math.max(1, Difficulty.Impossible.getValue() - game.getDifficulty().getValue());
+        return Math.max(1, Difficulty.Impossible.getValue() - difficulty.getValue());
     }
 
     /**
@@ -136,7 +138,7 @@ public class PlayerShip extends Ship {
      */
     @Override
     public int getHullStrength() {
-        if (game.getScarabStatus() == Scarab.DestroyedUpgradePerformed) {
+        if (quests.scarabUpgradePerformed()) {
             return type.getHullStrength() + UPGRADED_HULL;
         } else {
             return type.getHullStrength();
@@ -148,8 +150,35 @@ public class PlayerShip extends Ship {
     }
 
     public void removeAllMercenaries() {
-        crew.clear();
-        crew.add(game.getCaptain());
+        for (int i = 1; i < crew.size(); ++i) {
+            crew.remove(i);
+        }
+    }
+
+    @Override
+    public int getTraderSkill() {
+        int maxSkill = crew.stream()
+                .mapToInt(Crew::getTraderSkill)
+                .max()
+                .getAsInt();
+
+        if (quests.isJarekDelivered()) {
+            ++maxSkill;
+        }
+        return applyDifficultyModifierToSkill(maxSkill);
+    }
+
+    @Override
+    protected int totalCargoBays() {
+        int bays = super.totalCargoBays();
+        if (quests.isAntidoteOnBoard()) { // carrying the cure
+            bays -= 10;
+        }
+
+        if (quests.isReactorOnBoard()) { // carrying the melting-down reactor
+            bays -= (5 + 10 - (quests.getReactorDays() - 1)/2);
+        }
+        return bays;
     }
 
     public int getRepairCost() {

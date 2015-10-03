@@ -1,9 +1,10 @@
-package com.malcolmcrum.spacetrader;
+package com.malcolmcrum.spacetrader.Serializers;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.malcolmcrum.spacetrader.Bank;
 
 import java.lang.reflect.Type;
 

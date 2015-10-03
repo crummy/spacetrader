@@ -15,15 +15,19 @@ import static com.malcolmcrum.spacetrader.Utils.GetRandom;
 public class Market {
     private static final Logger logger = LoggerFactory.getLogger(Market.class);
 
-    private final Game game;
+    private final Captain captain;
+    private final Ship ship;
+    private final Difficulty difficulty;
     private final SolarSystem system;
     private final Map<TradeItem, Integer> sellPrices;
     private final Map<TradeItem, Integer> buyPrices;
     private final Map<TradeItem, Integer> quantities;
     private int tradeResetCountdown;
 
-    public Market(Game game, SolarSystem system) {
-        this.game = game;
+    public Market(Captain captain, Ship ship, Difficulty difficulty, SolarSystem system) {
+        this.captain = captain;
+        this.ship = ship;
+        this.difficulty = difficulty;
         this.system = system;
 
         sellPrices = new HashMap<>();
@@ -49,7 +53,7 @@ public class Market {
 
             // Cap robots and narcotics due to potential for easy profits
             if (item == TradeItem.Robots || item == TradeItem.Narcotics) {
-                int difficultyValue = game.getDifficulty().getValue();
+                int difficultyValue = difficulty.getValue();
                 quantity = ((quantity * (5 - difficultyValue)) / (6 - difficultyValue)) + 1;
             }
 
@@ -102,7 +106,7 @@ public class Market {
                 buyPrices.put(item, price);
 
                 // Criminals have to pay off an intermediary
-                if (game.getCaptain().isDubious()) {
+                if (captain.policeRecord.is(PoliceRecord.Status.Dubious)) {
                     sellPrices.put(item, (price * 90) / 100);
                 } else {
                     sellPrices.put(item, price);
@@ -133,7 +137,7 @@ public class Market {
     }
 
     private int initialTradeResetCountdown() {
-        return 3 + game.getDifficulty().getValue();
+        return 3 + difficulty.getValue();
     }
 
     /**
@@ -166,13 +170,13 @@ public class Market {
                 buyPrice = null;
             } else {
                 int sellPrice = sellPrices.get(item);
-                if (game.getCaptain().isDubious()) {
+                if (captain.policeRecord.is(PoliceRecord.Status.Dubious)) {
                     buyPrice = (sellPrice * 100) / 90;
                 } else {
                     buyPrice = sellPrice;
                 }
                 // BuyPrice = SellPrice + 1 to 12% (depending on trader skill (minimum is 1, max 12))
-                int traderSkill = game.getShip().getTraderSkill();
+                int traderSkill = ship.getTraderSkill();
                 buyPrice = (buyPrice * (103 + (Game.MAX_POINTS_PER_SKILL - traderSkill)) / 100);
                 if (buyPrice <= sellPrice) {
                     buyPrice = sellPrice + 1;
@@ -275,14 +279,14 @@ public class Market {
     public void buyItem(TradeItem item, int quantity) {
         quantities.put(item, quantities.get(item) - quantity);
         int cost = quantity * buyPrices.get(item);
-        game.getCaptain().subtractCredits(cost);
-        game.getShip().addCargo(item, quantity, buyPrices.get(item));
+        captain.subtractCredits(cost);
+        ship.addCargo(item, quantity, buyPrices.get(item));
     }
 
     public void sellItem(TradeItem item, int quantity) {
         quantities.put(item, quantities.get(item) + quantity);
         int price = quantity * sellPrices.get(item);
-        game.getCaptain().addCredits(price);
-        game.getShip().removeCargo(item, quantity);
+        captain.addCredits(price);
+        ship.removeCargo(item, quantity);
     }
 }

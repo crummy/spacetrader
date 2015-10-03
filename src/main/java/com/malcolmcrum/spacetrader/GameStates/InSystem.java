@@ -17,10 +17,14 @@ public class InSystem extends GameState {
     private static final Logger logger = LoggerFactory.getLogger(InSystem.class);
 
     private SolarSystem system;
+    private Quests quests;
+    private Captain captain;
     private boolean alreadyPaidForNewspaper;
 
     public InSystem(Game game, SolarSystem system) {
         super(game);
+        this.quests = game.getQuests();
+        this.captain = game.getCaptain();
         this.system = system;
     }
 
@@ -80,25 +84,21 @@ public class InSystem extends GameState {
 
     @Override
     public GameState init() {
-        if (game.getBank().getDebt() > 0 && game.getDays() % 5 == 0) {
+        if (captain.bank.getDebt() > 0 && game.getDays() % 5 == 0) {
             game.addAlert(Alert.DebtReminder);
         }
 
         // Reactor warnings as the thing melts down, and possible death
-        if (game.getReactorStatus() == Reactor.NineteenDaysLeft) {
+        if (quests.reactorDaysLeft() == 19) {
             game.addAlert(Alert.ReactorConsume);
-        } else if (game.getReactorStatus() == Reactor.FiveDaysLeft) {
+        } else if (quests.reactorDaysLeft() == 5) {
             game.addAlert(Alert.ReactorNoise);
-        } else if (game.getReactorStatus() == Reactor.ThreeDaysLeft) {
+        } else if (quests.reactorDaysLeft() == 3) {
             game.addAlert(Alert.ReactorSmoke);
-        } else if (game.getReactorStatus() == Reactor.OneDayLeft) {
-            game.setReactorStatus(Reactor.Unavailable);
+        } else if (quests.reactorDaysLeft() == 1) {
+            quests.reactorDestroyed();
             game.addAlert(Alert.ReactorMeltdown);
             return new ShipDestroyed(game, system);
-        }
-
-        if (game.getTrackAutoOff() && game.getTrackedSystem() == system) {
-            game.setTrackedSystem(null);
         }
 
         multiplyTribbles();
@@ -174,15 +174,15 @@ public class InSystem extends GameState {
         Map<ShipType, Integer> shipsForSale = system.getShipsForSale();
         if (!shipsForSale.containsKey(type)) {
             logger.error("Tried to buy unavailable ship");
-        } else if (game.getBank().getDebt() > 0) {
+        } else if (captain.bank.getDebt() > 0) {
             game.addAlert(Alert.CannotPurchaseShipInDebt);
-        } else if (game.getCaptain().getCredits() < shipsForSale.get(type)) {
+        } else if (captain.getCredits() < shipsForSale.get(type)) {
             game.addAlert(Alert.CannotAffordShip);
-        } else if (game.getJarekStatus() == Jarek.OnBoard && type.getCrewQuarters() < 2) {
+        } else if (quests.isJarekOnBoard() && type.getCrewQuarters() < 2) {
             game.addAlert(Alert.PassengerNeedsQuarters);
-        } else if (game.getWildStatus() == Wild.OnBoard && type.getCrewQuarters() < 2) {
+        } else if (quests.isWildOnBoard() && type.getCrewQuarters() < 2) {
             game.addAlert(Alert.PassengerNeedsQuarters);
-        } else if (game.getReactorStatus() != Reactor.Unavailable && game.getReactorStatus() != Reactor.Delivered) {
+        } else if (quests.isReactorOnBoard()) {
             game.addAlert(Alert.CannotSellShipWithReactor);
         } else if (!canTransferUniqueEquipment(game.getShip(), type)) {
             game.addAlert(Alert.CannotTransferUniqueEquipment);
@@ -191,12 +191,12 @@ public class InSystem extends GameState {
         } else {
             int price = system.getShipsForSale().get(type);
             game.getCaptain().subtractCredits(price);
-            PlayerShip newShip = new PlayerShip(type, game);
+            PlayerShip newShip = new PlayerShip(type, quests, game.getDifficulty());
             transferUniqueEquipment(game.getShip(), newShip);
             transferCrew(game.getShip(), newShip);
             game.setShip(newShip);
-            if (game.getScarabStatus() == Scarab.DestroyedUpgradePerformed) {
-                game.setScarabStatus(Scarab.Unavailable);
+            if (quests.scarabUpgradePerformed()) {
+                quests.setScarabUnavailable();
             }
             game.addAlert(Alert.ShipPurchased);
         }
@@ -236,13 +236,13 @@ public class InSystem extends GameState {
         if (!game.getCaptain().hasEscapePod()) {
             game.addAlert(Alert.NoEscapePod);
         } else {
-            game.getBank().setInsurance(true);
+            captain.bank.setInsurance(true);
         }
         return this;
     }
 
     public GameState cancelInsurance() {
-        game.getBank().cancelInsurance();
+        captain.bank.cancelInsurance();
         return this;
     }
 
@@ -310,7 +310,7 @@ public class InSystem extends GameState {
         int tribbles = game.getShip().getTribbles();
         int previousTribbles = tribbles;
         boolean foodOnBoard = false;
-        if (tribbles > 0 && game.getReactorStatus() != Reactor.Unavailable && game.getReactorStatus() != Reactor.Delivered) {
+        if (tribbles > 0 && quests.isReactorOnBoard()) {
             tribbles /= 2;
             if (tribbles < 10) {
                 game.addAlert(Alert.TribblesAllIrradiated);
@@ -361,13 +361,13 @@ public class InSystem extends GameState {
         }
 
         // If wild is aboard, make sure ship is armed!
-        if (game.getWildStatus() == Wild.OnBoard) {
+        if (quests.isWildOnBoard()) {
             game.addAlert(Alert.WildWontGo);
             return this;
         }
 
         // Check for large debt
-        if (game.getBank().veryLargeDebt()) {
+        if (captain.bank.veryLargeDebt()) {
             game.addAlert(Alert.DebtTooLargeForTravel);
             return this;
         }
@@ -380,8 +380,8 @@ public class InSystem extends GameState {
         }
 
         // Check for enough money to pay for insurance
-        int insuranceCost = game.getBank().getInsuranceCost();
-        if (game.getBank().hasInsurance()
+        int insuranceCost = captain.bank.getInsuranceCost();
+        if (captain.bank.hasInsurance()
                 && (insuranceCost + mercenaryCost > game.getCaptain().getCredits())) {
             game.addAlert(Alert.CantAffordInsuranceBill);
             return this;
@@ -416,40 +416,39 @@ public class InSystem extends GameState {
     }
 
     private void addNewsEvents() {
-        Captain captain = game.getCaptain();
         News news = game.getNews();
         SolarSystem.SpecialEvent systemEvent = system.getSpecialEvent();
-        if (systemEvent == SolarSystem.SpecialEvent.MonsterKilled && game.getMonsterStatus() == Monster.Destroyed) {
+        if (systemEvent == SolarSystem.SpecialEvent.MonsterKilled && quests.isMonsterKilled()) {
             news.addSpecialEvent(SolarSystem.SpecialEvent.MonsterKilled);
         } else if (systemEvent == SolarSystem.SpecialEvent.Dragonfly) {
             news.addSpecialEvent(SolarSystem.SpecialEvent.Dragonfly);
         } else if (systemEvent == SolarSystem.SpecialEvent.ScarabStolen) {
             news.addSpecialEvent(SolarSystem.SpecialEvent.ScarabStolen);
-        } else if (systemEvent == SolarSystem.SpecialEvent.ScarabDestroyed && game.getScarabStatus() == Scarab.DestroyedUpgradeAvailable) {
+        } else if (systemEvent == SolarSystem.SpecialEvent.ScarabDestroyed && quests.scarabUpgradeAvailable()) {
             news.addSpecialEvent(SolarSystem.SpecialEvent.ScarabDestroyed);
-        } else if (systemEvent == SolarSystem.SpecialEvent.FlyBaratas && game.getDragonflyStatus() == Dragonfly.GoToBaratas) {
+        } else if (systemEvent == SolarSystem.SpecialEvent.FlyBaratas && quests.isDragonflyAt(SolarSystem.Name.Baratas)) {
             news.addSpecialEvent(SolarSystem.SpecialEvent.FlyBaratas);
-        } else if (systemEvent == SolarSystem.SpecialEvent.FlyMelina && game.getDragonflyStatus() == Dragonfly.GoToMelina) {
+        } else if (systemEvent == SolarSystem.SpecialEvent.FlyMelina && quests.isDragonflyAt(SolarSystem.Name.Melina)) {
             news.addSpecialEvent(SolarSystem.SpecialEvent.FlyMelina);
-        } else if (systemEvent == SolarSystem.SpecialEvent.FlyRegulas && game.getDragonflyStatus() == Dragonfly.GoToRegulas) {
+        } else if (systemEvent == SolarSystem.SpecialEvent.FlyRegulas && quests.isDragonflyAt(SolarSystem.Name.Regulas)) {
             news.addSpecialEvent(SolarSystem.SpecialEvent.FlyRegulas);
-        } else if (systemEvent == SolarSystem.SpecialEvent.DragonflyDestroyed && game.getDragonflyStatus() == Dragonfly.Destroyed) {
+        } else if (systemEvent == SolarSystem.SpecialEvent.DragonflyDestroyed && quests.isDragonflyDestroyed()) {
             news.addSpecialEvent(SolarSystem.SpecialEvent.DragonflyDestroyed);
-        } else if (systemEvent == SolarSystem.SpecialEvent.MedicineDelivery && captain.getJaporiDiseaseStatus() == 1) {
+        } else if (systemEvent == SolarSystem.SpecialEvent.MedicineDelivery && quests.isAntidoteOnBoard()) {
             news.addSpecialEvent(SolarSystem.SpecialEvent.MedicineDelivery);
-        } else if (systemEvent == SolarSystem.SpecialEvent.ArtifactDelivery && captain.getArtifactOnBoard()) {
+        } else if (systemEvent == SolarSystem.SpecialEvent.ArtifactDelivery && quests.isArtifactOnBoard()) {
             news.addSpecialEvent(SolarSystem.SpecialEvent.ArtifactDelivery);
-        } else if (systemEvent == SolarSystem.SpecialEvent.JaporiDisease && captain.getJaporiDiseaseStatus() == 0) {
+        } else if (systemEvent == SolarSystem.SpecialEvent.JaporiDisease && !quests.isAntidoteOnBoard()) {
             news.addSpecialEvent(SolarSystem.SpecialEvent.JaporiDisease);
-        } else if (systemEvent == SolarSystem.SpecialEvent.JarekGetsOut && captain.getJarekStatus() == 1) {
+        } else if (systemEvent == SolarSystem.SpecialEvent.JarekGetsOut && quests.isJarekOnBoard()) {
             news.addSpecialEvent(SolarSystem.SpecialEvent.JarekGetsOut);
         } else if (systemEvent == SolarSystem.SpecialEvent.WildGetsOut) {
             news.addSpecialEvent(SolarSystem.SpecialEvent.WildGetsOut);
-        } else if (systemEvent == SolarSystem.SpecialEvent.GemulonRescued && captain.getInvasionStatus() > 0 && captain.getInvasionStatus() < 8) {
+        } else if (systemEvent == SolarSystem.SpecialEvent.GemulonRescued && quests.isInvasionComing()) {
             news.addSpecialEvent(SolarSystem.SpecialEvent.GemulonRescued);
         } else if (systemEvent == SolarSystem.SpecialEvent.AlienInvasion) {
             news.addSpecialEvent(SolarSystem.SpecialEvent.AlienInvasion);
-        } else if (systemEvent == SolarSystem.SpecialEvent.DisasterAverted && captain.getExperimentStatus() > 0 && captain.getExperimentStatus() < 12) {
+        } else if (systemEvent == SolarSystem.SpecialEvent.DisasterAverted && quests.isExperimentComing()) {
             news.addSpecialEvent(SolarSystem.SpecialEvent.DisasterAverted);
         } else if (systemEvent == SolarSystem.SpecialEvent.ExperimentFailed) {
             news.addSpecialEvent(SolarSystem.SpecialEvent.ExperimentFailed);
@@ -468,7 +467,7 @@ public class InSystem extends GameState {
     private boolean canAffordNewspaper() {
         if (alreadyPaidForNewspaper) {
             return true;
-        } else return game.getCaptain().getAvailableCash() >= game.getNews().getPrice();
+        } else return captain.bank.getAvailableCash() >= game.getNews().getPrice();
     }
 
     public SolarSystem getSystem() {

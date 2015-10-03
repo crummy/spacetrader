@@ -51,7 +51,7 @@ public class Dragonfly extends Encounter {
 
     public Dragonfly(Game game, Transit transit) {
         super(game, transit);
-        opponent = new Ship(ShipType.Dragonfly, game);
+        opponent = new Ship(ShipType.Dragonfly, difficulty);
 
         int difficulty = game.getDifficulty().getValue();
         opponent.addCrew(new Crew(4 + difficulty, 6 + difficulty, 1, 6 + difficulty));
@@ -84,7 +84,7 @@ public class Dragonfly extends Encounter {
     @Override
     protected GameState destroyedOpponent() {
         game.getCaptain().killedAPirate();
-        game.setDragonflyStatus(com.malcolmcrum.spacetrader.Dragonfly.Destroyed);
+        quests.destroyedDragonfly();
         return transit;
     }
 }

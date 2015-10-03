@@ -21,7 +21,7 @@ public class Scarab extends Encounter {
 
     public Scarab(Game game, Transit transit) {
         super(game, transit);
-        opponent = new Ship(ShipType.Scarab, game);
+        opponent = new Ship(ShipType.Scarab, difficulty);
 
         int difficulty = game.getDifficulty().getValue();
         opponent.addCrew(new Crew(5 + difficulty, 6 + difficulty, 1, 6 + difficulty));
@@ -90,7 +90,7 @@ public class Scarab extends Encounter {
     @Override
     protected GameState destroyedOpponent() {
         game.getCaptain().killedAPirate();
-        game.setScarabStatus(com.malcolmcrum.spacetrader.Scarab.DestroyedUpgradeAvailable);
+        quests.destroyedScarab();
         return transit;
     }
 }

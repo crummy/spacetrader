@@ -19,9 +19,10 @@ public class GalaxyTest
 
     @BeforeClass
     public static void setUp() {
-        Game game = new Game();
-        game.startNewGame("Bob", 5, 5, 5, 5, Difficulty.Normal);
-        galaxy = new Galaxy(game);
+        Difficulty difficulty = Difficulty.Easy;
+        Captain captain = new Captain("Bob", 5, 5, 5, 5, new Game());
+        PlayerShip ship = new PlayerShip(ShipType.Beetle, new Quests(), difficulty);
+        galaxy = new Galaxy(captain, ship, difficulty);
     }
 
     @Test

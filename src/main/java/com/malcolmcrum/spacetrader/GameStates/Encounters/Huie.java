@@ -3,6 +3,8 @@ package com.malcolmcrum.spacetrader.GameStates.Encounters;
 import com.malcolmcrum.spacetrader.*;
 import com.malcolmcrum.spacetrader.GameStates.GameState;
 import com.malcolmcrum.spacetrader.GameStates.Transit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
@@ -12,6 +14,9 @@ import static com.malcolmcrum.spacetrader.Utils.Pluralize;
  * Created by Malcolm on 9/6/2015.
  */
 public class Huie extends FamousCaptain {
+    private static final Logger logger = LoggerFactory.getLogger(Huie.class);
+
+
     public Huie(Game game, Transit transit) {
         super(game, transit);
     }
@@ -42,7 +47,7 @@ public class Huie extends FamousCaptain {
                 .filter(s -> s == Weapon.MilitaryLaser)
                 .findAny();
         if (military.isPresent()) {
-            game.getShip().getShields().remove(military.get());
+            game.getShip().getWeapons().remove(military.get());
             if (game.getDifficulty() == Difficulty.Hard || game.getDifficulty() == Difficulty.Impossible) {
                 game.getCaptain().addEngineerSkills(1);
             } else {

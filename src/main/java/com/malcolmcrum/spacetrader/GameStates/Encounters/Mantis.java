@@ -36,9 +36,9 @@ public class Mantis extends Pirate {
 
     @Override
     public GameState actionSurrender() {
-        if (game.getArtifactOnBoard()) {
+        if (quests.isArtifactOnBoard()) {
             game.addAlert(Alert.ArtifactStolen);
-            game.setArtifactOnBoard(false);
+            quests.lostArtifact();
             return transit;
         } else {
             game.addAlert(Alert.NoSurrender);

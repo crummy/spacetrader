@@ -71,11 +71,11 @@ public class PoliceTest extends GameStateTest {
         Transit transit = new Transit(game, systemWithCops, false);
         Police encounter = new Police(game, transit);
 
-        int policeRecord = game.getCaptain().getPoliceRecordScore();
+        int policeRecord = game.getCaptain().policeRecord.getScore();
         int cargoSpace = game.getShip().getFreeCargoBays();
         GameState nextState = encounter.actionSubmit();
         assertTrue("no illegal goods", nextState == transit);
-        assertTrue("police score boost", game.getCaptain().getPoliceRecordScore() > policeRecord);
+        assertTrue("police score boost", game.getCaptain().policeRecord.getScore() > policeRecord);
         assertTrue("no cargo taken", game.getShip().getFreeCargoBays() == cargoSpace);
     }
 
@@ -92,12 +92,12 @@ public class PoliceTest extends GameStateTest {
         game.getShip().addCargo(TradeItem.Firearms, 1, 0);
         game.getShip().addCargo(TradeItem.Narcotics, 2, 0);
         int credits = game.getCaptain().getCredits();
-        int policeScore = game.getCaptain().getPoliceRecordScore();
+        int policeScore = game.getCaptain().policeRecord.getScore();
         GameState nextState = encounter.actionSubmit();
         assertTrue("after submission, return to transit", nextState == transit);
         assertTrue("lose money", game.getCaptain().getCredits() == credits - encounter.getIllegalGoodsFine());
         assertTrue("lose firearms", game.getShip().getCargoCount(TradeItem.Firearms) == 0);
         assertTrue("lose narcotics", game.getShip().getCargoCount(TradeItem.Narcotics) == 0);
-        assertTrue("lose police score", game.getCaptain().getPoliceRecordScore() < policeScore);
+        assertTrue("lose police score", game.getCaptain().policeRecord.getScore() < policeScore);
     }
 }

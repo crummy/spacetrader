@@ -96,18 +96,18 @@ public class InSystemTest extends GameStateTest {
         InSystem inSystem = new InSystem(game, game.getGalaxy().getRandomSystem());
         game.getCaptain().setEscapePod(true);
         inSystem.buyInsurance();
-        assertTrue("buy insurance", game.getBank().hasInsurance());
-        game.getBank().cancelInsurance();
+        assertTrue("buy insurance", game.getCaptain().bank.hasInsurance());
+        game.getCaptain().bank.cancelInsurance();
         game.getCaptain().setEscapePod(false);
         inSystem.buyInsurance();
-        assertFalse("can't buy insurance without escape pod", game.getBank().hasInsurance());
+        assertFalse("can't buy insurance without escape pod", game.getCaptain().bank.hasInsurance());
     }
 
     @Test
     public void testCancelInsurance() throws Exception {
         InSystem inSystem = new InSystem(game, game.getGalaxy().getRandomSystem());
         inSystem.cancelInsurance();
-        assertFalse(game.getBank().hasInsurance());
+        assertFalse(game.getCaptain().bank.hasInsurance());
     }
 
     @Test

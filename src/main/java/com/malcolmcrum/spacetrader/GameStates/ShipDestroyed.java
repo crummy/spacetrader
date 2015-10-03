@@ -10,11 +10,20 @@ import java.util.List;
  * Created by Malcolm on 9/2/2015.
  */
 public class ShipDestroyed extends GameState {
-    SolarSystem newSystem; // system we wake up on
+    final SolarSystem newSystem; // system we wake up on
+
+    private final Quests quests;
+    private final Captain captain;
+    private final PlayerShip ship;
+    private final Difficulty difficulty;
 
     public ShipDestroyed(Game game, SolarSystem newSystem) {
         super(game);
         this.newSystem = newSystem;
+        this.quests = game.getQuests();
+        this.captain = game.getCaptain();
+        this.ship = game.getShip();
+        this.difficulty = game.getDifficulty();
     }
 
     public List<Method> getActions() {
@@ -41,48 +50,47 @@ public class ShipDestroyed extends GameState {
     }
 
     public GameState escapeWithPod() {
-        if (game.getReactorStatus() != Reactor.Unavailable
-                && game.getReactorStatus() != Reactor.Delivered) {
+        if (quests.isReactorOnBoard()) {
             game.addAlert(Alert.ReactorDestroyed);
-            game.setReactorStatus(Reactor.Unavailable);
+            quests.lostReactor();
         }
-        if (game.getJaporiDiseaseStatus() == Japori.GoToJapori) {
+        if (quests.isAntidoteOnBoard()) {
             game.addAlert(Alert.AntidoteDestroyed);
-            game.setJaporiDiseaseStatus(Japori.NoDisease);
+            quests.lostAntidote();
         }
-        if (game.getArtifactOnBoard()) {
+        if (quests.isArtifactOnBoard()) {
             game.addAlert(Alert.ArtifactNotSaved);
-            game.setArtifactOnBoard(false);
+            quests.lostArtifact();
         }
-        if (game.getJarekStatus() == Jarek.OnBoard) {
+        if (quests.isJarekOnBoard()) {
             game.addAlert(Alert.JarekTakenHome);
-            game.setJarekStatus(Jarek.Unavailable);
+            quests.lostJarek();
         }
-        if (game.getWildStatus() == Wild.OnBoard) {
+        if (quests.isWildOnBoard()) {
             game.addAlert(Alert.WildArrested);
-            game.getCaptain().caughtWithWild();
+            captain.policeRecord.caughtWithWild();
             game.getNews().addNotableEvent(News.NotableEvent.WildArrested);
-            game.setWildStatus(Wild.Unavailable);
+            quests.lostWild();
         }
         if (game.getShip().getTribbles() > 0) {
             game.addAlert(Alert.TribbleSurvived);
             // unnecessary to set ship.tribbles = 0 I think
         }
-        if (game.getBank().hasInsurance()) {
+        if (captain.bank.hasInsurance()) {
             game.addAlert(Alert.InsurancePays);
-            int payout = game.getShip().getPriceWithoutCargo(true, true);
-            game.getCaptain().addCredits(payout);
+            int payout = ship.getPriceWithoutCargo(true, true);
+            captain.addCredits(payout);
         }
 
         game.addAlert(Alert.FleaBuilt);
 
-        game.getCaptain().subtractCredits(500); // Normally it costs 2000 for a flea. Hmm.
+        captain.subtractCredits(500); // Normally it costs 2000 for a flea. Hmm.
 
         game.dayPasses();
         game.dayPasses();
         game.dayPasses();
 
-        PlayerShip flea = new PlayerShip(ShipType.Flea, game);
+        PlayerShip flea = new PlayerShip(ShipType.Flea, quests, difficulty);
 
         game.setShip(flea);
 

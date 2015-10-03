@@ -52,13 +52,13 @@ public class Monster extends Encounter {
 
     public Monster(Game game, Transit transit) {
         super(game, transit);
-        opponent = new Ship(ShipType.SpaceMonster, game);
+        opponent = new Ship(ShipType.SpaceMonster, difficulty);
 
         int difficulty = game.getDifficulty().getValue();
         opponent.addCrew(new Crew(8 + difficulty, 8 + difficulty, 1, 1 + difficulty));
 
         // Monster continues health from previous encounter.
-        int savedHealth = game.getMonsterHullStrength();
+        int savedHealth = quests.getMonsterHullStrength();
         opponent.setHullStrength(savedHealth);
 
         if (game.getShip().isInvisibleTo(opponent)) {
@@ -107,7 +107,7 @@ public class Monster extends Encounter {
             } else {
                 game.addAlert(Alert.YouEscaped);
             }
-            game.setMonsterHullStrength(opponent.getHullStrength());
+            quests.setMonsterHullStrength(opponent.getHullStrength());
             return transit;
         }
 
@@ -117,7 +117,7 @@ public class Monster extends Encounter {
     @Override
     protected GameState destroyedOpponent() {
         game.getCaptain().killedAPirate();
-        game.setMonsterStatus(com.malcolmcrum.spacetrader.Monster.Destroyed);
+        quests.destroyedMonster();
         return transit;
     }
 }

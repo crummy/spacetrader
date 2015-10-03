@@ -1,9 +1,10 @@
-package com.malcolmcrum.spacetrader;
+package com.malcolmcrum.spacetrader.Serializers;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.malcolmcrum.spacetrader.Captain;
 
 import java.lang.reflect.Type;
 
@@ -23,8 +24,8 @@ public class CaptainSerializer implements JsonSerializer {
         json.addProperty("trader", captain.getTraderSkill());
         json.addProperty("engineer", captain.getEngineerSkill());
         json.addProperty("worth", captain.getWorth());
-        json.addProperty("reputation", captain.getReputationScore());
-        json.addProperty("policeRecord", captain.getPoliceRecordScore());
+        json.addProperty("reputation", captain.reputation.getScore());
+        json.addProperty("policeRecord", captain.policeRecord.getScore());
         json.addProperty("difficulty", "");
         json.addProperty("kills", captain.getKills());
         json.addProperty("cash", captain.getCredits());

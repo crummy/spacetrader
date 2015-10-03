@@ -93,10 +93,10 @@ public abstract class FamousCaptain extends Encounter {
 
     @Override
     protected GameState destroyedOpponent() {
-        if (!game.getCaptain().isDangerous()) {
-            game.getCaptain().makeDangerous();
+        if (!captain.reputation.is(Reputation.Status.Dangerous)) {
+            captain.reputation.make(Reputation.Status.Dangerous);
         } else {
-            game.getCaptain().addReputation(100);
+            captain.reputation.add(100);
         }
         return super.destroyedOpponent();
     }
@@ -105,9 +105,9 @@ public abstract class FamousCaptain extends Encounter {
     void initialAttack() {
         super.initialAttack();
 
-        if (game.getCaptain().isVillainous()) {
-            game.getCaptain().makeVillain();
+        if (!captain.policeRecord.is(PoliceRecord.Status.Villain)) {
+            captain.policeRecord.make(PoliceRecord.Status.Villain);
         }
-        game.getCaptain().attackedTrader();
+        captain.policeRecord.attackedTrader();
     }
 }

@@ -19,33 +19,20 @@ public class Game {
     private static final int MIN_POINTS_PER_SKILL = 1;
     public static final int MAX_TRIBBLES = 100000;
 
-    private Experiment experimentStatus;
-    private Monster monsterStatus;
-    private int fabricRipProbability;
-    private Scarab scarabStatus;
-    private Dragonfly dragonflyStatus;
-    private Invasion invasionStatus;
-    private Wild wildStatus;
     private int days;
-    private Japori japoriDiseaseStatus;
-    private Reactor reactorStatus;
 
     private Galaxy galaxy;
     private Captain captain;
     private PlayerShip ship;
     private SolarSystem currentSystem;
-    private Bank bank;
     private Difficulty difficulty = Difficulty.Normal;
     private News news;
     private RareEncounters rareEncounters;
     private List<Alert> unreadAlerts;
 
-    private boolean artifactOnBoard;
-    private Jarek jarekStatus;
-
-    private boolean trackAutoOff;
     private SolarSystem trackedSystem;
     private int monsterHull;
+    private Quests quests;
 
 
     public GameState startNewGame(String commanderName, int pilotSkill, int fighterSkill, int traderSkill, int engineerSkill, Difficulty difficulty) {
@@ -55,13 +42,12 @@ public class Game {
             return null;
         }
 
-        bank = new Bank(this);
-        captain = new Captain(this, commanderName, pilotSkill, fighterSkill, traderSkill, engineerSkill);
-        ship = new PlayerShip(ShipType.Gnat, this);
+        captain = new Captain(commanderName, pilotSkill, fighterSkill, traderSkill, engineerSkill, this);
+        ship = new PlayerShip(ShipType.Gnat, quests, difficulty);
         ship.addWeapon(Weapon.PulseLaser);
         ship.addCrew(captain);
 
-        galaxy = new Galaxy(this);
+        galaxy = new Galaxy(captain, ship, difficulty);
         news = new News(this);
         currentSystem = galaxy.getStartSystem(ship.getFuelCapacity());
 
@@ -72,16 +58,8 @@ public class Game {
             currentSystem.setSpecialEvent(SolarSystem.SpecialEvent.LotteryWinner);
         }
 
-        fabricRipProbability = 0;
-        experimentStatus = Experiment.NotStarted;
-        monsterStatus = Monster.Unavailable;
-        scarabStatus = Scarab.Unavailable;
-        dragonflyStatus = Dragonfly.Unavailable;
-        invasionStatus = Invasion.Unavailable;
-        wildStatus = Wild.Unavailable;
+        quests = new Quests();
         days = 0;
-        japoriDiseaseStatus = Japori.NoDisease;
-        reactorStatus = Reactor.Unavailable;
         monsterHull = ShipType.SpaceMonster.getHullStrength();
 
         return new InSystem(this, currentSystem);
@@ -91,82 +69,19 @@ public class Game {
         return galaxy.systems;
     }
 
-    public int getFabricRipProbability() {
-        return fabricRipProbability;
-    }
-
-    public Experiment getExperimentStatus() {
-        return experimentStatus;
-    }
-
-    public Monster getMonsterStatus() {
-        return monsterStatus;
-    }
-
-    public Scarab getScarabStatus() {
-        return scarabStatus;
-    }
-
-    public Dragonfly getDragonflyStatus() {
-        return dragonflyStatus;
-    }
-
-    public Invasion getInvasionStatus() {
-        return invasionStatus;
-    }
-
-    public Wild getWildStatus() {
-        return wildStatus;
-    }
-
-    public int getDays() {
-        return days;
-    }
-
-    public Japori getJaporiDiseaseStatus() {
-        return japoriDiseaseStatus;
-    }
-
-    public Reactor getReactorStatus() {
-        return reactorStatus;
-    }
-
     public void addAlert(Alert alert) {
         unreadAlerts.add(alert);
     }
 
-    public void setReactorStatus(Reactor reactorStatus) {
-        this.reactorStatus = reactorStatus;
-    }
-
-    public void setJaporiDiseaseStatus(Japori japoriDiseaseStatus) {
-        this.japoriDiseaseStatus = japoriDiseaseStatus;
-    }
-
-    public void setArtifactOnBoard(boolean artifactOnBoard) {
-        this.artifactOnBoard = artifactOnBoard;
-    }
-
-    public Object getJarekStatus() {
-        return jarekStatus;
-    }
-
-    public void setJarekStatus(Jarek jarekStatus) {
-        this.jarekStatus = jarekStatus;
-    }
-
-    public void setWildStatus(Wild wildStatus) {
-        this.wildStatus = wildStatus;
-    }
-
     public void dayPasses() {
-        bank.payInterest();
-        if (bank.hasInsurance()) {
-            bank.incrementNoClaim();
+        captain.bank.payInterest();
+        if (captain.bank.hasInsurance()) {
+            captain.bank.incrementNoClaim();
         }
         days++;
     }
 
+    // TODO: consider moving captain, too.
     public void setShip(PlayerShip ship) {
         this.ship = ship;
     }
@@ -216,44 +131,15 @@ public class Game {
         return rareEncounters;
     }
 
-
-    public boolean getTrackAutoOff() {
-        return trackAutoOff;
-    }
-
     public SolarSystem getTrackedSystem() {
         return trackedSystem;
     }
 
-    public void setTrackedSystem(SolarSystem trackedSystem) {
-        this.trackedSystem = trackedSystem;
+    public Quests getQuests() {
+        return quests;
     }
 
-    public void setMonsterStatus(Monster monsterStatus) {
-        this.monsterStatus = monsterStatus;
-    }
-
-    public void setDragonflyStatus(Dragonfly dragonflyStatus) {
-        this.dragonflyStatus = dragonflyStatus;
-    }
-
-    public void setScarabStatus(Scarab scarabStatus) {
-        this.scarabStatus = scarabStatus;
-    }
-
-    public int getMonsterHullStrength() {
-        return monsterHull;
-    }
-
-    public void setMonsterHullStrength(int monsterHullStrength) {
-        this.monsterHull = monsterHullStrength;
-    }
-
-    public boolean getArtifactOnBoard() {
-        return artifactOnBoard;
-    }
-
-    public Bank getBank() {
-        return bank;
+    public int getDays() {
+        return days;
     }
 }

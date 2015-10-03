@@ -44,9 +44,9 @@ public class Trader extends Encounter {
         // If player is cloaked, they don't see him, and ignore
         if (game.getShip().isInvisibleTo(opponent)) {
             opponentStatus = Status.Ignoring;
-        } else if (game.getCaptain().isCriminal()) {
+        } else if (captain.policeRecord.is(PoliceRecord.Status.Criminal)) {
             // If you're a criminal with significant reputation, traders tend to flee
-            if (GetRandom(game.getCaptain().getEliteScore()) <= (game.getCaptain().getReputationScore() * 10) / (1 + opponent.getType().ordinal())) {
+            if (GetRandom(captain.reputation.getEliteScore()) <= (captain.reputation.getScore() * 10) / (1 + opponent.getType().ordinal())) {
                 opponentStatus = Status.Fleeing;
             }
         }
@@ -64,10 +64,10 @@ public class Trader extends Encounter {
             }
 
             // Criminals can only buy or sell illegal goods, noncriminals cannot buy or sell illegal goods.
-            if (foundItem && game.getCaptain().isDubious()
+            if (foundItem && captain.policeRecord.is(PoliceRecord.Status.Dubious)
                     && (item == TradeItem.Narcotics || item == TradeItem.Firearms)) {
                 return true;
-            } else if (foundItem && !game.getCaptain().isDubious()
+            } else if (foundItem && !captain.policeRecord.is(PoliceRecord.Status.Dubious)
                     && item != TradeItem.Narcotics && item != TradeItem.Firearms) {
                 return true;
             }
@@ -225,7 +225,7 @@ public class Trader extends Encounter {
             // if the player is criminal, the good must be illegal
             // if the player is not criminal, the good must be legal
             boolean isLegal = item != TradeItem.Firearms && item != TradeItem.Narcotics;
-            boolean playerIsDubious = game.getCaptain().isDubious();
+            boolean playerIsDubious = captain.policeRecord.is(PoliceRecord.Status.Dubious);
             if (isBuying) {
                 boolean playerHasCargo = game.getShip().getCargoCount(item) > 0;
                 boolean systemIsBuying = game.getCurrentSystem().getMarket().isBuying(item);
@@ -244,7 +244,7 @@ public class Trader extends Encounter {
         // this routine is only called if there are tradeable goods.
         for (TradeItem item : TradeItem.values()) {
             boolean isLegal = item != TradeItem.Firearms && item != TradeItem.Narcotics;
-            boolean playerIsDubious = game.getCaptain().isDubious();
+            boolean playerIsDubious = captain.policeRecord.is(PoliceRecord.Status.Dubious);
             if (isBuying) {
                 boolean playerHasCargo = game.getShip().getCargoCount(item) > 0;
                 boolean systemIsBuying = game.getCurrentSystem().getMarket().isBuying(item);

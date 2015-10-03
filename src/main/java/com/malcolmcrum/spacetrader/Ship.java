@@ -26,10 +26,10 @@ public class Ship {
     protected List<Crew> crew;
 
     protected int hullStrength;
-    final Game game;
+    protected final Difficulty difficulty;
 
-    public Ship(ShipType type, Game game) {
-        this.game = game;
+    public Ship(ShipType type, Difficulty difficulty) {
+        this.difficulty = difficulty;
         this.type = type;
         cargo = new ArrayList<>(type.getCargoBays());
         weapons = new ArrayList<>(type.getWeaponSlots());
@@ -103,20 +103,12 @@ public class Ship {
         return cargo.size();
     }
 
-    private int totalCargoBays() {
+    protected int totalCargoBays() {
         int bays = type.getCargoBays();
         for (Gadget gadget : gadgets) {
             if (gadget == Gadget.CargoBays) {
                 bays += 5;
             }
-        }
-        if (game.getJaporiDiseaseStatus() == Japori.GoToJapori) {
-            bays -= 10;
-        }
-        // since the quest ends when the reactor [?]
-        if (game.getReactorStatus() != Reactor.Unavailable
-                && game.getReactorStatus() != Reactor.Delivered) {
-            bays -= (5 + 10 - (game.getReactorStatus().getValue() - 1)/2);
         }
         return bays;
     }
@@ -127,9 +119,6 @@ public class Ship {
                 .max()
                 .getAsInt();
 
-        if (game.getJarekStatus() == Jarek.Delivered) {
-            ++maxSkill;
-        }
         return applyDifficultyModifierToSkill(maxSkill);
     }
 
@@ -175,11 +164,10 @@ public class Ship {
         return applyDifficultyModifierToSkill(maxSkill);
     }
 
-    private int applyDifficultyModifierToSkill(int level) {
-        Difficulty d = game.getDifficulty();
-        if (d == Difficulty.Beginner || d == Difficulty.Easy) {
+    protected int applyDifficultyModifierToSkill(int level) {
+        if (difficulty == Difficulty.Beginner || difficulty == Difficulty.Easy) {
             return level + 1;
-        } else if (d == Difficulty.Impossible) {
+        } else if (difficulty == Difficulty.Impossible) {
             return Math.max(1, level - 1);
         } else {
             return level;

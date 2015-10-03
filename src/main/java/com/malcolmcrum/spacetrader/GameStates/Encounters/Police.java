@@ -22,30 +22,32 @@ public class Police extends Encounter {
 
     public Police(Game game, Transit transit) {
         super(game, transit);
-        if (game.getShip().isInvisibleTo(opponent)) {
+        if (ship.isInvisibleTo(opponent)) {
             opponentStatus = Status.Ignoring;
-        } else if (game.getCaptain().isDubious()) {
+        } else if (captain.policeRecord.is(PoliceRecord.Status.Dubious)) {
             if (opponent.weaponStrength() == 0) {
-                if (opponent.isInvisibleTo(game.getShip())) {
+                if (opponent.isInvisibleTo(ship)) {
                     opponentStatus = Status.Ignoring;
                 } else {
                     opponentStatus = Status.Fleeing;
                 }
             }
-            if (!game.getCaptain().isAverage()) {
+            if (!captain.reputation.is(Reputation.Status.Average)) {
                 opponentStatus = Status.Attacking;
-            } else if (GetRandom(game.getCaptain().getEliteScore()) > (game.getCaptain().getReputationScore() / (1 + opponent.getType().ordinal()))) {
+            } else if (GetRandom(captain.reputation.getEliteScore()) > (captain.reputation.getScore() / (1 + opponent.getType().ordinal()))) {
                 opponentStatus = Status.Attacking;
-            } else if (opponent.isInvisibleTo(game.getShip())) {
+            } else if (opponent.isInvisibleTo(ship)) {
                 opponentStatus = Status.Ignoring;
             } else {
                 opponentStatus = Status.Fleeing;
             }
-        } else if (!game.getCaptain().isDubious() && !game.getCaptain().isClean() && transit.hasBeenInspected()) {
+        } else if (!captain.policeRecord.is(PoliceRecord.Status.Dubious)
+                && !captain.policeRecord.is(PoliceRecord.Status.Clean)
+                && transit.hasBeenInspected()) {
             opponentStatus = Status.Awake;
             transit.policeInspectedPlayer();
-        } else if (!game.getCaptain().isLawful()) {
-            if (GetRandom(12 - game.getDifficulty().getValue()) < 1 && !transit.hasBeenInspected()) {
+        } else if (!captain.policeRecord.is(PoliceRecord.Status.Lawful)) {
+            if (GetRandom(12 - difficulty.getValue()) < 1 && !transit.hasBeenInspected()) {
                 opponentStatus = Status.Awake;
                 transit.policeInspectedPlayer();
             }
@@ -57,8 +59,8 @@ public class Police extends Encounter {
         }
 
         // Police don't flee if your ship is weaker.
-        if (opponentStatus == Status.Fleeing && opponent.getType().ordinal() > game.getShip().getType().ordinal()) {
-            if (game.getCaptain().isDubious()) {
+        if (opponentStatus == Status.Fleeing && opponent.getType().ordinal() > ship.getType().ordinal()) {
+            if (captain.policeRecord.is(PoliceRecord.Status.Dubious)) {
                 opponentStatus = Status.Attacking;
             } else {
                 opponentStatus = Status.Awake;
@@ -68,7 +70,7 @@ public class Police extends Encounter {
 
     @Override
     public GameState init() {
-        if (opponentStatus == Status.Ignoring && opponent.isInvisibleTo(game.getShip())) {
+        if (opponentStatus == Status.Ignoring && opponent.isInvisibleTo(ship)) {
             return transit;
         }
         return this;
@@ -112,27 +114,27 @@ public class Police extends Encounter {
     }
 
     public GameState actionSubmit() {
-        int drugs = game.getShip().getCargoCount(TradeItem.Narcotics);
-        int guns = game.getShip().getCargoCount(TradeItem.Firearms);
+        int drugs = ship.getCargoCount(TradeItem.Narcotics);
+        int guns = ship.getCargoCount(TradeItem.Firearms);
         if (drugs > 0 || guns > 0) {
             // caught with illegal goods
             game.addAlert(Alert.FinedAndLostCargo);
-            game.getShip().removeCargo(TradeItem.Narcotics, drugs);
-            game.getShip().removeCargo(TradeItem.Firearms, guns);
-            game.getCaptain().subtractCredits(getIllegalGoodsFine());
-            game.getCaptain().caughtTrafficking();
-        } else if (game.getWildStatus() != Wild.OnBoard) {
+            ship.removeCargo(TradeItem.Narcotics, drugs);
+            ship.removeCargo(TradeItem.Firearms, guns);
+            captain.subtractCredits(getIllegalGoodsFine());
+            captain.policeRecord.caughtTrafficking();
+        } else if (!quests.isWildOnBoard()) {
             // no illegal goods
             game.addAlert(Alert.NoIllegalGoods);
-            game.getCaptain().passedInspection();
+            captain.policeRecord.passedInspection();
         }
-        if (game.getWildStatus() == Wild.OnBoard) {
+        if (quests.isWildOnBoard()) {
             arrestPlayer();
             return new InSystem(game, transit.getDestination());
         }
-        if (game.getReactorStatus() != Reactor.Unavailable && game.getReactorStatus() != Reactor.Delivered) {
+        if (quests.isReactorOnBoard()) {
             game.addAlert(Alert.PoliceConfiscateReactorAlert);
-            game.setReactorStatus(Reactor.Unavailable);
+            quests.lostReactor();
         }
         return transit;
     }
@@ -154,11 +156,11 @@ public class Police extends Encounter {
                 && opponentStatus == Status.Awake) {
             game.addAlert(Alert.SureToFleeOrBribe);
         }
-        if (!game.getCaptain().isCriminal()) {
+        if (!game.getCaptain().policeRecord.is(PoliceRecord.Status.Criminal)) {
             game.addAlert(Alert.AttackedPoliceNowCriminal);
-            game.getCaptain().makeCriminal();
+            game.getCaptain().policeRecord.make(PoliceRecord.Status.Criminal);
         }
-        game.getCaptain().attackedPolice();
+        game.getCaptain().policeRecord.attackedPolice();
     }
 
     @Override
@@ -173,7 +175,7 @@ public class Police extends Encounter {
 
     @Override
     protected String descriptionAwake() {
-        if (game.getCaptain().isCriminal()) {
+        if (game.getCaptain().policeRecord.is(PoliceRecord.Status.Criminal)) {
             return "The police hail they want you to surrender.";
         } else {
             return "The police summon you to submit to an inspection.";
@@ -184,14 +186,12 @@ public class Police extends Encounter {
     public GameState actionFlee() throws InvalidPlayerAction, InvalidOpponentAction {
         boolean hasNarcotics = game.getShip().getCargoCount(TradeItem.Narcotics) > 0;
         boolean hasFirearms = game.getShip().getCargoCount(TradeItem.Firearms) > 0;
-        boolean hasWild = game.getWildStatus() == Wild.OnBoard;
-        boolean hasReactor = game.getReactorStatus() != Reactor.Unavailable && game.getReactorStatus() != Reactor.Delivered;
-        if (!hasNarcotics && !hasFirearms && !hasWild && !hasReactor) {
+        if (!hasNarcotics && !hasFirearms && !quests.isWildOnBoard() && !quests.isReactorOnBoard()) {
             game.addAlert(Alert.SureToFleeOrBribe);
         }
 
         opponentStatus = Status.Attacking;
-        game.getCaptain().fledPolice();
+        captain.policeRecord.fledPolice();
 
         return super.actionFlee();
     }
@@ -207,7 +207,7 @@ public class Police extends Encounter {
      */
     protected void opponentHasBeenDamaged() {
         if (opponent.getHullStrength() < opponent.getFullHullStrength() >> 1) {
-            if (game.getShip().getHullStrength() < game.getShip().getFullHullStrength() >> 1) {
+            if (ship.getHullStrength() < ship.getFullHullStrength() >> 1) {
                 if (GetRandom(10) > 5) {
                     opponentStatus = Status.Fleeing;
                 }
@@ -218,15 +218,15 @@ public class Police extends Encounter {
     }
 
     public GameState actionSurrender() {
-        if (game.getCaptain().isPsychopathic()) {
+        if (captain.policeRecord.is(PoliceRecord.Status.Psychopath)) {
             game.addAlert(Alert.NoSurrender);
             return this;
         }
 
-        if (game.getWildStatus() == Wild.OnBoard) {
+        if (quests.isWildOnBoard()) {
             game.addAlert(Alert.SurrenderWithWild);
         }
-        if (game.getReactorStatus() != Reactor.Unavailable && game.getReactorStatus() != Reactor.Delivered) {
+        if (quests.isReactorOnBoard()) {
             game.addAlert(Alert.SurrenderWithReactor);
         }
 
@@ -238,19 +238,19 @@ public class Police extends Encounter {
         if (transit.getDestination().getPolitics().getBribeLevel() == BribeLevel.Impossible) {
             game.addAlert(Alert.BribeNotPossible);
             return this;
-        } else if (game.getCaptain().getCredits() < getBribeCost()) {
+        } else if (captain.getCredits() < getBribeCost()) {
             game.addAlert(Alert.NoMoneyForBribe);
             return this;
         } else {
-            game.getCaptain().subtractCredits(getBribeCost());
+            captain.subtractCredits(getBribeCost());
             return transit;
         }
     }
 
-    private void arrestPlayer() {
-        int policeRecordScore = game.getCaptain().getPoliceRecordScore();
-        int fine = (1 + (((game.getCaptain().getWorth() * Math.min(80, -policeRecordScore)) / 100) / 500)) * 500;
-        if (game.getWildStatus() == Wild.OnBoard) {
+    protected void arrestPlayer() {
+        int policeRecordScore = captain.policeRecord.getScore();
+        int fine = (1 + (((captain.getWorth() * Math.min(80, -policeRecordScore)) / 100) / 500)) * 500;
+        if (quests.isWildOnBoard()) {
             fine *= 1.05;
         }
 
@@ -268,9 +268,9 @@ public class Police extends Encounter {
             game.getShip().removeCargo(TradeItem.Firearms, firearmsOnBoard);
         }
 
-        if (game.getBank().hasInsurance()) {
+        if (captain.bank.hasInsurance()) {
             game.addAlert(Alert.InsuranceLost);
-            game.getBank().cancelInsurance();
+            captain.bank.cancelInsurance();
         }
 
         if (game.getShip().getMercenaryCount() > 0) {
@@ -278,51 +278,51 @@ public class Police extends Encounter {
             game.getShip().removeAllMercenaries();
         }
 
-        if (game.getJaporiDiseaseStatus() == Japori.GoToJapori) {
+        if (quests.isAntidoteOnBoard()) {
             game.addAlert(Alert.AntidoteRemoved);
-            game.setJaporiDiseaseStatus(Japori.FinishedOrCancelled);
+            quests.cancelJapori();
         }
 
-        if (game.getJarekStatus() == Jarek.OnBoard) {
+        if (quests.isJarekOnBoard()) {
             game.addAlert(Alert.JarekTakenHome);
-            game.setJarekStatus(Jarek.Unavailable);
+            quests.jarekLeft();
         }
 
-        if (game.getWildStatus() == Wild.OnBoard) {
+        if (quests.isWildOnBoard()) {
             game.addAlert(Alert.WildArrested);
             game.getNews().addNotableEvent(News.NotableEvent.WildArrested);
-            game.setWildStatus(Wild.Unavailable);
+            quests.wildArrested();
         }
 
-        if (game.getReactorStatus() != Reactor.Unavailable && game.getReactorStatus() != Reactor.Delivered) {
+        if (quests.isReactorOnBoard()) {
             game.addAlert(Alert.PoliceConfiscateReactorAlert);
-            game.setReactorStatus(Reactor.Unavailable);
+            quests.lostReactor();
         }
 
-        int credits = game.getCaptain().getCredits();
+        int credits = captain.getCredits();
         if (credits >= fine) {
-            game.getCaptain().subtractCredits(fine);
+            captain.subtractCredits(fine);
         } else {
-            game.getCaptain().subtractCredits(credits);
+            captain.subtractCredits(credits);
             game.addAlert(Alert.ShipSold);
-            if (game.getShip().getTribbles() > 0) {
+            if (ship.getTribbles() > 0) {
                 game.addAlert(Alert.TribblesSold);
             }
             game.addAlert(Alert.FleaRecieved);
-            game.setShip(new PlayerShip(ShipType.Flea, game));
+            game.setShip(new PlayerShip(ShipType.Flea, quests, difficulty));
         }
 
-        game.getCaptain().makeDubious();
+        captain.policeRecord.make(PoliceRecord.Status.Dubious);
 
-        credits = game.getCaptain().getCredits();
-        int debt = game.getBank().getDebt();
+        credits = captain.getCredits();
+        int debt = captain.bank.getDebt();
         if (debt > 0) {
             if (credits >= debt) {
-                game.getCaptain().subtractCredits(debt);
-                game.getBank().setDebt(0);
+                captain.subtractCredits(debt);
+                captain.bank.setDebt(0);
             } else {
-                game.getBank().setDebt(debt - credits);
-                game.getCaptain().subtractCredits(credits);
+                captain.bank.setDebt(debt - credits);
+                captain.subtractCredits(credits);
             }
         }
 
@@ -336,9 +336,9 @@ public class Police extends Encounter {
     // be a psychopath (or are transporting Jonathan Wild)
     @Override
     protected int getShipTypeTries() {
-        if (game.getCaptain().isVillainous() && game.getWildStatus() != Wild.OnBoard) {
+        if (captain.policeRecord.is(PoliceRecord.Status.Villain) && !quests.isWildOnBoard()) {
             return 3;
-        } else if (game.getCaptain().isPsychopathic() || game.getWildStatus() == Wild.OnBoard) {
+        } else if (captain.policeRecord.is(PoliceRecord.Status.Psychopath) || quests.isWildOnBoard()) {
             return 5;
         } else {
             return super.getShipTypeTries();
@@ -347,13 +347,13 @@ public class Police extends Encounter {
 
     @Override
     protected boolean shipTypeAcceptable(ShipType betterShip) {
-        int difficulty = game.getDifficulty().getValue();
+        int difficultyValue = difficulty.getValue();
         int normal = Difficulty.Normal.ordinal();
         if (betterShip.getMinStrengthForPirateEncounter() == null) {
             return false;
         }
         int shipLevel = betterShip.getMinStrengthForPoliceEncounter().getStrength();
-        int difficultyModifier = (game.getDifficulty() == Difficulty.Hard || game.getDifficulty() == Difficulty.Impossible) ? difficulty - normal : 0;
+        int difficultyModifier = (difficulty == Difficulty.Hard || difficulty == Difficulty.Impossible) ? difficultyValue - normal : 0;
         int destinationRequirement = transit.getDestination().getPoliceStrength().getStrength();
         return destinationRequirement + difficultyModifier >= shipLevel;
     }
@@ -365,16 +365,15 @@ public class Police extends Encounter {
     }
 
     public int getBribeCost() {
-        int difficultyModifier = Difficulty.Impossible.getValue() - game.getDifficulty().getValue();
+        int difficultyModifier = Difficulty.Impossible.getValue() - difficulty.getValue();
         int bribeDifficultyModifier = transit.getDestination().getPolitics().getBribeLevel().getValue();
-        int bribe = game.getCaptain().getWorth() / ((10 + 5 * difficultyModifier) * bribeDifficultyModifier);
+        int bribe = captain.getWorth() / ((10 + 5 * difficultyModifier) * bribeDifficultyModifier);
         if (bribe % 100 != 0) {
             bribe += (100 - (bribe % 100));
         }
-        boolean hasWild = game.getWildStatus() == Wild.OnBoard;
-        boolean hasReactor = game.getReactorStatus() != Reactor.Unavailable && game.getReactorStatus() != Reactor.Delivered;
-        if (hasWild || hasReactor) {
-            if (game.getDifficulty() == Difficulty.Hard || game.getDifficulty() == Difficulty.Impossible) {
+
+        if (quests.isWildOnBoard() || quests.isReactorOnBoard()) {
+            if (difficulty == Difficulty.Hard || difficulty == Difficulty.Impossible) {
                 bribe *= 3;
             } else {
                 bribe *= 2;
@@ -386,8 +385,8 @@ public class Police extends Encounter {
     }
 
     public int getIllegalGoodsFine() {
-        int difficultyModifier = Difficulty.Impossible.getValue() + 2 - game.getDifficulty().getValue();
-        int fine = game.getCaptain().getWorth() / (difficultyModifier * 10);
+        int difficultyModifier = Difficulty.Impossible.getValue() + 2 - difficulty.getValue();
+        int fine = captain.getWorth() / (difficultyModifier * 10);
         if (fine % 50 != 0) {
             fine += (50 - (fine % 50));
         }

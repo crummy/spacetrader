@@ -32,20 +32,30 @@ public abstract class Encounter extends GameState {
     boolean playerWasHit;
     int tribblesOnScreen;
 
+    protected final Captain captain;
+    protected final Quests quests;
+    protected final PlayerShip ship;
+    protected final Difficulty difficulty;
+
     Encounter(Game game, Transit transit) {
         super(game);
+        this.captain = game.getCaptain();
+        this.quests = game.getQuests();
+        this.ship = game.getShip();
+        this.difficulty = game.getDifficulty();
+
         transit.setHadEncounter(true);
         this.transit = transit;
         this.isPlayerFleeing = false;
         this.playerWasHit = false;
-        this.tribblesOnScreen = getTribbles();;
+        this.tribblesOnScreen = getTribbles();
         this.opponentStatus = Status.Awake;
 
         int tries = getShipTypeTries();
 
         ShipType shipType = chooseShipType(tries);
 
-        opponent = new Ship(shipType, game);
+        opponent = new Ship(shipType, game.getDifficulty());
 
         tries = getEquipmentTries();
 
@@ -257,7 +267,7 @@ public abstract class Encounter extends GameState {
         } else if (opponent.isDestroyed()) {
             game.addAlert(Alert.OpponentDestroyed);
             opponentStatus = Status.Destroyed;
-            game.getCaptain().addReputation(opponent.reputationGainForKilling());
+            game.getCaptain().reputation.add(opponent.reputationGainForKilling());
             return destroyedOpponent();
         }
         if (opponentStatus == Status.Fled) {
@@ -306,7 +316,7 @@ public abstract class Encounter extends GameState {
         int damage = GetRandom(attacker.weaponStrength() * (100 + 2 * attacker.getEngineerSkill()) / 100);
 
         // If reactor on board -- damage is boosted!
-        if (defenderIsPlayer && game.getReactorStatus() != Reactor.Unavailable && game.getReactorStatus() != Reactor.Delivered) {
+        if (defenderIsPlayer && game.getQuests().isReactorOnBoard()) {
             if (difficulty == Difficulty.Beginner || difficulty == Difficulty.Easy) {
                 damage *= 1 + (difficulty.getValue() + 1) * 0.25;
             } else {
@@ -361,7 +371,7 @@ public abstract class Encounter extends GameState {
         int traderSkill = 1 + GetRandom(Game.MAX_POINTS_PER_SKILL);
         int engineerSkill = 1 + GetRandom(Game.MAX_POINTS_PER_SKILL);
         int difficulty = game.getDifficulty().getValue();
-        if (transit.getDestination().getType() == SolarSystem.Name.Kravat && game.getWildStatus() == Wild.OnBoard && GetRandom(10) < difficulty + 1) {
+        if (transit.getDestination().getType() == SolarSystem.Name.Kravat && game.getQuests().isWildOnBoard() && GetRandom(10) < difficulty + 1) {
             engineerSkill = Game.MAX_POINTS_PER_SKILL;
         }
         opponent.addCrew(new Crew(pilotSkill, fighterSkill, traderSkill, engineerSkill));

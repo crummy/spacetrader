@@ -21,6 +21,9 @@ public class Transit extends GameState {
 
     private final SolarSystem origin;
     private SolarSystem destination;
+    private final Quests quests;
+    private final Captain captain;
+    private final Difficulty difficulty;
 
     private boolean possibleToGoThroughRip;
     private boolean beenRaided;
@@ -31,10 +34,15 @@ public class Transit extends GameState {
     private boolean litterWarning;
     private boolean hadEncounter;
     private boolean justLootedMarie;
+    private final PlayerShip ship;
 
     public Transit(Game game, SolarSystem destination, boolean viaSingularity) {
         super(game);
         origin = game.getCurrentSystem();
+        this.quests = game.getQuests();
+        this.ship = game.getShip();
+        this.captain = game.getCaptain();
+        this.difficulty = game.getDifficulty();
         this.destination = destination;
         this.destination.getMarket().determinePrices();
         this.possibleToGoThroughRip = true;
@@ -51,25 +59,20 @@ public class Transit extends GameState {
         beenInspected = false;
         litterWarning = false;
 
-        game.setMonsterHullStrength((game.getMonsterHullStrength() * 105)/100);
-        if (game.getMonsterHullStrength() > ShipType.SpaceMonster.getHullStrength()) {
-            game.setMonsterHullStrength(ShipType.SpaceMonster.getHullStrength());
-        }
+        quests.healMonster();
 
-        if (game.getDays() % 3 == 0 && game.getCaptain().isClean()) {
-            game.getCaptain().addPoliceScore(-1);
-        } else if (game.getCaptain().isDubious()){
-            Difficulty d = game.getDifficulty();
-            if (d == Difficulty.Beginner || d == Difficulty.Easy || d == Difficulty.Normal) {
-                game.getCaptain().addPoliceScore(1);
-            } else if (game.getDays() % d.getValue() == 0) {
-                game.getCaptain().addPoliceScore(1);
+        if (game.getDays() % 3 == 0 && captain.policeRecord.is(PoliceRecord.Status.Clean)) {
+            captain.policeRecord.add(-1);
+        } else if (captain.policeRecord.is(PoliceRecord.Status.Dubious)){
+            if (difficulty == Difficulty.Beginner || difficulty == Difficulty.Easy || difficulty == Difficulty.Normal) {
+                captain.policeRecord.add(1);
+            } else if (game.getDays() % difficulty.getValue() == 0) {
+                captain.policeRecord.add(1);
             }
         }
 
-        int fabricRipProbability = game.getFabricRipProbability();
-        if (game.getExperimentStatus() == Experiment.Performed
-                && fabricRipProbability > 0) {
+        int fabricRipProbability = quests.getFabricRipProbability();
+        if (quests.experimentPerformed() && fabricRipProbability > 0) {
             if (GetRandom(100) < fabricRipProbability || fabricRipProbability == 25) {
                 game.addAlert(Alert.FlyInFabricRip);
                 this.destination = game.getGalaxy().getRandomSystem();
@@ -96,20 +99,20 @@ public class Transit extends GameState {
     public GameState travel() {
         --clicksRemaining;
         while (clicksRemaining > 0) {
-            int engineerSkill = game.getShip().getEngineerSkill();
+            int engineerSkill = ship.getEngineerSkill();
             int repairsAmount = GetRandom(engineerSkill) >> 1;
-            game.getShip().repair(repairsAmount);
+            ship.repair(repairsAmount);
 
             boolean spaceMonsterEncounter = clicksRemaining == 1
                     && destination.getType() == SolarSystem.Name.Acamar
-                    && game.getMonsterStatus() == com.malcolmcrum.spacetrader.Monster.InAcamar;
+                    && quests.monsterInAcamar();
             if (spaceMonsterEncounter) {
                 return new Monster(game, this);
             }
 
             boolean scarabEncounter = clicksRemaining == 20
                     && destination.getSpecialEvent() == SolarSystem.SpecialEvent.ScarabDestroyed
-                    && game.getScarabStatus() == com.malcolmcrum.spacetrader.Scarab.Alive
+                    && quests.isScarabAlive()
                     && arrivedViaWormhole;
             if (scarabEncounter) {
                 return new Scarab(game, this);
@@ -117,14 +120,14 @@ public class Transit extends GameState {
 
             boolean dragonflyEncounter = clicksRemaining == 1
                     && destination.getType() == SolarSystem.Name.Zalkon
-                    && game.getDragonflyStatus() == com.malcolmcrum.spacetrader.Dragonfly.GoToZalkon;
+                    && quests.isDragonflyAt(SolarSystem.Name.Zalkon);
             if (dragonflyEncounter) {
                 return new Dragonfly(game, this);
             }
 
             boolean encounterMantis = false;
             if (destination.getType() == SolarSystem.Name.Gemulon
-                    && game.getInvasionStatus() != Invasion.TooLate
+                    && quests.isInvasionTooLate() // TODO: should this be negated?
                     && GetRandom(10) > 4) {
                 encounterMantis = true;
             }
@@ -145,8 +148,7 @@ public class Transit extends GameState {
                 encounterPolice = true;
             } else if (encounterTest < destination.getPirateStrength().getStrength() + policeStrength() + destination.getTraderStrength().getStrength()) {
                 encounterTrader = true;
-            } else if (game.getWildStatus() == Wild.OnBoard
-                    && destination.getType() == SolarSystem.Name.Kravat) {
+            } else if (quests.isWildOnBoard() && destination.getType() == SolarSystem.Name.Kravat) {
                 // if you're coming in to Kravat & you have Wild onboard, there'll be swarms o' cops.
                 int rareEncounter = GetRandom(100);
                 if (game.getDifficulty() == Difficulty.Beginner || game.getDifficulty() == Difficulty.Easy
@@ -195,41 +197,41 @@ public class Transit extends GameState {
                         }
                         break;
                     case 1:
-                        if (game.getShip().hasShield(ShieldType.ReflectiveShield)
-                                && game.getCaptain().getPilotSkill() < 10
-                                && !game.getCaptain().isCriminal()
-                                && !game.getRareEncounters().ahab()) {
-                            game.getRareEncounters().encounteredAhab();
+                        if (ship.hasShield(ShieldType.ReflectiveShield)
+                                && captain.getPilotSkill() < 10
+                                && !captain.policeRecord.is(PoliceRecord.Status.Criminal)
+                                && !game.getRareEncounters().hasEncounteredAhab()) {
+                            game.getRareEncounters().justEncounteredAhab();
                             return new Ahab(game, this);
                         }
                         break;
                     case 2:
-                        if (game.getShip().hasWeapon(Weapon.MilitaryLaser)
-                                && game.getCaptain().getTraderSkill() < 10
-                                && !game.getCaptain().isCriminal()
-                                && !game.getRareEncounters().conrad()) {
-                            game.getRareEncounters().encounteredConrad();
+                        if (ship.hasWeapon(Weapon.MilitaryLaser)
+                                && captain.getTraderSkill() < 10
+                                && !captain.policeRecord.is(PoliceRecord.Status.Criminal)
+                                && !game.getRareEncounters().hasEncounteredConrad()) {
+                            game.getRareEncounters().justEncounteredConrad();
                             return new Conrad(game, this);
                         }
                         break;
                     case 3:
-                        if (game.getShip().hasWeapon(Weapon.MilitaryLaser)
-                                && game.getCaptain().getTraderSkill() < 10
-                                && !game.getCaptain().isCriminal()
-                                && !game.getRareEncounters().huie()) {
-                            game.getRareEncounters().encounteredHuie();
+                        if (ship.hasWeapon(Weapon.MilitaryLaser)
+                                && captain.getTraderSkill() < 10
+                                && !captain.policeRecord.is(PoliceRecord.Status.Criminal)
+                                && !game.getRareEncounters().hasEncounteredHuie()) {
+                            game.getRareEncounters().justEncounteredHuie();
                             return new Huie(game, this);
                         }
                         break;
                     case 4:
-                        if (!game.getRareEncounters().oldBottle()) {
-                            game.getRareEncounters().encounteredOldBottle();
+                        if (!game.getRareEncounters().hasEncounteredOldBottle()) {
+                            game.getRareEncounters().justEncounteredOldBottle();
                             return new OldBottle(game, this);
                         }
                         break;
                     case 5:
-                        if (!game.getRareEncounters().goodBottle()) {
-                            game.getRareEncounters().encounteredGoodBottle();
+                        if (!game.getRareEncounters().hasEncounteredGoodBottle()) {
+                            game.getRareEncounters().justEncounteredGoodBottle();
                             return new GoodBottle(game, this);
                         }
                         break;
@@ -258,9 +260,9 @@ public class Transit extends GameState {
      * @return PoliceStrength for a system, modified by criminal score
      */
     private int policeStrength() {
-        if (game.getCaptain().isPsychopathic()) {
+        if (captain.policeRecord.is(PoliceRecord.Status.Psychopath)) {
             return 3 * destination.getPoliceStrength().getStrength();
-        } else if (game.getCaptain().isVillainous()) {
+        } else if (captain.policeRecord.is(PoliceRecord.Status.Villain)) {
             return 2 * destination.getPoliceStrength().getStrength();
         } else {
             return destination.getPoliceStrength().getStrength();

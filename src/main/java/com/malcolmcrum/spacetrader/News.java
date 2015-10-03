@@ -21,9 +21,11 @@ public class News {
     final private List<NotableEvent> notableEvents;
     final private List<SolarSystem.SpecialEvent> specialEvents;
     final private Game game;
+    private final Quests quests;
 
-    public News(Game game) {
+    public News(Game game) { // TODO: don't pass in Game
         this.game = game;
+        this.quests = game.getQuests();
         notableEvents = new ArrayList<>();
         specialEvents = new ArrayList<>();
     }
@@ -51,7 +53,7 @@ public class News {
 
         for (NotableEvent notableEvent : notableEvents) {
             String headline = notableEvent.getHeadline();
-            headline = headline.replace("{{CAPTAIN_NAME}}", captain.getName());
+            headline = headline.replace("{{CAPTAIN_NAME}}", captain.getName()); // haha wow what a hack. jesus
             paper.add(headline);
         }
         for (SolarSystem.SpecialEvent specialEvent : specialEvents) {
@@ -60,13 +62,13 @@ public class News {
                 paper.add(headline);
             }
         }
-        if (currentSystem.getSpecialEvent() == SolarSystem.SpecialEvent.MonsterKilled && game.getMonsterStatus() == Monster.InAcamar) {
+        if (currentSystem.getSpecialEvent() == SolarSystem.SpecialEvent.MonsterKilled && quests.monsterInAcamar()) {
             paper.add("Space Monster Threatens Homeworld!");
         }
-        if (currentSystem.getSpecialEvent() == SolarSystem.SpecialEvent.ScarabDestroyed && game.getScarabStatus() == Scarab.Alive) {
+        if (currentSystem.getSpecialEvent() == SolarSystem.SpecialEvent.ScarabDestroyed && quests.isScarabAlive()) {
             paper.add("Wormhole Travelers Harassed by Unusual Ship!");
         }
-        if (currentSystem.getSpecialEvent() == SolarSystem.SpecialEvent.DragonflyDestroyed && game.getDragonflyStatus() == Dragonfly.GoToZalkon && !specialEvents.contains(SolarSystem.SpecialEvent.DragonflyDestroyed)) {
+        if (currentSystem.getSpecialEvent() == SolarSystem.SpecialEvent.DragonflyDestroyed && quests.isDragonflyAt(SolarSystem.Name.Zalkon) && !specialEvents.contains(SolarSystem.SpecialEvent.DragonflyDestroyed)) {
             paper.add("Unidentified Ship: A Threat to Zalkon?");
         }
         if (currentSystem.getSpecialEvent() == SolarSystem.SpecialEvent.GemulonRescued && !specialEvents.contains(SolarSystem.SpecialEvent.GemulonRescued)) {
@@ -151,7 +153,7 @@ public class News {
 
     private String getCaptainHeadline(Captain captain, SolarSystem system) {
         String headline = null;
-        if (captain.isVillainous()) {
+        if (captain.policeRecord.is(PoliceRecord.Status.Villain)) {
             int diceRoll = GetRandom(4);
             switch (diceRoll) {
                 case 0:
@@ -167,7 +169,7 @@ public class News {
                     headline = "Terror Strikes Locals on Arrival of " + captain.getName() + "!";
                     break;
             }
-        } else if (captain.isHeroic()) {
+        } else if (captain.policeRecord.is(PoliceRecord.Status.Hero)) {
             int diceRoll = GetRandom(3);
             switch (diceRoll) {
                 case 0:

@@ -49,7 +49,7 @@ public class PirateTest extends GameStateTest {
 	@Test
 	public void testPirateSurrender() throws InvalidOpponentAction {
 		Pirate encounter = new Pirate(game, transit);
-		game.setShip(new PlayerShip(ShipType.Beetle, game));
+		game.setShip(new PlayerShip(ShipType.Beetle, game.getQuests(), game.getDifficulty()));
 		game.getShip().addCrew(game.getCaptain());
 		game.getShip().addWeapon(Weapon.PulseLaser);
 		game.getShip().addShield(ShieldType.LightningShield);
@@ -72,25 +72,25 @@ public class PirateTest extends GameStateTest {
 	public void testSurrenderToPirate() {
 		Pirate encounter = new Pirate(game, transit);
 
-		game.setWildStatus(Wild.OnBoard);
-		game.setReactorStatus(Reactor.ElevenDaysLeft);
+		game.getQuests().gotWild();
+		game.getQuests().gotReactor();
 		game.getShip().addCargo(TradeItem.Food, 1, 0);
 		game.getShip().addCargo(TradeItem.Robots, 2, 2);
 		GameState state = encounter.actionSurrender();
 		assertTrue("pirates plundered food", game.getShip().getCargoCount(TradeItem.Food) == 0);
 		assertTrue("pirates plundered robots", game.getShip().getCargoCount(TradeItem.Robots) == 0);
-		assertTrue("wild goes with pirates if they have space", encounter.getOpponent().getCrewQuarters() == 1 || game.getWildStatus() == Wild.Unavailable);
-		assertTrue("reactor untouched", game.getReactorStatus() == Reactor.ElevenDaysLeft);
+		assertTrue("wild goes with pirates if they have space", encounter.getOpponent().getCrewQuarters() == 1 || !game.getQuests().isWildOnBoard());
+		assertTrue("reactor untouched", game.getQuests().getReactorDays() == 20);
 		assertTrue("transitioned to next state after surrender", state != encounter);
 
 		encounter = new Pirate(game, transit);
 
 		game.getCaptain().setCredits(1);
 		int credits = game.getCaptain().getCredits();
-		int debt = game.getBank().getDebt();
+		int debt = game.getCaptain().bank.getDebt();
 		encounter.actionSurrender();
 		assertTrue("can't afford blackmail? lose cash", credits > game.getCaptain().getCredits());
-		assertTrue("can't afford blackmail? gain debt", debt < game.getBank().getDebt());
+		assertTrue("can't afford blackmail? gain debt", debt < game.getCaptain().bank.getDebt());
 	}
 
 	@Test

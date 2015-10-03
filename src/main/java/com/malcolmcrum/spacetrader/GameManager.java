@@ -119,7 +119,7 @@ public class GameManager {
     }
 
     public Bank getBank() {
-        return game.getBank();
+        return game.getCaptain().bank;
     }
 
     public class ShipTypes {

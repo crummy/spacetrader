@@ -26,7 +26,7 @@ public class Pirate extends Encounter {
         if (game.getShip().isInvisibleTo(opponent)) {
             opponentStatus = Status.Ignoring;
         } else if (opponent.getType().ordinal() >= 7 // Pirates will mostly attack, unless your rep is too high
-                || GetRandom(game.getCaptain().getEliteScore()) > (game.getCaptain().getReputationScore() * 4) / (1 + opponent.getType().ordinal())) {
+                || GetRandom(captain.reputation.getEliteScore()) > (captain.reputation.getScore() * 4) / (1 + opponent.getType().ordinal())) {
            opponentStatus = Status.Attacking;
         } else {
             opponentStatus = Status.Fleeing;
@@ -91,7 +91,7 @@ public class Pirate extends Encounter {
             if (game.getCaptain().getCredits() >= blackmail) {
                 game.getCaptain().subtractCredits(blackmail);
             } else {
-                game.getBank().addDebt(blackmail - game.getCaptain().getCredits());
+                captain.bank.addDebt(blackmail - game.getCaptain().getCredits());
                 game.getCaptain().setCredits(0);
             }
         } else {
@@ -114,13 +114,13 @@ public class Pirate extends Encounter {
             }
         }
 
-        if (game.getWildStatus() == Wild.OnBoard && opponent.getCrewQuarters() > 1) {
+        if (quests.isWildOnBoard() && opponent.getCrewQuarters() > 1) {
             game.addAlert(Alert.WildGoesWithPirates);
-            game.setWildStatus(Wild.Unavailable);
-        } else if (game.getWildStatus() == Wild.OnBoard) {
+            quests.lostWild();
+        } else if (quests.isWildOnBoard()) {
             game.addAlert(Alert.WildStaysAboard);
         }
-        if (game.getReactorStatus() != Reactor.Unavailable && game.getReactorStatus() != Reactor.Delivered) {
+        if (quests.isReactorOnBoard()) {
             game.addAlert(Alert.PiratesDontStealReactor);
         }
         return transit;
@@ -155,7 +155,7 @@ public class Pirate extends Encounter {
 
     @Override
     protected GameState destroyedOpponent() {
-        if (!game.getCaptain().isDubious()) {
+        if (!captain.policeRecord.is(PoliceRecord.Status.Dubious)) {
             game.addAlert(Alert.BountyEarned);
             // NOTE: In the original, it seems the bounty is added whether or not the player is dubious.
             // I suspect the bounty should only be added if the BountyEarned message is sent, so that

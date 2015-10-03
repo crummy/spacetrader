@@ -4,27 +4,40 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Created by Malcolm on 9/11/2015.
+ * Created by Malcolm on 10/3/2015.
  */
 public class Bank {
     private static final Logger logger = LoggerFactory.getLogger(Bank.class);
+
     private static final int DEBT_TOO_LARGE = 100000;
 
-    private Game game;
     private int debt;
     private boolean hasInsurance;
     private int daysWithoutClaim;
+    private boolean reserveMoney;
+    private final Captain captain;
+    private final Game game;
 
-    public Bank(Game game) {
+    public Bank(Captain captain, Game game) {
+        this.captain = captain;
         this.game = game;
         hasInsurance = false;
+        reserveMoney = false;
         debt = 0;
         daysWithoutClaim = 0;
     }
 
+    public int getAvailableCash() {
+        if (!reserveMoney) {
+            return captain.getCredits();
+        } else {
+            return Math.max(0, captain.getCredits() - game.getShip().getMercenaryDailyCost() - getInsuranceCost());
+        }
+    }
+
     public int maxLoan() {
-        if (game.getCaptain().isClean()) {
-            return Math.min(25000, Math.max(1000, ((game.getCaptain().getWorth() / 10) / 500 * 500)));
+        if (captain.policeRecord.is(PoliceRecord.Status.Clean)) {
+            return Math.min(25000, Math.max(1000, ((captain.getWorth() / 10) / 500 * 500)));
         } else {
             return 500;
         }
@@ -35,7 +48,7 @@ public class Bank {
             logger.error("Trying to get a larger loan than maxLoan()");
         }
         int amount = Math.min(maxLoan() - debt, loan);
-        game.getCaptain().addCredits(amount);
+        captain.addCredits(amount);
         debt += amount;
     }
 
@@ -43,12 +56,12 @@ public class Bank {
         if (cash > debt) {
             logger.error("Trying to pay back more than we owe!");
         }
-        if (cash > game.getCaptain().getCredits()) {
+        if (cash > captain.getCredits()) {
             logger.error("Trying to pay back more than we have!");
         }
         int amount = Math.min(debt, cash);
-        amount = Math.min(amount, game.getCaptain().getCredits());
-        game.getCaptain().subtractCredits(amount);
+        amount = Math.min(amount, captain.getCredits());
+        captain.subtractCredits(amount);
         debt -= amount;
     }
 
@@ -75,11 +88,11 @@ public class Bank {
     public void payInterest() {
         if (debt > 0) {
             int additionalDebt = Math.max(1, debt/10);
-            if (game.getCaptain().getCredits() > additionalDebt) {
-                game.getCaptain().subtractCredits(additionalDebt);
+            if (captain.getCredits() > additionalDebt) {
+                captain.subtractCredits(additionalDebt);
             } else {
-                debt += (additionalDebt - game.getCaptain().getCredits());
-                game.getCaptain().setCredits(0);
+                debt += (additionalDebt - captain.getCredits());
+                captain.setCredits(0);
             }
         }
     }
@@ -90,7 +103,7 @@ public class Bank {
     }
 
     public int getInsuranceCost() {
-        if (game.getBank().hasInsurance()) {
+        if (hasInsurance) {
             return 0;
         } else {
             return Math.max(1, (((game.getShip().getPriceWithoutCargo(true, true) * 5) / 2000) *

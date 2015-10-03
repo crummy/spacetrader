@@ -1,7 +1,8 @@
 package com.malcolmcrum.spacetrader.GameStates.Encounters;
 
-import com.malcolmcrum.spacetrader.Game;
+import com.malcolmcrum.spacetrader.*;
 import com.malcolmcrum.spacetrader.GameStates.GameState;
+import com.malcolmcrum.spacetrader.GameStates.InSystem;
 import com.malcolmcrum.spacetrader.GameStates.Transit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +59,18 @@ public class PostMariePolice extends Police {
     }
 
     public GameState actionYield() {
-        // TODO
+        if (quests.isWildOnBoard() || quests.isReactorOnBoard()) {
+            arrestPlayer();
+            return new InSystem(game, transit.getDestination());
+        } else {
+            if (captain.policeRecord.is(PoliceRecord.Status.Dubious)) { // TODO: should this be negated?
+                captain.policeRecord.make(PoliceRecord.Status.Dubious);
+                // TODO: should this be outside the if?
+                game.getShip().removeCargo(TradeItem.Narcotics, game.getShip().getCargoCount(TradeItem.Narcotics));
+                game.getShip().removeCargo(TradeItem.Firearms, game.getShip().getCargoCount(TradeItem.Firearms));
+                game.addAlert(Alert.YieldNarcotics);
+            }
+        }
         return this;
     }
 

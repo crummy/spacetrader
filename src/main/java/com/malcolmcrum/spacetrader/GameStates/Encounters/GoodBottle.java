@@ -1,5 +1,6 @@
 package com.malcolmcrum.spacetrader.GameStates.Encounters;
 
+import com.malcolmcrum.spacetrader.Difficulty;
 import com.malcolmcrum.spacetrader.Game;
 import com.malcolmcrum.spacetrader.GameStates.GameState;
 import com.malcolmcrum.spacetrader.GameStates.Transit;
@@ -10,6 +11,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.malcolmcrum.spacetrader.Utils.GetRandom;
 import static com.malcolmcrum.spacetrader.Utils.Pluralize;
 
 /**
@@ -54,8 +56,27 @@ public class GoodBottle extends Encounter {
     }
 
     public GameState actionDrink() {
-        // TODO
-        return this;
+        increaseRandomSkill();
+        if (game.getDifficulty() != Difficulty.Impossible && game.getDifficulty() != Difficulty.Hard) {
+            increaseRandomSkill();
+        }
+        return transit;
+    }
+
+    private void increaseRandomSkill() {
+        boolean didIncreaseSkill = false;
+        while (didIncreaseSkill) {
+            int skill = GetRandom(4);
+            if (skill == 0) {
+                didIncreaseSkill = game.getCaptain().addEngineerSkills(1);
+            } else if (skill == 1) {
+                didIncreaseSkill = game.getCaptain().addFighterSkills(1);
+            } else if (skill == 2) {
+                didIncreaseSkill = game.getCaptain().addPilotSkills(1);
+            } else if (skill == 3) {
+                didIncreaseSkill = game.getCaptain().addTraderSkills(1);
+            }
+        }
     }
 
     @Override

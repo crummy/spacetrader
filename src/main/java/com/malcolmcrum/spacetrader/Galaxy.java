@@ -21,11 +21,15 @@ public class Galaxy {
     static final int GALAXY_WIDTH = 150;
     static final int GALAXY_HEIGHT = 110;
 
-    private final Game game;
+    private final PlayerShip ship;
+    private final Captain captain;
+    private final Difficulty difficulty;
     protected final List<SolarSystem> systems;
 
-    public Galaxy(Game game) {
-        this.game = game;
+    public Galaxy(Captain captain, PlayerShip ship, Difficulty difficulty) {
+        this.captain = captain;
+        this.ship = ship;
+        this.difficulty = difficulty;
         systems = new ArrayList<>();
 
         addSolarSystems();
@@ -269,7 +273,7 @@ public class Galaxy {
                 }
             } while(i > 0 && (neighbourTooClose || neighbourTooFar));
 
-            SolarSystem system = new SolarSystem(game, i);
+            SolarSystem system = new SolarSystem(captain, ship, difficulty, i);
             system.setLocation(location);
             systems.add(system);
         }
@@ -294,7 +298,7 @@ public class Galaxy {
      * Finds the perfect star system: one with at least three systems in range of
      * current ship, with no special event, at least agricultural tech level, but not
      * hitech.
-     * @param ship Current ship, used for range calculations of other planets
+     * @param maxRange Maximum range of current ship.
      * @return A goldilock system in the galaxy.
      */
     public SolarSystem getStartSystem(int maxRange) {

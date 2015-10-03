@@ -28,11 +28,15 @@ public class SolarSystem {
     private SpecialEvent specialEvent;
     private SolarSystem wormholeDestination;
     private Mercenary mercenary;
-    private Game game;
+    private final Captain captain;
+    private final PlayerShip ship;
+    private final Difficulty difficulty;
 
-    SolarSystem(Game game, int index) {
+    SolarSystem(Captain captain, PlayerShip ship, Difficulty difficulty, int index) {
         name = Name.values()[index];
-        this.game = game;
+        this.captain = captain;
+        this.ship = ship;
+        this.difficulty = difficulty;
 
         TechLevel t;
         Politics p;
@@ -60,7 +64,7 @@ public class SolarSystem {
         visited = false;
         wormholeDestination = null;
 
-        market = new Market(game, this);
+        market = new Market(captain, ship, difficulty, this);
     }
 
     public static int GetMaxSystems() {
@@ -90,7 +94,7 @@ public class SolarSystem {
     // When a mercenary is hired, they are not actually removed from the system.
     // That way, if they are fired, they return to their home system.
     public boolean hasMercenary() {
-        return mercenary != null && !game.getShip().getCrew().contains(mercenary);
+        return mercenary != null && !ship.getCrew().contains(mercenary);
     }
 
     public void addMercenary(Mercenary mercenary) {
@@ -180,7 +184,7 @@ public class SolarSystem {
         Map<ShipType, Integer> shipsForSale = new HashMap<>();
         for (ShipType type : ShipType.values()) {
             if (!type.getMinTechLevel().isBeyond(techLevel)) {
-                int price = baseShipPrice(type) - game.getShip().getPrice(false, false);
+                int price = baseShipPrice(type) - ship.getPrice(false, false);
                 shipsForSale.put(type, price);
             }
         }
@@ -188,7 +192,7 @@ public class SolarSystem {
     }
 
     private int baseShipPrice(ShipType type) {
-        return (type.getPrice() * (100 - game.getShip().getTraderSkill())) / 100;
+        return (type.getPrice() * (100 - ship.getTraderSkill())) / 100;
     }
 
     public int getLocationX() {

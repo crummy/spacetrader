@@ -20,43 +20,43 @@ public class RareEncounters {
         marie = true;
     }
 
-    public boolean ahab() {
+    public boolean hasEncounteredAhab() {
         return ahab;
     }
 
-    public void encounteredAhab() {
+    public void justEncounteredAhab() {
         ahab = true;
     }
 
-    public boolean conrad() {
+    public boolean hasEncounteredConrad() {
         return conrad;
     }
 
-    public void encounteredConrad() {
+    public void justEncounteredConrad() {
         conrad = true;
     }
 
-    public boolean huie() {
+    public boolean hasEncounteredHuie() {
         return huie;
     }
 
-    public void encounteredHuie() {
+    public void justEncounteredHuie() {
         huie = true;
     }
 
-    public boolean oldBottle() {
+    public boolean hasEncounteredOldBottle() {
         return oldBottle;
     }
 
-    public void encounteredOldBottle() {
+    public void justEncounteredOldBottle() {
         oldBottle = true;
     }
 
-    public boolean goodBottle() {
+    public boolean hasEncounteredGoodBottle() {
         return goodBottle;
     }
 
-    public void encounteredGoodBottle() {
+    public void justEncounteredGoodBottle() {
         goodBottle = true;
     }
 }
