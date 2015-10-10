@@ -13,13 +13,9 @@ public enum BribeLevel {
     Easy(6),
     VeryEasy(7);
 
-    private final int value;
+    public final int value;
 
     BribeLevel(int value) {
         this.value = value;
-    }
-
-    public int getValue() {
-        return value;
     }
 }

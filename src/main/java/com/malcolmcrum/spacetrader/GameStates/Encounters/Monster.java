@@ -54,7 +54,7 @@ public class Monster extends Encounter {
         super(game, transit);
         opponent = new Ship(ShipType.SpaceMonster, difficulty);
 
-        int difficulty = game.getDifficulty().getValue();
+        int difficulty = game.getDifficulty().value;
         opponent.addCrew(new Crew(8 + difficulty, 8 + difficulty, 1, 1 + difficulty));
 
         // Monster continues health from previous encounter.
@@ -97,7 +97,7 @@ public class Monster extends Encounter {
             game.addAlert(Alert.YouEscaped);
             return transit;
         }
-        int difficulty = game.getDifficulty().getValue();
+        int difficulty = game.getDifficulty().value;
         int playerFleeChance = (GetRandom(7) + (game.getShip().getPilotSkill() / 3)) * 2;
         int opponentChaseChance = GetRandom(opponent.getPilotSkill()) * (2 * difficulty);
         if (playerFleeChance >= opponentChaseChance) {

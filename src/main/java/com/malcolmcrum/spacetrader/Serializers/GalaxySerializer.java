@@ -18,6 +18,8 @@ public class GalaxySerializer implements JsonSerializer {
         JsonObject json = new JsonObject();
 
         json.add("solarSystems", GetSolarSystems(galaxy));
+        json.add("width", new JsonPrimitive(Galaxy.GALAXY_WIDTH));
+        json.add("height", new JsonPrimitive(Galaxy.GALAXY_HEIGHT));
 
         return json;
     }

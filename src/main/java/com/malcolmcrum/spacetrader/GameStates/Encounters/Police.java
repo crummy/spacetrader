@@ -47,7 +47,7 @@ public class Police extends Encounter {
             opponentStatus = Status.Awake;
             transit.policeInspectedPlayer();
         } else if (!captain.policeRecord.is(PoliceRecord.Status.Lawful)) {
-            if (GetRandom(12 - difficulty.getValue()) < 1 && !transit.hasBeenInspected()) {
+            if (GetRandom(12 - difficulty.value) < 1 && !transit.hasBeenInspected()) {
                 opponentStatus = Status.Awake;
                 transit.policeInspectedPlayer();
             }
@@ -347,7 +347,7 @@ public class Police extends Encounter {
 
     @Override
     protected boolean shipTypeAcceptable(ShipType betterShip) {
-        int difficultyValue = difficulty.getValue();
+        int difficultyValue = difficulty.value;
         int normal = Difficulty.Normal.ordinal();
         if (betterShip.getMinStrengthForPirateEncounter() == null) {
             return false;
@@ -365,8 +365,8 @@ public class Police extends Encounter {
     }
 
     public int getBribeCost() {
-        int difficultyModifier = Difficulty.Impossible.getValue() - difficulty.getValue();
-        int bribeDifficultyModifier = transit.getDestination().getPolitics().getBribeLevel().getValue();
+        int difficultyModifier = Difficulty.Impossible.value - difficulty.value;
+        int bribeDifficultyModifier = transit.getDestination().getPolitics().getBribeLevel().value;
         int bribe = captain.getWorth() / ((10 + 5 * difficultyModifier) * bribeDifficultyModifier);
         if (bribe % 100 != 0) {
             bribe += (100 - (bribe % 100));
@@ -385,7 +385,7 @@ public class Police extends Encounter {
     }
 
     public int getIllegalGoodsFine() {
-        int difficultyModifier = Difficulty.Impossible.getValue() + 2 - difficulty.getValue();
+        int difficultyModifier = Difficulty.Impossible.value + 2 - difficulty.value;
         int fine = captain.getWorth() / (difficultyModifier * 10);
         if (fine % 50 != 0) {
             fine += (50 - (fine % 50));

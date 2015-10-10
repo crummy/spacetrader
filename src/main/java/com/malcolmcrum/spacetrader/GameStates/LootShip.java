@@ -42,7 +42,7 @@ public class LootShip extends GameState {
         // Chance 50% to pick something up on Normal level, 33% on Hard level, 25% on
         // Impossible level, and 100% on Easy or Beginner
         if (game.getDifficulty() == Difficulty.Hard || game.getDifficulty() == Difficulty.Impossible) {
-            if (GetRandom(game.getDifficulty().getValue()) != 1) {
+            if (GetRandom(game.getDifficulty().value) != 1) {
                 return nextState;
             }
         }

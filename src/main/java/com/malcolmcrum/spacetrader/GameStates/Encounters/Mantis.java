@@ -48,6 +48,6 @@ public class Mantis extends Pirate {
 
     @Override
     protected int getShipTypeTries() {
-        return 1 + game.getDifficulty().getValue();
+        return 1 + game.getDifficulty().value;
     }
 }

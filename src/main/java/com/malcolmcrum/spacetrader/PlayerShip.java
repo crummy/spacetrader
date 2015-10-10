@@ -131,7 +131,7 @@ public class PlayerShip extends Ship {
 
     @Override
     int minDamage() {
-        return Math.max(1, Difficulty.Impossible.getValue() - difficulty.getValue());
+        return Math.max(1, Difficulty.Impossible.value - difficulty.value);
     }
 
     /**

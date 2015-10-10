@@ -53,7 +53,7 @@ public class Market {
 
             // Cap robots and narcotics due to potential for easy profits
             if (item == TradeItem.Robots || item == TradeItem.Narcotics) {
-                int difficultyValue = difficulty.getValue();
+                int difficultyValue = difficulty.value;
                 quantity = ((quantity * (5 - difficultyValue)) / (6 - difficultyValue)) + 1;
             }
 
@@ -137,7 +137,7 @@ public class Market {
     }
 
     private int initialTradeResetCountdown() {
-        return 3 + difficulty.getValue();
+        return 3 + difficulty.value;
     }
 
     /**

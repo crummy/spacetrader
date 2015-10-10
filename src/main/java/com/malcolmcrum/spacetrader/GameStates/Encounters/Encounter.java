@@ -155,7 +155,7 @@ public abstract class Encounter extends GameState {
             game.addAlert(Alert.YouEscaped);
             return transit;
         }
-        int difficulty = game.getDifficulty().getValue();
+        int difficulty = game.getDifficulty().value;
         int playerFleeChance = (GetRandom(7) + (game.getShip().getPilotSkill() / 3)) * 2;
         int opponentChaseChance = GetRandom(opponent.getPilotSkill()) * (2 * difficulty);
         if (playerFleeChance >= opponentChaseChance) {
@@ -318,9 +318,9 @@ public abstract class Encounter extends GameState {
         // If reactor on board -- damage is boosted!
         if (defenderIsPlayer && game.getQuests().isReactorOnBoard()) {
             if (difficulty == Difficulty.Beginner || difficulty == Difficulty.Easy) {
-                damage *= 1 + (difficulty.getValue() + 1) * 0.25;
+                damage *= 1 + (difficulty.value + 1) * 0.25;
             } else {
-                damage *= 1 + (difficulty.getValue() + 1) * 0.33;
+                damage *= 1 + (difficulty.value + 1) * 0.33;
             }
         }
 
@@ -370,7 +370,7 @@ public abstract class Encounter extends GameState {
         int fighterSkill = 1 + GetRandom(Game.MAX_POINTS_PER_SKILL);
         int traderSkill = 1 + GetRandom(Game.MAX_POINTS_PER_SKILL);
         int engineerSkill = 1 + GetRandom(Game.MAX_POINTS_PER_SKILL);
-        int difficulty = game.getDifficulty().getValue();
+        int difficulty = game.getDifficulty().value;
         if (transit.getDestination().getType() == SolarSystem.Name.Kravat && game.getQuests().isWildOnBoard() && GetRandom(10) < difficulty + 1) {
             engineerSkill = Game.MAX_POINTS_PER_SKILL;
         }
@@ -534,8 +534,8 @@ public abstract class Encounter extends GameState {
     }
 
     protected int getEquipmentTries() {
-        int difficulty = game.getDifficulty().getValue();
-        int normal = Difficulty.Normal.getValue();
+        int difficulty = game.getDifficulty().value;
+        int normal = Difficulty.Normal.value;
         return Math.max(1, (game.getCaptain().getWorth() / 150000) + difficulty - normal);
     }
 

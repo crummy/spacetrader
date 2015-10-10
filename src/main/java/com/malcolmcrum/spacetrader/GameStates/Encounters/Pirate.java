@@ -168,7 +168,7 @@ public class Pirate extends Encounter {
 
     @Override
     protected boolean shipTypeAcceptable(ShipType betterShip) {
-        int difficulty = game.getDifficulty().getValue();
+        int difficulty = game.getDifficulty().value;
         int normal = Difficulty.Normal.ordinal();
         if (betterShip.getMinStrengthForPirateEncounter() == null) {
             return false;
@@ -183,7 +183,7 @@ public class Pirate extends Encounter {
     protected int getCargoToGenerate() {
         int cargoToGenerate;
         int cargoBays = opponent.getCargoBays();
-        int difficulty = game.getDifficulty().getValue();
+        int difficulty = game.getDifficulty().value;
         if (game.getDifficulty() == Difficulty.Hard || game.getDifficulty() == Difficulty.Impossible) {
             int m = 3 + GetRandom(cargoBays - 5);
             cargoToGenerate = Math.min(m, 15);
@@ -198,8 +198,8 @@ public class Pirate extends Encounter {
     @Override
     protected int getShipTypeTries() {
         int base = 1 + (game.getCaptain().getWorth() / 100000);
-        int difficulty = game.getDifficulty().getValue();
-        int normal = Difficulty.Normal.getValue();
+        int difficulty = game.getDifficulty().value;
+        int normal = Difficulty.Normal.value;
         return Math.max(1, base + difficulty - normal);
     }
 

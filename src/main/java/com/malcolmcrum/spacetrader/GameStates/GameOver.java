@@ -45,7 +45,7 @@ public class GameOver extends GameState {
     public int getScore() {
         int worth = game.getCaptain().getWorth();
         worth = (worth < 1000000 ? worth : 1000000 + ((worth - 1000000) / 10));
-        int difficulty = game.getDifficulty().getValue();
+        int difficulty = game.getDifficulty().value;
 
         if (status == endStatus.Killed) {
             return (difficulty + 1)*(worth * 90) / 50000;

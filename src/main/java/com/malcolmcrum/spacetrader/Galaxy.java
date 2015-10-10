@@ -18,8 +18,8 @@ public class Galaxy {
     static final int MAX_WORM_HOLES = 6;
     static final int CLOSE_DISTANCE = 13;   // Each system should have another system within this range
     static final int MIN_DISTANCE = 6;      // No system should have another system this close
-    static final int GALAXY_WIDTH = 150;
-    static final int GALAXY_HEIGHT = 110;
+    public static final int GALAXY_WIDTH = 150;
+    public static final int GALAXY_HEIGHT = 110;
 
     private final PlayerShip ship;
     private final Captain captain;

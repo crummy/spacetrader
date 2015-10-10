@@ -23,7 +23,7 @@ public class Scarab extends Encounter {
         super(game, transit);
         opponent = new Ship(ShipType.Scarab, difficulty);
 
-        int difficulty = game.getDifficulty().getValue();
+        int difficulty = game.getDifficulty().value;
         opponent.addCrew(new Crew(5 + difficulty, 6 + difficulty, 1, 6 + difficulty));
 
         if (game.getShip().isInvisibleTo(opponent)) {

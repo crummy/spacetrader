@@ -53,7 +53,7 @@ public class Dragonfly extends Encounter {
         super(game, transit);
         opponent = new Ship(ShipType.Dragonfly, difficulty);
 
-        int difficulty = game.getDifficulty().getValue();
+        int difficulty = game.getDifficulty().value;
         opponent.addCrew(new Crew(4 + difficulty, 6 + difficulty, 1, 6 + difficulty));
 
         if (game.getShip().isInvisibleTo(opponent)) {

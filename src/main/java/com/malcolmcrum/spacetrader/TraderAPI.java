@@ -5,6 +5,9 @@ import com.google.gson.GsonBuilder;
 import com.malcolmcrum.spacetrader.GameStates.GameOver;
 import com.malcolmcrum.spacetrader.GameStates.InSystem;
 import com.malcolmcrum.spacetrader.Serializers.*;
+import spark.Filter;
+import spark.Request;
+import spark.Response;
 
 import static spark.Spark.*;
 
@@ -14,6 +17,8 @@ import static spark.Spark.*;
 public class TraderAPI {
     public TraderAPI() {
         GameManager manager = new GameManager();
+
+        enableCORS("*", "*", "*");
 
         GsonBuilder builder = new GsonBuilder();
         builder.registerTypeAdapter(InSystem.class, new InSystemSerializer());
@@ -76,5 +81,13 @@ public class TraderAPI {
             this.code = 400;
             this.message = message;
         }
+    }
+
+    private static void enableCORS(final String origin, final String methods, final String headers) {
+        before((request, response) -> {
+            response.header("Access-Control-Allow-Origin", origin);
+            response.header("Access-Control-Request-Method", methods);
+            response.header("Access-Control-Allow-Headers", headers);
+        });
     }
 }

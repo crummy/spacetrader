@@ -265,7 +265,7 @@ public class Trader extends Encounter {
 
     @Override
     protected boolean shipTypeAcceptable(ShipType betterShip) {
-        int difficulty = game.getDifficulty().getValue();
+        int difficulty = game.getDifficulty().value;
         int normal = Difficulty.Normal.ordinal();
         int shipLevel = betterShip.getMinStrengthForTraderEncounter().getStrength();
         int difficultyModifier = (game.getDifficulty() == Difficulty.Hard || game.getDifficulty() == Difficulty.Impossible) ? difficulty - normal : 0;

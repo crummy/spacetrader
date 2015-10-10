@@ -123,7 +123,7 @@ public class News {
                 // I don't think that makes sense, so I do the system status check here.
                 // (See SystemInfoEvent.c:698 for the line I moved).
                 Difficulty difficulty = game.getDifficulty();
-                if (somethingGoingOn && GetRandom(100) <= USEFUL_STORY_PROBABILITY * system.getTechLevel().getEra() + 10 * (5 - difficulty.getValue())) {
+                if (somethingGoingOn && GetRandom(100) <= USEFUL_STORY_PROBABILITY * system.getTechLevel().getEra() + 10 * (5 - difficulty.value)) {
                     int diceRoll = GetRandom(6);
                     switch (diceRoll) {
                         case 0:
@@ -320,7 +320,7 @@ public class News {
     }
 
     public int getPrice() {
-        return game.getDifficulty().getValue() + 1;
+        return game.getDifficulty().value + 1;
     }
 
     public void replaceEvent(NotableEvent removeme, NotableEvent addme) {

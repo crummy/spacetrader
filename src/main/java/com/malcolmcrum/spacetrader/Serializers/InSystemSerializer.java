@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * TODO: What is the difference between insystem and system? Differentiate them
  * Created by Malcolm on 9/10/2015.
  */
 public class InSystemSerializer extends GameStateSerializer implements JsonSerializer {
@@ -27,8 +28,10 @@ public class InSystemSerializer extends GameStateSerializer implements JsonSeria
         shipObj.add("status", GetShipStatus(ship));
         shipObj.add("equipment", GetEquipment(ship));
         shipObj.add("crew", GetCrew(ship));
+        shipObj.add("cargo", GetCargo(ship));
         json.add("ship", shipObj);
 
+        json.add("escapePod", GetEscapePod(inSystem));
         json.add("market", GetMarket(system.getMarket()));
         json.add("shipsForSale", GetShipsForSale(system.getShipsForSale()));
         json.add("equipmentForSale", GetEquipmentForSale(inSystem.getEquipmentForSale()));
@@ -42,6 +45,16 @@ public class InSystemSerializer extends GameStateSerializer implements JsonSeria
         }
 
         return json;
+    }
+
+    private JsonElement GetEscapePod(InSystem inSystem) {
+        JsonObject escapePod = new JsonObject();
+        boolean isAvailable = inSystem.escapePodForSale();
+        escapePod.add("isAvailable", new JsonPrimitive(isAvailable));
+        if (isAvailable) {
+            escapePod.add("price", new JsonPrimitive(inSystem.getEscapePodPrice()));
+        }
+        return escapePod;
     }
 
     private JsonArray GetEquipmentForSale(Map<String, Integer> equipmentForSale) {
@@ -76,11 +89,17 @@ public class InSystemSerializer extends GameStateSerializer implements JsonSeria
 
     private JsonArray GetShipsForSale(Map<ShipType, Integer> shipsForSale) {
         JsonArray ships = new JsonArray();
-        for (ShipType type : shipsForSale.keySet()) {
-            JsonObject shipForSale = new JsonObject();
-            shipForSale.addProperty("type", type.getName());
-            shipForSale.addProperty("price", shipsForSale.get(type));
-            ships.add(shipForSale);
+        for (ShipType type : ShipType.values()) {
+            if (type.getMinTechLevel() == TechLevel.Unattainable) {
+                continue;
+            }
+
+            JsonObject ship = new JsonObject();
+            ship.addProperty("type", type.getName());
+            if (shipsForSale.containsKey(type)) {
+                ship.addProperty("price", shipsForSale.get(type));
+            }
+            ships.add(ship);
         }
         return ships;
     }
@@ -94,7 +113,8 @@ public class InSystemSerializer extends GameStateSerializer implements JsonSeria
         properties.addProperty("resources", system.getSpecialResource().getName());
         properties.addProperty("police", system.getPoliceStrength().getName());
         properties.addProperty("pirates", system.getPirateStrength().getName());
-        properties.addProperty("status", system.getStatus().getTitle());
+        properties.addProperty("traders", system.getTraderStrength().getName());
+        properties.addProperty("status", system.getStatus().getDescription());
         return properties;
     }
 
@@ -115,8 +135,12 @@ public class InSystemSerializer extends GameStateSerializer implements JsonSeria
         JsonObject items = new JsonObject();
         for (TradeItem item : TradeItem.values()) {
             JsonObject details = new JsonObject();
-            details.addProperty("buyPrice", market.getBuyPrice(item).get());
-            details.addProperty("sellPrice", market.getSellPrice(item).get());
+            if (market.getBuyPrice(item).isPresent()) {
+                details.addProperty("buyPrice", market.getBuyPrice(item).get());
+            }
+            if (market.getSellPrice(item).isPresent()) {
+                details.addProperty("sellPrice", market.getSellPrice(item).get());
+            }
             details.addProperty("quantity", market.getQuantity(item));
             items.add(item.getName(), details);
         }
@@ -127,32 +151,54 @@ public class InSystemSerializer extends GameStateSerializer implements JsonSeria
         JsonObject shipStatus = new JsonObject();
         shipStatus.addProperty("hull", ship.getHullStrength());
         shipStatus.addProperty("fullHull", ship.getFullHullStrength());
+        shipStatus.addProperty("repairCost", ship.getRepairCost());
         shipStatus.addProperty("fuel", ship.getFuel());
         shipStatus.addProperty("fuelCapacity", ship.getFuelCapacity());
+        shipStatus.addProperty("fuelCost", ship.getCostToFillFuelTank());
         return shipStatus;
     }
 
     private static JsonElement GetEquipment(PlayerShip ship) {
         JsonObject equipment = new JsonObject();
         JsonArray weapons = new JsonArray();
-        for (Weapon weapon : ship.getWeapons()) {
-            weapons.add(new JsonPrimitive(weapon.getName()));
+        for (int i = 0; i < ship.getWeaponSlots(); ++i) {
+            if (i < ship.getWeapons().size()) {
+                weapons.add(new JsonPrimitive(ship.getWeapons().get(i).getName()));
+            } else {
+                weapons.add(new JsonPrimitive("Empty Slot"));
+            }
         }
         equipment.add("weapons", weapons);
 
         JsonArray shields = new JsonArray();
-        for (Ship.Shield shield : ship.getShields()) {
-            shields.add(new JsonPrimitive(shield.getName()));
+        for (int i = 0; i < ship.getShieldSlots(); ++i) {
+            if (i < ship.getShields().size()) {
+                shields.add(new JsonPrimitive(ship.getShields().get(i).getName()));
+            } else {
+                shields.add(new JsonPrimitive("Empty Slot"));
+            }
         }
         equipment.add("shields", shields);
 
         JsonArray gadgets = new JsonArray();
-        for (Gadget gadget : ship.getGadgets()) {
-            gadgets.add(new JsonPrimitive(gadget.getName()));
+        for (int i = 0; i < ship.getGadgetSlots(); ++i) {
+            if (i < ship.getGadgets().size()) {
+                gadgets.add(new JsonPrimitive(ship.getGadgets().get(i).name));
+            } else {
+                gadgets.add(new JsonPrimitive("Empty Slot"));
+            }
         }
         equipment.add("gadgets", gadgets);
 
         return equipment;
+    }
+
+    private static JsonElement GetCargo(PlayerShip ship) {
+        JsonObject cargo = new JsonObject();
+        for (TradeItem item : TradeItem.values()) {
+            cargo.add(item.getName(), new JsonPrimitive(ship.getCargoCount(item)));
+        }
+        return cargo;
     }
 
 }

@@ -386,7 +386,7 @@ public class SolarSystem {
     }
 
     public enum Status {
-        Uneventful("UNUSED_TEXT", "under no particular pressure"),
+        Uneventful("", "under no particular pressure"),
         War("Strife and War", "at war"),
         Plague("Plague Outbreaks", "ravaged by a plague"),
         Drought("Severe Drought", "suffering from a drought"),
@@ -405,6 +405,10 @@ public class SolarSystem {
 
         public String getTitle() {
             return title;
+        }
+
+        public String getDescription() {
+            return description;
         }
     }
 

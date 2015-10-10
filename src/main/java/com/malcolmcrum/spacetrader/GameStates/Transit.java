@@ -66,7 +66,7 @@ public class Transit extends GameState {
         } else if (captain.policeRecord.is(PoliceRecord.Status.Dubious)){
             if (difficulty == Difficulty.Beginner || difficulty == Difficulty.Easy || difficulty == Difficulty.Normal) {
                 captain.policeRecord.add(1);
-            } else if (game.getDays() % difficulty.getValue() == 0) {
+            } else if (game.getDays() % difficulty.value == 0) {
                 captain.policeRecord.add(1);
             }
         }
@@ -132,7 +132,7 @@ public class Transit extends GameState {
                 encounterMantis = true;
             }
 
-            int encounterTest = GetRandom(44 - (2 * game.getDifficulty().getValue()));
+            int encounterTest = GetRandom(44 - (2 * game.getDifficulty().value));
 
             // encounters are half as likely if you're in a flea.
             if (game.getShip().getType() == ShipType.Flea) {

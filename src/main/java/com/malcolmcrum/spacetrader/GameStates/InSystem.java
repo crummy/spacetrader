@@ -1,5 +1,6 @@
 package com.malcolmcrum.spacetrader.GameStates;
 
+import com.google.gson.JsonElement;
 import com.malcolmcrum.spacetrader.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,12 +21,15 @@ public class InSystem extends GameState {
     private Quests quests;
     private Captain captain;
     private boolean alreadyPaidForNewspaper;
+    private final int ESCAPE_POD_PRICE = 2000;
 
     public InSystem(Game game, SolarSystem system) {
         super(game);
         this.quests = game.getQuests();
         this.captain = game.getCaptain();
         this.system = system;
+
+        system.setVisited();
     }
 
     public Map<String, Integer> getEquipmentForSale() {
@@ -36,8 +40,8 @@ public class InSystem extends GameState {
             }
         }
         for (Gadget gadget : Gadget.values()) {
-            if (!gadget.getTechLevelRequired().isBeyond(system.getTechLevel())) {
-                equipment.put(gadget.getName(), equipmentPrice(gadget.getTechLevelRequired(), gadget.getPrice()));
+            if (!gadget.techLevel.isBeyond(system.getTechLevel())) {
+                equipment.put(gadget.name, equipmentPrice(gadget.techLevel, gadget.getPrice()));
             }
         }
         for (ShieldType shield : ShieldType.values()) {
@@ -247,8 +251,8 @@ public class InSystem extends GameState {
     }
 
     public GameState buyEscapePod() {
-        if (game.getCaptain().getCredits() >= 2000) {
-            game.getCaptain().subtractCredits(2000);
+        if (game.getCaptain().getCredits() >= ESCAPE_POD_PRICE) {
+            game.getCaptain().subtractCredits(ESCAPE_POD_PRICE);
             game.getCaptain().setEscapePod(true);
         } else {
             game.addAlert(Alert.CannotAffordEscapePod);
@@ -506,5 +510,14 @@ public class InSystem extends GameState {
             game.getShip().addCrew(system.getMercenary());
         }
         return this;
+    }
+
+    public boolean escapePodForSale() {
+        // If a system can build a Flea, they can build an escape pod.
+        return !system.getTechLevel().isBefore(ShipType.Flea.getMinTechLevel());
+    }
+
+    public int getEscapePodPrice() {
+        return ESCAPE_POD_PRICE;
     }
 }

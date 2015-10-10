@@ -14,9 +14,9 @@ public enum Gadget {
     FuelCompactor("Fuel compactor", 30000, TechLevel.Unattainable, 0);
 
 
-    private final String name;
+    public final String name;
     private final int price;
-    private final TechLevel techLevel;
+    public final TechLevel techLevel;
     private final int chance;
 
     Gadget(String name, int price, TechLevel techLevel, int chance) {
@@ -46,14 +46,6 @@ public enum Gadget {
             }
         }
         return null;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public TechLevel getTechLevelRequired() {
-        return techLevel;
     }
 
     public int getPrice() {

@@ -10,8 +10,8 @@ public enum Difficulty {
     Hard(3, "Hard"),
     Impossible(4, "Impossible");
 
-    private final int value;
-    private final String name;
+    public final int value;
+    public final String name;
 
     Difficulty(int value, String name) {
         this.value = value;
