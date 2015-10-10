@@ -193,7 +193,7 @@ public enum Politics {
             TradeItem.Narcotics);
 
 
-    private final String name;
+    public final String name;
     private final Reaction reactionIllegal;
     private final PoliceStrength policeStrength;
     private final PirateStrength pirateStrength;

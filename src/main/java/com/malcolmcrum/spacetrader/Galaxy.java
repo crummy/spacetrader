@@ -48,12 +48,12 @@ public class Galaxy {
     private void addScatteredSpecialEvents(boolean scarabEndpointExists) {
         logger.debug("SCATTERING EVENTS");
         for (SolarSystem.SpecialEvent event : SolarSystem.SpecialEvent.values()) {
-            logger.debug("Adding event " + event.getTitle());
-            if (event.hasFixedLocation()) {
+            logger.debug("Adding event " + event.title);
+            if (event.hasFixedLocation) {
                 logger.trace("  Event has fixed location; no need to scatter it.");
                 continue;
             }
-            for (int occurrence = 0; occurrence < event.getOccurrence(); ++occurrence) {
+            for (int occurrence = 0; occurrence < event.occurrence; ++occurrence) {
                 boolean keepLooking = true;
                 while (keepLooking) {
                     SolarSystem system = getRandomSystem();

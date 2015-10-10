@@ -15,7 +15,7 @@ public enum TechLevel {
     HiTech(7, "Hi-tech"),
     Unattainable(8, "UNATTAINABLE");
 
-    private String name;
+    public String name;
     private int era;
 
     TechLevel(int era, String name) {

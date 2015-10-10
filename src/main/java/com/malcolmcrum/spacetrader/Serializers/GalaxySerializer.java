@@ -36,16 +36,16 @@ public class GalaxySerializer implements JsonSerializer {
                 system.addProperty("wormholeDestination", s.getWormholeDestination().getName());
             }
             system.addProperty("name", s.getName());
-            system.addProperty("size", s.getSize().getName());
-            system.addProperty("techLevel", s.getTechLevel().getName());
-            system.addProperty("government", s.getPolitics().getName());
+            system.addProperty("size", s.getSize().name);
+            system.addProperty("techLevel", s.getTechLevel().name);
+            system.addProperty("government", s.getPolitics().name);
             if (s.isVisited()) {
-                system.addProperty("resources", s.getSpecialResource().getName());
+                system.addProperty("resources", s.getSpecialResource().name);
             } else {
                 system.addProperty("resources", "Unknown");
             }
-            system.addProperty("police", s.getPoliceStrength().getName());
-            system.addProperty("pirates", s.getPirateStrength().getName());
+            system.addProperty("police", s.getPoliceStrength().name);
+            system.addProperty("pirates", s.getPirateStrength().name);
             system.addProperty("visited", s.isVisited());
             systems.add(system);
         }

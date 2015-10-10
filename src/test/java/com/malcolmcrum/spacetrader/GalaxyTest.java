@@ -128,7 +128,7 @@ public class GalaxyTest
                         occurrencesOfEvent == 0 || occurrencesOfEvent == 1);
             } else {
                 assertTrue("NotableEvent: " + event + "(" + occurrencesOfEvent + ")",
-                        occurrencesOfEvent == event.getOccurrence() || event.hasFixedLocation());
+                        occurrencesOfEvent == event.occurrence || event.hasFixedLocation);
             }
         }
     }

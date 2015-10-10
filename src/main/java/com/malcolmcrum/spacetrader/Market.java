@@ -49,7 +49,7 @@ public class Market {
                 continue;
             }
 
-            Integer quantity = ((9 + GetRandom(5)) - techLevel().erasBetween(item.getTechLevelForTopProduction())) * (1 + size().getMultiplier());
+            Integer quantity = ((9 + GetRandom(5)) - techLevel().erasBetween(item.getTechLevelForTopProduction())) * (1 + size().multiplier);
 
             // Cap robots and narcotics due to potential for easy profits
             if (item == TradeItem.Robots || item == TradeItem.Narcotics) {
@@ -206,7 +206,7 @@ public class Market {
             price = (price * (100 - (2 * politics().getTraderStrength().getStrength()))) / 100;
 
             // Large system = high production; decrease price
-            price = (price * (100 - size().getMultiplier())) / 100;
+            price = (price * (100 - size().multiplier)) / 100;
 
             // Special resources modifiers
             if (item.getCheapResourceTrigger() == specialResource()) {

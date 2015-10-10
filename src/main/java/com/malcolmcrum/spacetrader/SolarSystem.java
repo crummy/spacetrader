@@ -18,12 +18,14 @@ public class SolarSystem {
 
     private Vector2i location;
     private final Name name;
+
     private final TechLevel techLevel;
     private final Politics politics;
     private final SpecialResource specialResource;
-    private Status status;
     private final Size size;
     private final Market market;
+
+    private Status status;
     private boolean visited;
     private SpecialEvent specialEvent;
     private SolarSystem wormholeDestination;
@@ -88,7 +90,7 @@ public class SolarSystem {
     }
 
     public String getName() {
-        return name.getTitle();
+        return name.title;
     }
 
     // When a mercenary is hired, they are not actually removed from the system.
@@ -218,14 +220,10 @@ public class SolarSystem {
         ArtisticPopulace("Artistic populace"),
         WarlikePopulace("Warlike populace");
 
-        private final String name;
+        public final String name;
 
         SpecialResource(String name) {
             this.name = name;
-        }
-
-        public String getName() {
-            return name;
         }
     }
 
@@ -236,20 +234,12 @@ public class SolarSystem {
         Large(4, "Large"),
         Huge(5, "Huge");
 
-        private final String name;
-        private final int multiplier;
+        public final String name;
+        public final int multiplier;
 
         Size(int multiplier, String name) {
             this.multiplier = multiplier;
             this.name = name;
-        }
-
-        public int getMultiplier() {
-            return multiplier;
-        }
-
-        public String getName() {
-            return name;
         }
     }
 
@@ -375,13 +365,9 @@ public class SolarSystem {
         Zalkon("Zalkon"),
         Zuul("Zuul");            // From the first Ghostbusters movie
 
-        private final String title;
+        public final String title;
         Name(String title) {
             this.title = title;
-        }
-
-        protected String getTitle() {
-            return title;
         }
     }
 
@@ -395,20 +381,12 @@ public class SolarSystem {
         Crops("Crop Failures", "suffering from a crop failure"),
         Workers("Labor Shortages", "lacking enough workers");
 
-        private final String description; // used for reporting status
-        private final String title; // used for newspaper headlines
+        public final String description; // used for reporting status
+        public final String title; // used for newspaper headlines
 
         Status(String title, String description) {
             this.title = title;
             this.description = description;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public String getDescription() {
-            return description;
         }
     }
 
@@ -451,12 +429,12 @@ public class SolarSystem {
         ExperimentFailed("Experiment Failed", "MISSING_STRING", 0, 0, true, true),
         WildGetsOut("Wild Gets Out", "MISSING_STRING", 0, 0, true, true);
 
-        private final String title;
-        private final String text;
+        public final String title;
+        public final String text;
         private final int price;
-        private int occurrence;
+        public int occurrence;
         private final boolean justAMessage;
-        private final boolean fixedLocation;
+        public final boolean hasFixedLocation;
 
         SpecialEvent(String title, String text, int price, int occurrence, boolean justAMessage) {
             this(title, text, price, occurrence, justAMessage, false);
@@ -468,19 +446,7 @@ public class SolarSystem {
             this.price = price;
             this.occurrence = occurrence;
             this.justAMessage = justAMessage;
-            this.fixedLocation = fixedLocation;
-        }
-
-        public boolean hasFixedLocation() {
-            return fixedLocation;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public int getOccurrence() {
-            return occurrence;
+            this.hasFixedLocation = fixedLocation;
         }
     }
 

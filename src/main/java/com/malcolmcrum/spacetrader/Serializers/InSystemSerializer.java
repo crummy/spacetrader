@@ -107,14 +107,14 @@ public class InSystemSerializer extends GameStateSerializer implements JsonSeria
     private JsonObject GetProperties(SolarSystem system) {
         JsonObject properties = new JsonObject();
         properties.addProperty("name", system.getName());
-        properties.addProperty("size", system.getSize().getName());
-        properties.addProperty("techLevel", system.getTechLevel().getName());
-        properties.addProperty("government", system.getPolitics().getName());
-        properties.addProperty("resources", system.getSpecialResource().getName());
-        properties.addProperty("police", system.getPoliceStrength().getName());
-        properties.addProperty("pirates", system.getPirateStrength().getName());
-        properties.addProperty("traders", system.getTraderStrength().getName());
-        properties.addProperty("status", system.getStatus().getDescription());
+        properties.addProperty("size", system.getSize().name);
+        properties.addProperty("techLevel", system.getTechLevel().name);
+        properties.addProperty("government", system.getPolitics().name);
+        properties.addProperty("resources", system.getSpecialResource().name);
+        properties.addProperty("police", system.getPoliceStrength().name);
+        properties.addProperty("pirates", system.getPirateStrength().name);
+        properties.addProperty("traders", system.getTraderStrength().name);
+        properties.addProperty("status", system.getStatus().description);
         return properties;
     }
 

@@ -13,8 +13,8 @@ public enum PirateStrength {
     Abundant(6, "Abundant"),
     Swarms(7, "Swarms");
 
-    private int strength;
-    private String name;
+    public int strength;
+    public String name;
 
     PirateStrength(int strength, String name) {
         this.strength = strength;

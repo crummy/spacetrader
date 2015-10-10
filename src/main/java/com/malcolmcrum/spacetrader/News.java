@@ -48,7 +48,7 @@ public class News {
         Captain captain = game.getCaptain();
         List<String> paper = new ArrayList<>();
 
-        String masthead = generateTitle(currentSystem.getType().getTitle(), currentSystem.getPolitics());
+        String masthead = generateTitle(currentSystem.getType().title, currentSystem.getPolitics());
         paper.add(masthead);
 
         for (NotableEvent notableEvent : notableEvents) {
@@ -127,22 +127,22 @@ public class News {
                     int diceRoll = GetRandom(6);
                     switch (diceRoll) {
                         case 0:
-                            headlines.add("Reports of " + system.getStatus().getTitle() + " in the " + system.getType() + " System");
+                            headlines.add("Reports of " + system.getStatus().title + " in the " + system.getType() + " System");
                             break;
                         case 1:
-                            headlines.add("News of " + system.getStatus().getTitle() + " in the " + system.getType() + " System");
+                            headlines.add("News of " + system.getStatus().title + " in the " + system.getType() + " System");
                             break;
                         case 2:
-                            headlines.add("News Rumors of " + system.getStatus().getTitle() + " in the " + system.getType() + " System");
+                            headlines.add("News Rumors of " + system.getStatus().title + " in the " + system.getType() + " System");
                             break;
                         case 3:
-                            headlines.add("Sources say " + system.getStatus().getTitle() + " in the " + system.getType() + " System");
+                            headlines.add("Sources say " + system.getStatus().title + " in the " + system.getType() + " System");
                             break;
                         case 4:
-                            headlines.add("Notice: " + system.getStatus().getTitle() + " in the " + system.getType() + " System");
+                            headlines.add("Notice: " + system.getStatus().title + " in the " + system.getType() + " System");
                             break;
                         case 5:
-                            headlines.add("Evidence Suggests " + system.getStatus().getTitle() + " in the " + system.getType() + " System");
+                            headlines.add("Evidence Suggests " + system.getStatus().title + " in the " + system.getType() + " System");
                             break;
                     }
                 }

@@ -14,7 +14,7 @@ public enum TraderStrength {
     Swarms(7, "Swarms");
 
     private final int strength;
-    private final String name;
+    public final String name;
 
     TraderStrength(int strength, String name) {
         this.name = name;

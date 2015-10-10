@@ -14,7 +14,7 @@ public enum PoliceStrength {
     Swarms(7, "Swarms");
 
     private final int strength;
-    private final String name;
+    public final String name;;
 
     PoliceStrength(int strength, String name) {
         this.strength = strength;
