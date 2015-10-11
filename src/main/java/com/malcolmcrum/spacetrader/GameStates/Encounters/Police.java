@@ -352,9 +352,9 @@ public class Police extends Encounter {
         if (betterShip.getMinStrengthForPirateEncounter() == null) {
             return false;
         }
-        int shipLevel = betterShip.getMinStrengthForPoliceEncounter().getStrength();
+        int shipLevel = betterShip.getMinStrengthForPoliceEncounter().strength;
         int difficultyModifier = (difficulty == Difficulty.Hard || difficulty == Difficulty.Impossible) ? difficultyValue - normal : 0;
-        int destinationRequirement = transit.getDestination().getPoliceStrength().getStrength();
+        int destinationRequirement = transit.getDestination().getPoliceStrength().strength;
         return destinationRequirement + difficultyModifier >= shipLevel;
     }
 

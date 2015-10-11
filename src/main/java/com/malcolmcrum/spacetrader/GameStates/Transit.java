@@ -142,11 +142,11 @@ public class Transit extends GameState {
             boolean encounterPirate = false;
             boolean encounterPolice = false;
             boolean encounterTrader = false;
-            if (encounterTest < destination.getPirateStrength().getStrength() && !beenRaided) {
+            if (encounterTest < destination.getPirateStrength().strength && !beenRaided) {
                 encounterPirate = true;
-            } else if (encounterTest < destination.getPirateStrength().getStrength() + policeStrength()) {
+            } else if (encounterTest < destination.getPirateStrength().strength + policeStrength()) {
                 encounterPolice = true;
-            } else if (encounterTest < destination.getPirateStrength().getStrength() + policeStrength() + destination.getTraderStrength().getStrength()) {
+            } else if (encounterTest < destination.getPirateStrength().strength + policeStrength() + destination.getTraderStrength().strength) {
                 encounterTrader = true;
             } else if (quests.isWildOnBoard() && destination.getType() == SolarSystem.Name.Kravat) {
                 // if you're coming in to Kravat & you have Wild onboard, there'll be swarms o' cops.
@@ -261,11 +261,11 @@ public class Transit extends GameState {
      */
     private int policeStrength() {
         if (captain.policeRecord.is(PoliceRecord.Status.Psychopath)) {
-            return 3 * destination.getPoliceStrength().getStrength();
+            return 3 * destination.getPoliceStrength().strength;
         } else if (captain.policeRecord.is(PoliceRecord.Status.Villain)) {
-            return 2 * destination.getPoliceStrength().getStrength();
+            return 2 * destination.getPoliceStrength().strength;
         } else {
-            return destination.getPoliceStrength().getStrength();
+            return destination.getPoliceStrength().strength;
         }
 
     }

@@ -13,19 +13,11 @@ public enum PoliceStrength {
     Abundant(6, "Abundant"),
     Swarms(7, "Swarms");
 
-    private final int strength;
-    public final String name;;
+    public final int strength;
+    public final String name;
 
     PoliceStrength(int strength, String name) {
         this.strength = strength;
         this.name = name;
-    }
-
-    public int getStrength() {
-        return strength;
-    }
-
-    public String getName() {
-        return name;
     }
 }

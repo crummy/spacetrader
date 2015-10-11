@@ -20,12 +20,4 @@ public enum PirateStrength {
         this.strength = strength;
         this.name = name;
     }
-
-    public int getStrength() {
-        return strength;
-    }
-
-    public String getName() {
-        return name;
-    }
 }

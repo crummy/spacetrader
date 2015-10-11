@@ -13,19 +13,11 @@ public enum TraderStrength {
     Abundant(6, "Abundant"),
     Swarms(7, "Swarms");
 
-    private final int strength;
+    public final int strength;
     public final String name;
 
     TraderStrength(int strength, String name) {
         this.name = name;
         this.strength = strength;
-    }
-
-    public int getStrength() {
-        return strength;
-    }
-
-    public String getName() {
-        return name;
     }
 }

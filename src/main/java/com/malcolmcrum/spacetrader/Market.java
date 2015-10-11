@@ -203,7 +203,7 @@ public class Market {
             }
 
             // High trader activity decreases price
-            price = (price * (100 - (2 * politics().getTraderStrength().getStrength()))) / 100;
+            price = (price * (100 - (2 * politics().getTraderStrength().strength))) / 100;
 
             // Large system = high production; decrease price
             price = (price * (100 - size().multiplier)) / 100;

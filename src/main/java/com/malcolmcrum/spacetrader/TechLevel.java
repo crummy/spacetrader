@@ -23,10 +23,6 @@ public enum TechLevel {
         this.name = name;
     }
 
-    public String getName() {
-        return name;
-    }
-
     public boolean isBeyond(TechLevel otherLevel) {
         return era > otherLevel.era;
     }
