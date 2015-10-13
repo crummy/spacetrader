@@ -102,9 +102,9 @@ public class Trader extends Encounter {
                 price *= isBuying? 0.9 : 1.1;
             }
         }
-        price /= item.getRoundOff();
-        price *= item.getRoundOff();
-        price = Clamp(price, item.getMinTradePrice(), item.getMaxTradePrice());
+        price /= item.roundOff;
+        price *= item.roundOff;
+        price = Clamp(price, item.minTradePrice, item.maxTradePrice);
         return price;
     }
 

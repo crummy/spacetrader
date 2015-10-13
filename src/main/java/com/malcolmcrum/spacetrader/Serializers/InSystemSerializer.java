@@ -142,7 +142,7 @@ public class InSystemSerializer extends GameStateSerializer implements JsonSeria
                 details.addProperty("sellPrice", market.getSellPrice(item).get());
             }
             details.addProperty("quantity", market.getQuantity(item));
-            items.add(item.getName(), details);
+            items.add(item.name, details);
         }
         return items;
     }
@@ -196,7 +196,7 @@ public class InSystemSerializer extends GameStateSerializer implements JsonSeria
     private static JsonElement GetCargo(PlayerShip ship) {
         JsonObject cargo = new JsonObject();
         for (TradeItem item : TradeItem.values()) {
-            cargo.add(item.getName(), new JsonPrimitive(ship.getCargoCount(item)));
+            cargo.add(item.name, new JsonPrimitive(ship.getCargoCount(item)));
         }
         return cargo;
     }

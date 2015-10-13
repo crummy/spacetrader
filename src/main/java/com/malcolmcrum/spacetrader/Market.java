@@ -42,14 +42,14 @@ public class Market {
         for (TradeItem item : TradeItem.values()) {
             boolean bannedItem = (item == TradeItem.Narcotics && !narcoticsOK()) ||
                     (item == TradeItem.Firearms && !firearmsOK());
-            boolean itemTooAdvanced = item.getTechLevelRequiredForProduction().isBeyond(techLevel());
+            boolean itemTooAdvanced = item.techLevelRequiredForProduction.isBeyond(techLevel());
 
             if (bannedItem || itemTooAdvanced) {
                 quantities.put(item, 0);
                 continue;
             }
 
-            Integer quantity = ((9 + GetRandom(5)) - techLevel().erasBetween(item.getTechLevelForTopProduction())) * (1 + size().multiplier);
+            Integer quantity = ((9 + GetRandom(5)) - techLevel().erasBetween(item.techLevelForTopProduction)) * (1 + size().multiplier);
 
             // Cap robots and narcotics due to potential for easy profits
             if (item == TradeItem.Robots || item == TradeItem.Narcotics) {
@@ -57,18 +57,18 @@ public class Market {
                 quantity = ((quantity * (5 - difficultyValue)) / (6 - difficultyValue)) + 1;
             }
 
-            if (item.getCheapResourceTrigger() != SolarSystem.SpecialResource.Nothing
-                    && specialResource() == item.getCheapResourceTrigger()) {
+            if (item.cheapResourceTrigger != SolarSystem.SpecialResource.Nothing
+                    && specialResource() == item.cheapResourceTrigger) {
                 quantity = (quantity * 4) / 3;
             }
 
-            if (item.getExpensiveResourceTrigger() != SolarSystem.SpecialResource.Nothing
-                    && specialResource() == item.getExpensiveResourceTrigger()) {
+            if (item.expensiveResourceTrigger != SolarSystem.SpecialResource.Nothing
+                    && specialResource() == item.expensiveResourceTrigger) {
                 quantity = (quantity * 3) >> 2;
             }
 
-            if (item.getDoublePriceTrigger() != SolarSystem.Status.Uneventful
-                    && status() == item.getDoublePriceTrigger()) {
+            if (item.doublePriceTrigger != SolarSystem.Status.Uneventful
+                    && status() == item.doublePriceTrigger) {
                 quantity = quantity / 5;
             }
 
@@ -97,7 +97,7 @@ public class Market {
                 }
 
                 // Randomize price a bit
-                price = price + GetRandom(item.getPriceVariance()) - GetRandom(item.getPriceVariance());
+                price = price + GetRandom(item.priceVariance) - GetRandom(item.priceVariance);
 
                 if (price <= 0) {
                     logger.error("Buying price is <= 0!");
@@ -148,7 +148,7 @@ public class Market {
         for (TradeItem item : TradeItem.values()) {
             boolean itemAllowed = (item != TradeItem.Narcotics || narcoticsOK())
                     && (item != TradeItem.Firearms || firearmsOK())
-                    && (!techLevel().isBefore(item.getTechLevelRequiredForProduction()));
+                    && (!techLevel().isBefore(item.techLevelRequiredForProduction));
             if (itemAllowed) {
                 int currentQuantity = quantities.get(item);
                 int newQuantity = currentQuantity + GetRandom(5) - GetRandom(5);
@@ -163,7 +163,7 @@ public class Market {
     public void recalculateBuyPrice() {
         for (TradeItem item : TradeItem.values()) {
             Integer buyPrice;
-            if (techLevel().isBefore(item.getTechLevelRequiredForProduction())) {
+            if (techLevel().isBefore(item.techLevelRequiredForProduction)) {
                 buyPrice = null;
             } else if ((item == TradeItem.Narcotics && !narcoticsOK())
                     || (item == TradeItem.Firearms && !firearmsOK())) {
@@ -191,11 +191,11 @@ public class Market {
         if ((item == TradeItem.Narcotics && !narcoticsOK())
                 || (item == TradeItem.Firearms && !firearmsOK())) {
             return Optional.empty();
-        } else if (techLevel().isBefore(item.getTechLevelRequiredForUsage())) {
+        } else if (techLevel().isBefore(item.techLevelRequiredForUsage)) {
             return Optional.empty();
         } else {
             // Determine base price on TechLevel of system
-            Integer price = item.getPriceAtLowestTech() + (techLevel().getEra() * item.getPriceIncreasePerTechLevel());
+            Integer price = item.lowestTechLevelPrice + (techLevel().getEra() * item.priceIncreasePerLevel);
 
             // If item is highly requested, increase price
             if (politics().getWantedTradeItem() == item) {
@@ -209,10 +209,10 @@ public class Market {
             price = (price * (100 - size().multiplier)) / 100;
 
             // Special resources modifiers
-            if (item.getCheapResourceTrigger() == specialResource()) {
+            if (item.cheapResourceTrigger == specialResource()) {
                 price = (price * 3) / 4;
             }
-            if (item.getExpensiveResourceTrigger() == specialResource()) {
+            if (item.expensiveResourceTrigger == specialResource()) {
                 price = (price * 4) / 3;
             }
 

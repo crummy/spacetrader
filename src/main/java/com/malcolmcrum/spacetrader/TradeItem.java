@@ -137,19 +137,19 @@ public enum TradeItem {
             5000,
             100);
 
-    private String name;
-    private TechLevel techLevelRequiredForProduction;
-    private TechLevel techLevelRequiredForUsage;
-    private TechLevel techLevelForTopProduction;
-    private int lowestTechLevelPrice;
-    private int priceIncreasePerLevel;
-    private int priceVariance;
-    private Status doublePriceTrigger;
-    private SpecialResource cheapResourceTrigger;
-    private SpecialResource expensiveResourceTrigger;
-    private int minTradePrice;
-    private int maxTradePrice;
-    private int roundOff;
+    public String name;
+    public TechLevel techLevelRequiredForProduction;
+    public TechLevel techLevelRequiredForUsage;
+    public TechLevel techLevelForTopProduction;
+    public int lowestTechLevelPrice;
+    public int priceIncreasePerLevel;
+    public int priceVariance;
+    public Status doublePriceTrigger;
+    public SpecialResource cheapResourceTrigger;
+    public SpecialResource expensiveResourceTrigger;
+    public int minTradePrice;
+    public int maxTradePrice;
+    public int roundOff;
 
     TradeItem(String name,
               TechLevel techLevelRequiredForProduction,
@@ -178,57 +178,5 @@ public enum TradeItem {
         this.minTradePrice = minTradePrice; // Minimum price to buy/sell in orbit
         this.maxTradePrice = maxTradePrice; // Maximum price to buy/sell in orbit
         this.roundOff = roundOff;
-    }
-
-    public TechLevel getTechLevelRequiredForProduction() {
-        return techLevelRequiredForProduction;
-    }
-
-    public TechLevel getTechLevelForTopProduction() {
-        return techLevelForTopProduction;
-    }
-
-    public SpecialResource getCheapResourceTrigger() {
-        return cheapResourceTrigger;
-    }
-
-    public SpecialResource getExpensiveResourceTrigger() {
-        return expensiveResourceTrigger;
-    }
-
-    public Status getDoublePriceTrigger() {
-        return doublePriceTrigger;
-    }
-
-    public int getPriceAtLowestTech() {
-        return lowestTechLevelPrice;
-    }
-
-    public int getPriceIncreasePerTechLevel() {
-        return priceIncreasePerLevel;
-    }
-
-    public TechLevel getTechLevelRequiredForUsage() {
-        return techLevelRequiredForUsage;
-    }
-
-    public int getPriceVariance() {
-        return priceVariance;
-    }
-
-    public int getRoundOff() {
-        return roundOff;
-    }
-
-    public int getMinTradePrice() {
-        return minTradePrice;
-    }
-
-    public int getMaxTradePrice() {
-        return maxTradePrice;
-    }
-
-    public String getName() {
-        return name;
     }
 }
