@@ -15,17 +15,18 @@ import static com.malcolmcrum.spacetrader.Utils.GetRandom;
 public class News {
     private static final Logger logger = LoggerFactory.getLogger(News.class);
 
-
     static private final int USEFUL_STORY_PROBABILITY = 50 / 8;
 
     final private List<NotableEvent> notableEvents;
     final private List<SolarSystem.SpecialEvent> specialEvents;
-    final private Game game;
     private final Quests quests;
+    private final Captain captain;
+    private final Difficulty difficulty;
 
-    public News(Game game) { // TODO: don't pass in Game
-        this.game = game;
-        this.quests = game.getQuests();
+    public News(Captain captain, Quests quests, Difficulty difficulty) { // TODO: don't pass in Game
+        this.quests = quests;
+        this.captain = captain;
+        this.difficulty = difficulty;
         notableEvents = new ArrayList<>();
         specialEvents = new ArrayList<>();
     }
@@ -43,9 +44,7 @@ public class News {
         specialEvents.add(event);
     }
 
-    public List<String> getNewspaper() {
-        SolarSystem currentSystem = game.getCurrentSystem();
-        Captain captain = game.getCaptain();
+    public List<String> getNewspaper(SolarSystem currentSystem, Galaxy galaxy, Ship ship) {
         List<String> paper = new ArrayList<>();
 
         String masthead = generateTitle(currentSystem.getType().title, currentSystem.getPolitics());
@@ -85,7 +84,7 @@ public class News {
             paper.add(captainHeadline);
         }
 
-        List<String> usefulHeadlines = getUsefulHeadlines(currentSystem);
+        List<String> usefulHeadlines = getUsefulHeadlines(currentSystem, galaxy, ship);
         paper.addAll(usefulHeadlines.stream().collect(Collectors.toList()));
 
         if (usefulHeadlines.size() == 0) {
@@ -96,15 +95,15 @@ public class News {
         return paper;
     }
 
-    private List<String> getUsefulHeadlines(SolarSystem currentSystem) {
+    private List<String> getUsefulHeadlines(SolarSystem currentSystem, Galaxy galaxy, Ship ship) {
         List<String> headlines = new ArrayList<>();
-        for (SolarSystem system : game.getSystems()) {
+        for (SolarSystem system : galaxy.getSystems()) {
             if (system == currentSystem) {
                 continue;
             }
 
             int systemDistance = (int)Vector2i.Distance(currentSystem.getLocation(), system.getLocation());
-            boolean systemNear = (systemDistance <= game.getShip().type.getFuelTanks());
+            boolean systemNear = (systemDistance <= ship.type.getFuelTanks());
             boolean systemConnectedThroughWormhole = (currentSystem.getWormholeDestination() == system);
             if (systemNear || systemConnectedThroughWormhole) {
 
@@ -122,7 +121,6 @@ public class News {
                 // the system status is not none.
                 // I don't think that makes sense, so I do the system status check here.
                 // (See SystemInfoEvent.c:698 for the line I moved).
-                Difficulty difficulty = game.getDifficulty();
                 if (somethingGoingOn && GetRandom(100) <= USEFUL_STORY_PROBABILITY * system.getTechLevel().getEra() + 10 * (5 - difficulty.value)) {
                     int diceRoll = GetRandom(6);
                     switch (diceRoll) {
@@ -320,7 +318,7 @@ public class News {
     }
 
     public int getPrice() {
-        return game.getDifficulty().value + 1;
+        return difficulty.value + 1;
     }
 
     public void replaceEvent(NotableEvent removeme, NotableEvent addme) {

@@ -15,21 +15,14 @@ public class Captain extends Crew {
     public final Reputation reputation;
     public final PoliceRecord policeRecord;
 
-    // TODO: gotta move some of these variables elsewhere
     private int policeKills;
     private int traderKills;
     private int pirateKills;
-    private int policeRecordScore;
-    private int reputationScore;
     private boolean moonBought;
-    private boolean possibleToGoThroughRip;
-    private boolean arrivedViaWormhole;
     private int trackedSystem;
     private boolean showTrackedRange;
     private boolean canSuperWarp;
-    private boolean artifactOnBoard;
     private boolean hasEscapePod;
-    private boolean reserveMoney;
     private int credits;
 
     public Captain(String name, int pilot, int fighter, int trader, int engineer, Game game) {
@@ -43,15 +36,11 @@ public class Captain extends Crew {
         traderKills = 0;
         pirateKills = 0;
         credits = 1000;
-        policeRecordScore = 0;
-        reputationScore = 0;
         moonBought = false;
-        arrivedViaWormhole = false;
         trackedSystem = -1;
         showTrackedRange = false;
         canSuperWarp = false;
         hasEscapePod = false;
-        reserveMoney = false;
     }
 
     public String getName() {
@@ -74,10 +63,6 @@ public class Captain extends Crew {
 
     public int getCredits() {
         return credits;
-    }
-
-    public boolean hasBoughtMoon() {
-        return moonBought;
     }
 
     public int getWorth() {

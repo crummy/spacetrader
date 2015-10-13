@@ -209,7 +209,10 @@ public class InSystem extends GameState {
 
     private void transferCrew(PlayerShip ship, PlayerShip newShip) {
         for (int i = 0; i < ship.getCrew().size(); ++i) {
-            newShip.addCrew(ship.getCrew().get(i));
+            Crew crew = ship.getCrew().get(i);
+            if (crew != game.getCaptain()) {
+                newShip.addCrew(ship.getCrew().get(i));
+            }
         }
     }
 

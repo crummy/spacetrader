@@ -92,7 +92,7 @@ public class Market {
                 int price = buyingPrice.get();
 
                 // In case of a special status, adjust price accordingly
-                if (item.getDoublePriceTrigger() == status()) {
+                if (item.doublePriceTrigger == status()) {
                     price = (price * 3) >> 1;
                 }
 

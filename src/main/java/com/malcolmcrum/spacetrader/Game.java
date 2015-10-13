@@ -46,10 +46,9 @@ public class Game {
         captain = new Captain(commanderName, pilotSkill, fighterSkill, traderSkill, engineerSkill, this);
         ship = new PlayerShip(ShipType.Gnat, quests, difficulty);
         ship.addWeapon(Weapon.PulseLaser);
-        ship.addCrew(captain);
 
         galaxy = new Galaxy(captain, ship, difficulty);
-        news = new News(this);
+        news = new News(captain, quests, difficulty);
         currentSystem = galaxy.getStartSystem(ship.getFuelCapacity());
 
         rareEncounters = new RareEncounters();
@@ -81,9 +80,9 @@ public class Game {
         days++;
     }
 
-    // TODO: consider moving captain, too.
     public void setShip(PlayerShip ship) {
         this.ship = ship;
+        ship.addCrew(captain);
     }
 
     public News getNews() {
@@ -108,7 +107,7 @@ public class Game {
     }
 
     public List<String> getNewspaper() {
-        return news.getNewspaper();
+        return news.getNewspaper(currentSystem, galaxy, ship);
     }
 
     public Difficulty getDifficulty() {

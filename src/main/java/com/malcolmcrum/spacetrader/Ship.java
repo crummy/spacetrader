@@ -40,7 +40,11 @@ public class Ship {
     }
 
     public void addCrew(Crew member) {
-        crew.add(member);
+        if (crew.contains(member)) {
+            logger.warn("Tried to add a crewmember that already exists, named " + member.getName());
+        } else {
+            crew.add(member);
+        }
     }
 
     public void addWeapon(Weapon weapon) {
