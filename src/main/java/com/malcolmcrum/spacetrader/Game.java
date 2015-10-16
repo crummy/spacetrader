@@ -44,7 +44,7 @@ public class Game {
 
         quests = new Quests();
         captain = new Captain(commanderName, pilotSkill, fighterSkill, traderSkill, engineerSkill, this);
-        ship = new PlayerShip(ShipType.Gnat, quests, difficulty);
+        ship = new PlayerShip(ShipType.Gnat, captain, quests, difficulty);
         ship.addWeapon(Weapon.PulseLaser);
 
         galaxy = new Galaxy(captain, ship, difficulty);
@@ -82,7 +82,6 @@ public class Game {
 
     public void setShip(PlayerShip ship) {
         this.ship = ship;
-        ship.addCrew(captain);
     }
 
     public News getNews() {

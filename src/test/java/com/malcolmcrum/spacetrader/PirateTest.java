@@ -49,7 +49,7 @@ public class PirateTest extends GameStateTest {
 	@Test
 	public void testPirateSurrender() throws InvalidOpponentAction {
 		Pirate encounter = new Pirate(game, transit);
-		game.setShip(new PlayerShip(ShipType.Beetle, game.getQuests(), game.getDifficulty()));
+		game.setShip(new PlayerShip(ShipType.Beetle, game.getCaptain(), game.getQuests(), game.getDifficulty()));
 		game.getShip().addCrew(game.getCaptain());
 		game.getShip().addWeapon(Weapon.PulseLaser);
 		game.getShip().addShield(ShieldType.LightningShield);

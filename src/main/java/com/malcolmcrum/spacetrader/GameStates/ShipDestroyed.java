@@ -90,7 +90,7 @@ public class ShipDestroyed extends GameState {
         game.dayPasses();
         game.dayPasses();
 
-        PlayerShip flea = new PlayerShip(ShipType.Flea, quests, difficulty);
+        PlayerShip flea = new PlayerShip(ShipType.Flea, captain, quests, difficulty);
 
         game.setShip(flea);
 

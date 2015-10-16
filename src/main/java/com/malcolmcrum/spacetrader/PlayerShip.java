@@ -19,8 +19,9 @@ public class PlayerShip extends Ship {
     private final Quests quests;
 
     // TODO: this should take Captain as an argument. no playerships without captains.
-    public PlayerShip(ShipType type, Quests quests, Difficulty difficulty) {
+    public PlayerShip(ShipType type, Captain captain, Quests quests, Difficulty difficulty) {
         super(type, difficulty);
+        crew.add(captain);
         this.quests = quests;
         tribbles = 0;
         artifactOnBoard = false;

@@ -15,10 +15,10 @@ public class NewsTest {
     public void testGetNewspaper() {
         Game game = new Game();
         game.startNewGame("Bob", 5, 5, 5, 5, Difficulty.Normal);
-        News news = new News(game); // ahah what a silly line
+        News news = new News(game.getCaptain(), game.getQuests(), Difficulty.Normal); // ahah what a silly line
         news.addNotableEvent(News.NotableEvent.ArrivalViaSingularity);
         news.addSpecialEvent(SolarSystem.SpecialEvent.MedicineDelivery);
-        List<String> paper = news.getNewspaper();
+        List<String> paper = news.getNewspaper(game.getCurrentSystem(), game.getGalaxy(), game.getShip());
 
         boolean paperContainsSingularityHeadline = false;
         boolean paperContainsMedicineHeadline = false;
@@ -33,7 +33,7 @@ public class NewsTest {
         assertTrue("singularity headline should exist", paperContainsSingularityHeadline);
 
         news.resetNewsEvents();
-        paper = news.getNewspaper();
+        paper = news.getNewspaper(game.getCurrentSystem(), game.getGalaxy(), game.getShip());
 
         paperContainsSingularityHeadline = false;
         paperContainsMedicineHeadline = false;

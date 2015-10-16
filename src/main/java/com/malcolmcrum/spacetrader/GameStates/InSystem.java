@@ -61,7 +61,7 @@ public class InSystem extends GameState {
     }
 
     public List<String> getNews() {
-        return game.getNews().getNewspaper();
+        return game.getNews().getNewspaper(system, game.getGalaxy(), game.getShip());
     }
 
     @Override
@@ -195,7 +195,7 @@ public class InSystem extends GameState {
         } else {
             int price = system.getShipsForSale().get(type);
             game.getCaptain().subtractCredits(price);
-            PlayerShip newShip = new PlayerShip(type, quests, game.getDifficulty());
+            PlayerShip newShip = new PlayerShip(type, captain, quests, game.getDifficulty());
             transferUniqueEquipment(game.getShip(), newShip);
             transferCrew(game.getShip(), newShip);
             game.setShip(newShip);

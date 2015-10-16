@@ -309,7 +309,7 @@ public class Police extends Encounter {
                 game.addAlert(Alert.TribblesSold);
             }
             game.addAlert(Alert.FleaRecieved);
-            game.setShip(new PlayerShip(ShipType.Flea, quests, difficulty));
+            game.setShip(new PlayerShip(ShipType.Flea, captain, quests, difficulty));
         }
 
         captain.policeRecord.make(PoliceRecord.Status.Dubious);
