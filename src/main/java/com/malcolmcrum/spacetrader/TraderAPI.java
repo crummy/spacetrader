@@ -30,7 +30,7 @@ public class TraderAPI {
         builder.setPrettyPrinting();
         Gson gson = builder.create();
 
-        get("/", (request, response) -> {
+        get("/state", (request, response) -> {
             return gson.toJson(manager.getState());
         });
 
