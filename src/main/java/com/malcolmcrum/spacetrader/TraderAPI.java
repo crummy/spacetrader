@@ -5,9 +5,8 @@ import com.google.gson.GsonBuilder;
 import com.malcolmcrum.spacetrader.GameStates.GameOver;
 import com.malcolmcrum.spacetrader.GameStates.InSystem;
 import com.malcolmcrum.spacetrader.Serializers.*;
-import spark.Filter;
-import spark.Request;
-import spark.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static spark.Spark.*;
 
@@ -15,6 +14,9 @@ import static spark.Spark.*;
  * Created by Malcolm on 9/10/2015.
  */
 public class TraderAPI {
+    private static final Logger logger = LoggerFactory.getLogger(TraderAPI.class);
+
+
     public TraderAPI() {
         GameManager manager = new GameManager();
 
@@ -29,6 +31,10 @@ public class TraderAPI {
         builder.registerTypeAdapter(GameOver.class, new GameOverSerializer());
         builder.setPrettyPrinting();
         Gson gson = builder.create();
+
+        get("games", (request, response) -> {
+            return gson.toJson(manager.getGames());
+        });
 
         get("game/:id/state", (request, response) -> {
             int id = Integer.parseInt(request.params(":id"));
@@ -67,6 +73,10 @@ public class TraderAPI {
         exception(IllegalArgumentException.class, (e, request, response) -> {
             response.status(400);
             response.body(gson.toJson(new APIError(e.getMessage())));
+        });
+
+        before((request, response) -> {
+           logger.info("request from " + request.ip() + ": " + request.requestMethod() + " " + request.url());
         });
 
         after((request, response) -> {

@@ -31,6 +31,10 @@ public class GameManager {
         return getState(game.id);
     }
 
+    public Map<Integer, Game> getGames() {
+        return games;
+    }
+
     public GameState getState(int id) {
         if (states.containsKey(id)) {
             return states.get(id);
