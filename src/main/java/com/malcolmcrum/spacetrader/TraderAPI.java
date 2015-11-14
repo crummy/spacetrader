@@ -29,11 +29,22 @@ public class TraderAPI {
         builder.registerTypeAdapter(Captain.class, new CaptainSerializer());
         builder.registerTypeAdapter(Bank.class, new BankSerializer());
         builder.registerTypeAdapter(GameOver.class, new GameOverSerializer());
+        builder.registerTypeAdapter(Game.class, new GameSerializer());
         builder.setPrettyPrinting();
         Gson gson = builder.create();
 
         get("games", (request, response) -> {
             return gson.toJson(manager.getGames());
+        });
+
+        post("games/new", (request, response) -> {
+            String name = request.queryParams("name");
+            int fighter = Integer.parseInt(request.queryParams("fighter"));
+            int pilot = Integer.parseInt(request.queryParams("pilot"));
+            int trader = Integer.parseInt(request.queryParams("trader"));
+            int engineer = Integer.parseInt(request.queryParams("engineer"));
+            int difficulty = Integer.parseInt(request.queryParams("difficulty"));
+            return gson.toJson(manager.newGame(name, fighter, pilot, trader, engineer, difficulty));
         });
 
         get("game/:id/state", (request, response) -> {
@@ -73,6 +84,7 @@ public class TraderAPI {
         exception(IllegalArgumentException.class, (e, request, response) -> {
             response.status(400);
             response.body(gson.toJson(new APIError(e.getMessage())));
+            logger.error("Error occurred", e);
         });
 
         before((request, response) -> {

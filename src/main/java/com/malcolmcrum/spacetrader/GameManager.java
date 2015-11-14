@@ -23,12 +23,13 @@ public class GameManager {
     private Map<Integer, Game> games = new HashMap<>();
     private Map<Integer, GameState> states = new HashMap<>();
 
-    public GameState newGame(String name, int fighter, int pilot, int trader, int engineer, int difficultyIndex) {
+    public int newGame(String name, int fighter, int pilot, int trader, int engineer, int difficultyIndex) {
         Game game = new Game();
         games.put(game.id, game);
         Difficulty d = Difficulty.values()[difficultyIndex];
         states.put(game.id, game.startNewGame(name, fighter, pilot, trader, engineer, d));
-        return getState(game.id);
+        logger.info("New game created for Captain " + name + ", id: " + game.id);
+        return game.id;
     }
 
     public Map<Integer, Game> getGames() {
