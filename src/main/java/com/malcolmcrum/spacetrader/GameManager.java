@@ -10,38 +10,50 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Eventually will handle multiple games. Right now, just one.
  * Created by Malcolm on 9/10/2015.
  */
 public class GameManager {
     private static final Logger logger = LoggerFactory.getLogger(GameManager.class);
 
-    private Game game;
-    private GameState state;
+    private Map<Integer, Game> games = new HashMap<>();
+    private Map<Integer, GameState> states = new HashMap<>();
 
-    public GameManager() {
-        newGame();
+    public GameState newGame(String name, int fighter, int pilot, int trader, int engineer, int difficultyIndex) {
+        Game game = new Game();
+        games.put(game.id, game);
+        Difficulty d = Difficulty.values()[difficultyIndex];
+        states.put(game.id, game.startNewGame(name, fighter, pilot, trader, engineer, d));
+        return getState(game.id);
     }
 
-    public void newGame() {
-        game = new Game();
-        state = game.startNewGame("Billy Bob", 5, 5, 5, 5, Difficulty.Normal);
+    public GameState getState(int id) {
+        if (states.containsKey(id)) {
+            return states.get(id);
+        } else {
+            throw new InvalidGameIdException();
+        }
     }
 
-
-    public GameState getState() {
-        return state;
+    private Game getGame(int id) {
+        if (games.containsKey(id)) {
+            return games.get(id);
+        } else {
+            throw new InvalidGameIdException();
+        }
     }
 
-    public Galaxy getGalaxy() {
-        return game.getGalaxy();
+    public Galaxy getGalaxy(int id) {
+        return getGame(id).getGalaxy();
     }
 
     // TODO: Make this check parameters as well
-    public boolean isActionValid(String action, String body) {
+    public boolean isActionValid(int id, String action, String body) {
+        GameState state = getState(id);
         List<Method> actions = state.getActions();
         for (Method m : actions) {
             if (m.getName().equals(action)) {
@@ -51,7 +63,8 @@ public class GameManager {
         return false;
     }
 
-    public GameState action(String action, String body) {
+    public GameState action(int id, String action, String body) {
+        GameState state = getState(id);
         List<Method> actions = state.getActions();
         for (Method m : actions) {
             if (m.getName().equals(action)) {
@@ -114,12 +127,12 @@ public class GameManager {
         return new ShipTypes();
     }
 
-    public Captain getCaptain() {
-        return game.getCaptain();
+    public Captain getCaptain(int id) {
+        return getGame(id).getCaptain();
     }
 
-    public Bank getBank() {
-        return game.getCaptain().bank;
+    public Bank getBank(int id) {
+        return getGame(id).getCaptain().bank;
     }
 
     public class ShipTypes {
@@ -127,5 +140,9 @@ public class GameManager {
         ShipTypes() {
             types = ShipType.values();
         }
+    }
+
+    private class InvalidGameIdException extends IllegalArgumentException {
+
     }
 }

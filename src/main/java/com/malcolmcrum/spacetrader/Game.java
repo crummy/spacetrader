@@ -34,6 +34,8 @@ public class Game {
     private int monsterHull;
     private Quests quests;
 
+    private static int lastGameId = 0;
+    public final int id = ++lastGameId;
 
     public GameState startNewGame(String commanderName, int pilotSkill, int fighterSkill, int traderSkill, int engineerSkill, Difficulty difficulty) {
 

@@ -30,30 +30,35 @@ public class TraderAPI {
         builder.setPrettyPrinting();
         Gson gson = builder.create();
 
-        get("/state", (request, response) -> {
-            return gson.toJson(manager.getState());
+        get("game/:id/state", (request, response) -> {
+            int id = Integer.parseInt(request.params(":id"));
+            return gson.toJson(manager.getState(id));
         });
 
-        get("/galaxy", (request, response) -> {
-            return gson.toJson(manager.getGalaxy());
+        get("game/:id/galaxy", (request, response) -> {
+            int id = Integer.parseInt(request.params(":id"));
+            return gson.toJson(manager.getGalaxy(id));
         });
 
-        get("/ships", (request, response) -> {
+        get("game/:id/ships", (request, response) -> {
             return gson.toJson(manager.getShipTypes());
         });
 
-        get("/captain", (request, response) -> {
-            return gson.toJson(manager.getCaptain());
+        get("game/:id/captain", (request, response) -> {
+            int id = Integer.parseInt(request.params(":id"));
+            return gson.toJson(manager.getCaptain(id));
         });
 
-        get("/bank", (request, response) -> {
-            return gson.toJson(manager.getBank());
+        get("game/:id/bank", (request, response) -> {
+            int id = Integer.parseInt(request.params(":id"));
+            return gson.toJson(manager.getBank(id));
         });
 
-        post("/action/:action", (request, response) -> {
+        post("game/:id/action/:action", (request, response) -> {
+            int id = Integer.parseInt(request.params(":id"));
             String action = request.params(":action");
-            if (manager.isActionValid(action, request.body())) {
-                return gson.toJson(manager.action(action, request.body()));
+            if (manager.isActionValid(id, action, request.body())) {
+                return gson.toJson(manager.action(id, action, request.body()));
             } else {
                 throw new APIError("No action found called " + action);
             }
