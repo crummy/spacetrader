@@ -9,10 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Malcolm on 9/10/2015.
@@ -75,6 +72,7 @@ public class GameManager {
             if (m.getName().equals(action)) {
                 Object[] parameters = getParametersForMethod(body, m);
                 try {
+                    logger.info("calling action " + m.getName() + "(" + Arrays.toString(parameters) + ")");
                     GameState previousState = state;
                     state = (GameState)m.invoke(state, parameters);
                     while (state != previousState) { // Some states are just transition states.

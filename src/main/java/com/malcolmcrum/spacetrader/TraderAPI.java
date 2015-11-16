@@ -88,7 +88,7 @@ public class TraderAPI {
         });
 
         before((request, response) -> {
-           logger.info("request from " + request.ip() + ": " + request.requestMethod() + " " + request.url());
+           logger.info("request from " + request.ip() + ": " + request.requestMethod() + " " + request.url() + " (" + request.body() + ")");
         });
 
         after((request, response) -> {
