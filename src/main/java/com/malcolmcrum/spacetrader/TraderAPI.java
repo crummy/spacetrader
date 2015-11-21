@@ -47,31 +47,31 @@ public class TraderAPI {
             return gson.toJson(manager.newGame(name, fighter, pilot, trader, engineer, difficulty));
         });
 
-        get("game/:id/state", (request, response) -> {
+        get("games/:id/state", (request, response) -> {
             int id = Integer.parseInt(request.params(":id"));
             return gson.toJson(manager.getState(id));
         });
 
-        get("game/:id/galaxy", (request, response) -> {
+        get("games/:id/galaxy", (request, response) -> {
             int id = Integer.parseInt(request.params(":id"));
             return gson.toJson(manager.getGalaxy(id));
         });
 
-        get("game/:id/ships", (request, response) -> {
+        get("games/:id/ships", (request, response) -> {
             return gson.toJson(manager.getShipTypes());
         });
 
-        get("game/:id/captain", (request, response) -> {
+        get("games/:id/captain", (request, response) -> {
             int id = Integer.parseInt(request.params(":id"));
             return gson.toJson(manager.getCaptain(id));
         });
 
-        get("game/:id/bank", (request, response) -> {
+        get("games/:id/bank", (request, response) -> {
             int id = Integer.parseInt(request.params(":id"));
             return gson.toJson(manager.getBank(id));
         });
 
-        post("game/:id/action/:action", (request, response) -> {
+        post("games/:id/action/:action", (request, response) -> {
             int id = Integer.parseInt(request.params(":id"));
             String action = request.params(":action");
             if (manager.isActionValid(id, action, request.body())) {

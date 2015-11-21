@@ -16,16 +16,21 @@ mvn package... I can't remember right now. I just run it in IntelliJ
 
 Interaction with the game is via a REST API. These are subject to change.
 
-`GET /state` - Get current GameState of the game, e.g. on system, in combat, etc. Returns all relevant information about
+`GET /games` - List current games available
+
+`POST /games/new?name=[commanderName]&fighter=[fighterSkill]&engineer=[engineerSkill]&pilot=[pilotSkill]&trader=[traderSkill]&difficulty=[difficultyLevel]`
+  - Start new game. Returns `id` for newly created game. Skills are 0-10 and must add up to 20. Difficulty is 0-4.
+
+`GET /games/[id]/state` - Get current GameState of the game, e.g. on system, in combat, etc. Returns all relevant information about
 current state, such as goods for sale on a system, or opponent hull strength in combat. Also returns all possible
 actions.
 
-`POST /action/[action]` - Take an action, such as "attack" or "buyShip". Returns the new GameState.
+`POST /games/[id]/action/[action]` - Take an action, such as "attack" or "buyShip". Returns the new GameState.
 
-`GET /galaxy` - Get information about the entire galaxy - system locations, political status, etc.
+`GET /games/[id]/galaxy` - Get information about the entire galaxy - system locations, political status, etc.
 
-`GET /ships` - Get information about every ship in the game. (Maybe this will be removed?)
+`GET /games/[id]/ships` - Get information about every ship in the game. (Maybe this will be removed?)
 
-`GET /captain` - Get captain specific statistics.
+`GET /games/[id]/captain` - Get captain specific statistics.
 
-`GET /bank` - Get financial information such as debt and insurance status.
+`GET /games/[id]/bank` - Get financial information such as debt and insurance status.
