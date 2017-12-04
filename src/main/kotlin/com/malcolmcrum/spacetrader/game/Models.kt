@@ -17,7 +17,7 @@ enum class ShipType(val text: String,
                     val gadgetSlots: Int,
                     val crewQuarters: Int,
                     val fuelTanks: Int,
-                    val minTechLevel: TechLevel,
+                    val minTechLevel: TechLevel?,
                     val costOfFuel: Int,
                     val basePrice: Int,
                     val baseBounty: Int,
@@ -40,11 +40,11 @@ enum class ShipType(val text: String,
     TERMITE("Termite", 60, 1, 3, 2, 3, 13, TechLevel.of(7), 20, 225000, 300, 2, 200, 4, 5, 3, 4, 4),
     WASP("Wasp", 35, 3, 2, 2, 3, 14, TechLevel.of(7), 20, 300000, 500, 2, 200, 5, 6, 4, 5, 4),
     // The ships below can't be bought
-    SPACE_MONSTER("Space monster", 0, 3, 0, 0, 1, 1, TechLevel.of(8), 1, 500000, 0, 0, 500, 8, 8, 8, 1, 4),
-    DRAGONFLY("Dragonfly", 0, 2, 3, 2, 1, 1, TechLevel.of(8), 1, 500000, 0, 0, 10, 8, 8, 8, 1, 1),
-    MANTIS("Mantis", 0, 3, 1, 3, 3, 1, TechLevel.of(8), 1, 500000, 0, 0, 300, 8, 8, 8, 1, 2),
-    SCARAB("Scarab", 20, 2, 0, 0, 2, 1, TechLevel.of(8), 1, 500000, 0, 0, 400, 8, 8, 8, 1, 3),
-    BOTTLE("Bottle", 0, 0, 0, 0, 0, 1, TechLevel.of(8), 1, 100, 0, 0, 10, 8, 8, 8, 1, 1);
+    SPACE_MONSTER("Space monster", 0, 3, 0, 0, 1, 1, null, 1, 500000, 0, 0, 500, 8, 8, 8, 1, 4),
+    DRAGONFLY("Dragonfly", 0, 2, 3, 2, 1, 1, null, 1, 500000, 0, 0, 10, 8, 8, 8, 1, 1),
+    MANTIS("Mantis", 0, 3, 1, 3, 3, 1, null, 1, 500000, 0, 0, 300, 8, 8, 8, 1, 2),
+    SCARAB("Scarab", 20, 2, 0, 0, 2, 1, null, 1, 500000, 0, 0, 400, 8, 8, 8, 1, 3),
+    BOTTLE("Bottle", 0, 0, 0, 0, 0, 1, null, 1, 100, 0, 0, 10, 8, 8, 8, 1, 1);
 
 }
 

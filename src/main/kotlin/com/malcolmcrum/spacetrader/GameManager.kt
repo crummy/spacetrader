@@ -1,12 +1,28 @@
 package com.malcolmcrum.spacetrader
 
-import com.malcolmcrum.spacetrader.game.GameState
+import com.malcolmcrum.spacetrader.game.*
 import java.util.*
 
-data class Id(val value: String) {
-    constructor() : this(UUID.randomUUID().toString())
-}
+
 
 class GameManager {
-    val games = HashMap<Id, GameState>()
+    data class Id(val value: String) {
+        constructor() : this(UUID.randomUUID().toString())
+    }
+
+    val games = HashMap<Id, Game>()
+
+    private val galaxyGenerator = GalaxyGenerator()
+
+    fun newGame(commanderName: String, difficulty: Difficulty): Id {
+        val systems = galaxyGenerator.generateGalaxy()
+        galaxyGenerator.placeMercenaries(systems)
+        galaxyGenerator.placeSpecialEvents(systems)
+        val player = Player(commanderName, difficulty)
+        val galaxy = Galaxy(systems, 0, difficulty)
+
+        val id = Id()
+        games.put(id, Game(galaxy, player, id))
+        return id
+    }
 }

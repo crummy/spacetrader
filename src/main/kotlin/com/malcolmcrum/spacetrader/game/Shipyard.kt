@@ -1,6 +1,6 @@
 package com.malcolmcrum.spacetrader.game
 
 class Shipyard(val system: SolarSystem) {
-    val escapePodAvailable = system.tech >= ShipType.FLEA.minTechLevel
-    val shipsAvailable = ShipType.values().filter { it.minTechLevel >= system.tech }
+    val escapePodAvailable = system.tech >= ShipType.FLEA.minTechLevel!!
+    val shipsAvailable = ShipType.values().filter { it.minTechLevel != null && it.minTechLevel >= system.tech }
 }

@@ -2,42 +2,51 @@ package com.malcolmcrum.spacetrader
 
 import com.github.salomonbrys.kodein.Kodein
 import com.github.salomonbrys.kodein.with
-import com.malcolmcrum.spacetrader.game.*
-import com.malcolmcrum.spacetrader.ui.onPlanetUI
-import io.ktor.application.Application
-import io.ktor.application.call
-import io.ktor.application.install
-import io.ktor.features.CallLogging
-import io.ktor.features.DefaultHeaders
-import io.ktor.response.respond
-import io.ktor.routing.Routing
-import io.ktor.routing.get
-import io.ktor.routing.route
+import com.malcolmcrum.spacetrader.game.Difficulty
+import com.malcolmcrum.spacetrader.game.OnPlanet
+import com.malcolmcrum.spacetrader.ui.get
+import com.malcolmcrum.spacetrader.ui.newGame
+import org.http4k.core.HttpHandler
+import org.http4k.core.Method
+import org.http4k.core.Method.GET
+import org.http4k.core.Response
+import org.http4k.core.Status.Companion.OK
+import org.http4k.core.body.form
+import org.http4k.routing.bind
+import org.http4k.routing.path
+import org.http4k.routing.routes
+import org.http4k.server.Jetty
+import org.http4k.server.asServer
 
 val kodein = Kodein {
     constant("galaxyWidth") with 150
-    constant(GALAXY_HEIGHT) with 110
-    constant(MAX_SOLAR_SYSTEM) with 120
-    constant(MAX_WORMHOLES) with 6
-    constant(CLOSE_DISTANCE) with 13
-    constant(MIN_DISTANCE) with 6
-    constant(MAX_CREW_MEMBER) with 31
+    constant("galaxyHeight") with 110
+    constant("maxSolarSystems") with 120
+    constant("maxWormholes") with 6
+    constant("closeDistance") with 13
+    constant("minDistance") with 6
+    constant("maxCrewMembers") with 31
 }
 
 val gameManager = GameManager()
 
+fun main(args: Array<String>) {
+    val app: HttpHandler = routes(
+            "/game/{gameId}" bind GET to { req ->
+                val id = req.path("gameId")!!
+                val game = gameManager.games[GameManager.Id(id)]!!
+                val onPlanet = game as OnPlanet
+                Response(OK).body(get(onPlanet))
+            },
+            "/new" bind GET to {
+                Response(OK).body(newGame())
+            },
+            "/new" bind Method.POST to { req ->
+                val name = req.form("name")!!
+                val difficulty = Difficulty.valueOf(req.form("difficulty") ?: "NORMAL")
+                Response(OK).body(gameManager.newGame(name, difficulty).value)
+            }
+    )
 
-fun Application.main() {
-    install(DefaultHeaders)
-    install(CallLogging)
-    install(Routing) {
-        route("/rest/v1/") {
-            onPlanetUI()
-        }
-        get("/rest/v1/{gameId}/gameState") {
-            val id = Id(call.parameters["gameId"]!!)
-            val game = gameManager.games[id] ?: Exception("No game found with id $id")
-            call.respond(game)
-        }
-    }
+    app.asServer(Jetty(8000)).start()
 }
