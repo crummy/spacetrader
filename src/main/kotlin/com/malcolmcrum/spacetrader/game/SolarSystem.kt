@@ -21,4 +21,12 @@ class SolarSystem(val x: Int,
     override fun toString(): String {
         return "[$x, $y]"
     }
+
+    fun hasWormholeTo(destination: SolarSystem): Boolean {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    fun distanceTo(destination: SolarSystem): Int {
+        return Math.hypot((x - destination.x).toDouble(), (y - destination.y).toDouble()).toInt()
+    }
 }

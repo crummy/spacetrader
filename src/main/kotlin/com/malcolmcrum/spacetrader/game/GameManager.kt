@@ -7,6 +7,6 @@ class GameManager() {
         val galaxy = galaxyGenerator.generateGalaxy()
         galaxyGenerator.placeMercenaries(galaxy)
         galaxyGenerator.placeSpecialEvents(galaxy)
-        val player = Player("name", ShipType.GNAT)
+        val player = Player("name", Difficulty.NORMAL)
     }
 }

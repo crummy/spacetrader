@@ -172,7 +172,9 @@ enum class ShieldType(val text: String,
     ENERGY("Energy shield", 100,  5000, TechLevel.of(5), 70 ),
     REFLECTIVE("Reflective shield",  200, 20000, TechLevel.of(6), 30 ),
     // The shields below can't be bought
-    LIGHTNING("Lightning shield",   350, 45000, null,  0 )
+    LIGHTNING("Lightning shield",   350, 45000, null,  0 );
+
+    fun sellPrice(): Int = basePrice * 3/4
 }
 
 enum class Gadget(val text: String,
@@ -185,7 +187,9 @@ enum class Gadget(val text: String,
     TARGETING("Targeting system",	   25000, TechLevel.of(6), 20), // Increases fighter's effectivity
     CLOAKING("Cloaking device",      100000, TechLevel.of(7), 5), // If you have a good engineer, nor pirates nor police will notice you
     // The gadgets below can't be bought
-    FUEL_COMPACTOR("Fuel compactor",        30000, null, 0)
+    FUEL_COMPACTOR("Fuel compactor",        30000, null, 0);
+
+    fun sellPrice(): Int = basePrice * 3/4
 }
 
 enum class Weapon(val text: String,
@@ -198,7 +202,9 @@ enum class Weapon(val text: String,
     MILITARY("Military Laser", 35, 35000, TechLevel.of(7), 15),
     // The following cannot be purchased
     // NOTE: The original source says "fix me!" by the power for the laser. Why?
-    MORGANS("Morgan's Laser", 85, 50000, null, 0)
+    MORGANS("Morgan's Laser", 85, 50000, null, 0);
+
+    fun sellPrice(): Int = basePrice * 3/4
 }
 
 data class CrewMember(val text: String,
@@ -207,7 +213,35 @@ data class CrewMember(val text: String,
                       val trader: Int,
                       val engineer: Int,
                       var curSystem: SolarSystem) {
+    fun dailyCost(): Int {
+        // TODO: handle wildstatus
+        return (pilot + fighter + trader + engineer) * 3
+    }
 
+}
+
+enum class PoliceRecord(val score: Int) {
+    PSYCHOPATH(-70),
+    VILLAIN(-30),
+    CRIMINAL(-10),
+    DUBIOUS(-5),
+    CLEAN(0),
+    LAWFUL(5),
+    TRUSTED(10),
+    HELPER(25),
+    HERO(75)
+}
+
+enum class Reputation(val score: Int) {
+    HARMLESS(0),
+    MOSTLY_HARMLESS(10),
+    POOR(20),
+    AVERAGE(40),
+    ABOVE_AVERAGE(80),
+    COMPETENT(150),
+    DANGEROUS(300),
+    DEADLY(600),
+    ELITE(1500)
 }
 
 data class Amount(val current: Int, val max: Int)

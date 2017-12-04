@@ -16,8 +16,11 @@ plugins {
     id "org.jetbrains.kotlin.jvm" version "1.2.0"
 }
 
+apply plugin: 'application'
+
 group 'com.malcolmcrum.spacetrader'
 version '0.1-SNAPSHOT'
+mainClassName = 'io.ktor.server.netty.DevelopmentEngine'
 
 
 repositories {
@@ -29,8 +32,10 @@ repositories {
 
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib"
-    compile "io.ktor:ktor-server-jetty:$ktor_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "io.ktor:ktor-server-netty:$ktor_version"
+    compile "io.ktor:ktor-html-builder:$ktor_version"
+    compile "io.ktor:ktor-locations:$ktor_version"
     compile "ch.qos.logback:logback-classic:1.2.1"
     compile 'com.github.salomonbrys.kodein:kodein:4.1.0'
     testCompile("org.junit.jupiter:junit-jupiter-api:${junit_version}")
