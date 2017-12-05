@@ -1,37 +1,42 @@
 package com.malcolmcrum.spacetrader.game
 
+import org.slf4j.LoggerFactory
 import java.util.*
 
 
-val GALAXY_WIDTH = 150
-val GALAXY_HEIGHT = 110
-val MAX_SOLAR_SYSTEM = 120
-val MAX_WORMHOLES = 6
-val CLOSE_DISTANCE = 13
-val MIN_DISTANCE = 6
-val MAX_CREW_MEMBER = 31
+const val GALAXY_WIDTH = 150
+const val GALAXY_HEIGHT = 110
+const val MAX_SOLAR_SYSTEM = 120
+const val MAX_WORMHOLES = 6
+const val CLOSE_DISTANCE = 13
+const val MIN_DISTANCE = 6
+const val MAX_CREW_MEMBER = 31
 
 private data class Position(val x: Int, val y: Int)
 
 class GalaxyGenerator {
+    val log = LoggerFactory.getLogger(GalaxyGenerator::class.java)
+
     // TODO: This method still is quite C-ish. Needs improvement
     fun generateGalaxy(): List<SolarSystem> {
 
         val systems = ArrayList<SolarSystem>()
         var i = 0
         while (i < MAX_SOLAR_SYSTEM) {
-            // Generate a random-ish location
-            val (x, y) = if (systemGetsWormhole(i)) randomPositionNearCenter(i) else randomPositionAnywhere()
+            // Generate a random-ish location, especially near the center if a wormhole
+            val wormholesPlaced = !systemGetsWormhole(i)
+            val (x, y) = if (!wormholesPlaced) randomPositionNearCenter(i) else randomPositionAnywhere()
 
             // Ensure other systems are close, but not too close
-            val wormholesPlaced = !systemGetsWormhole(i)
             if (wormholesPlaced) {
                 val veryCloseSystems = systems.filter { it.distanceTo(x, y) <= MIN_DISTANCE }.count()
                 if (veryCloseSystems > 1) {
+                    log.warn("Rejected $x,$y; too close to $veryCloseSystems systems")
                     continue
                 }
                 val closeSystems = systems.filter { it.distanceTo(x, y) <= CLOSE_DISTANCE }.count()
                 if (closeSystems == 0) {
+                    log.warn("Rejected $x,$y; no systems in range")
                     continue
                 }
             }
@@ -39,7 +44,7 @@ class GalaxyGenerator {
             val tech = pickRandom(TechLevel.values())
             val politics = pickRandom(Politics.values())
             if (!politics.compatibleWith(tech)) {
-                continue
+                log.debug("Rejected $x,$y; politics incompatible")
             }
 
             val hasSpecialResource = (0..5).random() >= 3
@@ -52,8 +57,12 @@ class GalaxyGenerator {
 
             val name = "TODO"
 
-            val system = SolarSystem(x, y, tech, politics, specialResource, size, status)
+            val system = SolarSystem(name, x, y, tech, politics, specialResource, size, status)
+            if (!wormholesPlaced) {
+                system.wormholeDestination = system
+            }
             systems.add(system)
+            log.debug("Added system: $system")
             ++i
         }
 
@@ -91,10 +100,6 @@ class GalaxyGenerator {
                 .filter { it.neighbours(ship.fuelTanks, systems) >= 3 }
                 .shuffled()
                 .getOrNull(0) ?: throw Exception("Couldn't find starting system")
-    }
-
-    private fun SolarSystem.distanceTo(x: Int, y: Int): Double {
-        return Math.hypot((this.x - x).toDouble(), (this.y - y).toDouble())
     }
 
     private fun randomPositionNearCenter(i: Int): Position {

@@ -1,6 +1,7 @@
 package com.malcolmcrum.spacetrader.game
 
-class SolarSystem(val x: Int,
+class SolarSystem(val name: String,
+                  val x: Int,
                   val y: Int,
                   val tech: TechLevel,
                   val politics: Politics,
@@ -13,6 +14,8 @@ class SolarSystem(val x: Int,
     var countdown = -1 // TODO
     val mercenary: CrewMember? = null
     val specialEvent: Any? = null
+    var wormholeDestination: SolarSystem? = null
+
 
     init {
         TradeItem.values().forEach { tradeItems[it] = 0 }
@@ -22,11 +25,16 @@ class SolarSystem(val x: Int,
         return "[$x, $y]"
     }
 
-    fun hasWormholeTo(destination: SolarSystem): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    fun hasWormholeTo(system: SolarSystem): Boolean {
+        return wormholeDestination == system
     }
 
     fun distanceTo(destination: SolarSystem): Int {
-        return Math.hypot((x - destination.x).toDouble(), (y - destination.y).toDouble()).toInt()
+        return distanceTo(destination.x, destination.y)
     }
+
+    fun distanceTo(x: Int, y: Int): Int {
+        return Math.hypot((this.x - x).toDouble(), (this.y - y).toDouble()).toInt()
+    }
+
 }

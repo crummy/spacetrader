@@ -22,7 +22,9 @@ class GameManager {
         val galaxy = Galaxy(systems, 0, difficulty)
 
         val id = Id()
-        games.put(id, Game(galaxy, player, id))
+        val startingSystem = galaxyGenerator.findStartingSystem(player.ship, systems)
+        val state = OnPlanet(startingSystem, player)
+        games.put(id, Game(galaxy, player, id, state))
         return id
     }
 }

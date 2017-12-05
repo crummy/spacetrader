@@ -4,7 +4,7 @@ import com.malcolmcrum.spacetrader.game.OnPlanet
 import kotlinx.html.*
 import kotlinx.html.stream.createHTML
 
-fun get(state: OnPlanet): String {
+fun onPlanet(state: OnPlanet): String {
     return createHTML().html {
         head {
             title {
