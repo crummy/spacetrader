@@ -26,17 +26,18 @@ class GalaxyGenerator {
             // Generate a random-ish location, especially near the center if a wormhole
             val wormholesPlaced = !systemGetsWormhole(i)
             val (x, y) = if (!wormholesPlaced) randomPositionNearCenter(i) else randomPositionAnywhere()
+            log.trace("Considering $x,$y")
 
             // Ensure other systems are close, but not too close
             if (wormholesPlaced) {
-                val veryCloseSystems = systems.filter { it.distanceTo(x, y) <= MIN_DISTANCE }.count()
-                if (veryCloseSystems > 1) {
-                    log.warn("Rejected $x,$y; too close to $veryCloseSystems systems")
+                val veryCloseSystems = systems.count { it.distanceTo(x, y) <= MIN_DISTANCE }
+                if (veryCloseSystems > 0) {
+                    log.trace("Rejected $x,$y; too close to $veryCloseSystems systems")
                     continue
                 }
-                val closeSystems = systems.filter { it.distanceTo(x, y) <= CLOSE_DISTANCE }.count()
+                val closeSystems = systems.count { it.distanceTo(x, y) <= CLOSE_DISTANCE }
                 if (closeSystems == 0) {
-                    log.warn("Rejected $x,$y; no systems in range")
+                    log.trace("Rejected $x,$y; no systems in range")
                     continue
                 }
             }
@@ -44,7 +45,8 @@ class GalaxyGenerator {
             val tech = pickRandom(TechLevel.values())
             val politics = pickRandom(Politics.values())
             if (!politics.compatibleWith(tech)) {
-                log.debug("Rejected $x,$y; politics incompatible")
+                log.trace("Rejected $x,$y; politics incompatible")
+                continue
             }
 
             val hasSpecialResource = (0..5).random() >= 3
@@ -62,7 +64,7 @@ class GalaxyGenerator {
                 system.wormholeDestination = system
             }
             systems.add(system)
-            log.debug("Added system: $system")
+            log.debug("Added system: $system.")
             ++i
         }
 

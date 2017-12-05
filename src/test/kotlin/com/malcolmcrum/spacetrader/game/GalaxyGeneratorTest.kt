@@ -13,7 +13,7 @@ internal class GalaxyGeneratorTest {
 
         for (y in 0..GALAXY_HEIGHT) {
             for (x in 0..GALAXY_WIDTH) {
-                var system = systems.firstOrNull { it.x == x && it.y == y }
+                val system = systems.firstOrNull { it.x == x && it.y == y }
                 if (system != null) {
                     if (system.wormholeDestination != null) {
                         print("W")
