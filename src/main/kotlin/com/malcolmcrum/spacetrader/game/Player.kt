@@ -17,7 +17,7 @@ data class Player(val name: String,
                   var hasInsurance: Boolean = false,
                   var days: Int = 0,
                   var policeRecordScore: Int = 0,
-                  var reputation: Int = 0) {
+                  var reputationScore: Int = 0) {
 
     fun getHull() = Amount(hullLeft, ship.hullStrength)
 

@@ -11,6 +11,21 @@ internal class GalaxyGeneratorTest {
     fun `verify all systems maintain a minimum distance`() {
         val systems = galaxyGenerator.generateGalaxy()
 
+        printGalaxy(systems)
+
+        systems.forEach { system ->
+            run {
+                systems.filter { it != system }.forEach { otherSystem ->
+                    run {
+                        assertTrue(system.distanceTo(otherSystem) >= MIN_DISTANCE, "Systems too close: $system, $otherSystem")
+                    }
+                }
+            }
+        }
+    }
+
+    // just a lil debugging fun
+    private fun printGalaxy(systems: List<SolarSystem>) {
         for (y in 0..GALAXY_HEIGHT) {
             for (x in 0..GALAXY_WIDTH) {
                 val system = systems.firstOrNull { it.x == x && it.y == y }
@@ -26,16 +41,13 @@ internal class GalaxyGeneratorTest {
             }
             println()
         }
+    }
 
-        systems.forEach { system ->
-            run {
-                systems.filter { it != system }.forEach { otherSystem ->
-                    run {
-                        assertTrue(system.distanceTo(otherSystem) >= MIN_DISTANCE, "Systems too close: $system, $otherSystem")
-                    }
-                }
-            }
-        }
+    @Test
+    fun `verify all politics and techlevels are compatible`() {
+        val systems = galaxyGenerator.generateGalaxy()
+
+        systems.forEach { assertTrue(it.politics.compatibleWith(it.tech)) }
     }
 
     @Test

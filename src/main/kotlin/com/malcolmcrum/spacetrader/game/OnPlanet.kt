@@ -1,7 +1,8 @@
 package com.malcolmcrum.spacetrader.game
 
-class OnPlanet(private val system: SolarSystem, private val player: Player) : GameState {
+class OnPlanet(val system: SolarSystem, private val player: Player) : GameState {
     val shipyard = Shipyard(system)
+    val market = MarketItem(system)
 
     fun repairShip(amount: Int) {
         val newHullLeft = player.hullLeft + amount

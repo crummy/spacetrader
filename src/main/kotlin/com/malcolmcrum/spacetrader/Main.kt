@@ -3,7 +3,6 @@ package com.malcolmcrum.spacetrader
 import com.github.salomonbrys.kodein.Kodein
 import com.github.salomonbrys.kodein.with
 import com.malcolmcrum.spacetrader.game.Difficulty
-import com.malcolmcrum.spacetrader.game.OnPlanet
 import com.malcolmcrum.spacetrader.ui.newGame
 import com.malcolmcrum.spacetrader.ui.onPlanet
 import org.http4k.core.HttpHandler
@@ -36,7 +35,7 @@ fun main(args: Array<String>) {
             "/game/{gameId}" bind GET to { req ->
                 val id = req.path("gameId")!!
                 val game = gameManager.games[GameManager.Id(id)]!!
-                Response(OK).body(onPlanet(game.state as OnPlanet))
+                Response(OK).body(onPlanet(game))
             },
             "/new" bind GET to {
                 Response(OK).body(newGame())

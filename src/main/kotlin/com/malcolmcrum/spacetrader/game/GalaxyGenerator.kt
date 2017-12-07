@@ -22,6 +22,7 @@ class GalaxyGenerator {
 
         val systems = ArrayList<SolarSystem>()
         var i = 0
+
         while (i < MAX_SOLAR_SYSTEM) {
             // Generate a random-ish location, especially near the center if a wormhole
             val wormholesPlaced = !systemGetsWormhole(i)
@@ -96,7 +97,7 @@ class GalaxyGenerator {
 
     fun findStartingSystem(ship: ShipType, systems: List<SolarSystem>): SolarSystem {
         return systems
-                .filter { it.specialEvent != null }
+                .filter { it.specialEvent == null }
                 .filter { it.tech >= TechLevel.AGRICULTURAL }
                 .filter { it.tech <= TechLevel.POST_INDUSTRIAL }
                 .filter { it.neighbours(ship.fuelTanks, systems) >= 3 }
@@ -124,16 +125,3 @@ class GalaxyGenerator {
         return systems.filter { it != this }.filter { it.distanceTo(this.x, this.y) <= range }.count()
     }
 }
-
-// generate galaxy
-// generate wormholes
-// generate systems
-
-// shuffle wormhole order
-
-// initialize mercs
-
-// place special events
-
-// find suitable starting location
-

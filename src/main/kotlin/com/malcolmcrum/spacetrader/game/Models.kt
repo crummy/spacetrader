@@ -167,7 +167,7 @@ enum class SystemSize(val text: String) {
 enum class ShieldType(val text: String,
                       val power: Int,
                       val basePrice: Int,
-                      val requiredLevel: TechLevel?,
+                      val minTechLevel: TechLevel?,
                       val chance: Int) {
     ENERGY("Energy shield", 100,  5000, TechLevel.of(5), 70 ),
     REFLECTIVE("Reflective shield",  200, 20000, TechLevel.of(6), 30 ),
@@ -179,7 +179,7 @@ enum class ShieldType(val text: String,
 
 enum class Gadget(val text: String,
                   val basePrice: Int,
-                  val requiredLevel: TechLevel?,
+                  val minTechLevel: TechLevel?,
                   val chance: Int) {
     EXTRA_CARGO_BAYS("5 extra cargo bays", 	2500, TechLevel.of(4), 35), // 5 extra holds
     AUTOREPAIR("Auto-repair system",     7500, TechLevel.of(5), 20), // Increases engineer's effectivity
@@ -195,7 +195,7 @@ enum class Gadget(val text: String,
 enum class Weapon(val text: String,
                   val power: Int,
                   val basePrice: Int,
-                  val requiredLevel: TechLevel?,
+                  val minTechLevel: TechLevel?,
                   val chance: Int) {
     PULSE("Pulse Laser", 15, 2000, TechLevel.of(5), 50),
     BEAM("Beam Laser", 25, 12500, TechLevel.of(6), 35),
@@ -229,7 +229,15 @@ enum class PoliceRecord(val score: Int) {
     LAWFUL(5),
     TRUSTED(10),
     HELPER(25),
-    HERO(75)
+    HERO(75);
+
+    companion object {
+        fun of(score: Int): PoliceRecord {
+            return PoliceRecord.values()
+                    .filter { score >= it.score }
+                    .findLast { return it }!!
+        }
+    }
 }
 
 enum class Reputation(val score: Int) {
@@ -241,7 +249,15 @@ enum class Reputation(val score: Int) {
     COMPETENT(150),
     DANGEROUS(300),
     DEADLY(600),
-    ELITE(1500)
+    ELITE(1500);
+
+    companion object {
+        fun of(score: Int): Reputation {
+            return Reputation.values()
+                    .filter { score >= it.score }
+                    .findLast { return it }!!
+        }
+    }
 }
 
 data class Amount(val current: Int, val max: Int)

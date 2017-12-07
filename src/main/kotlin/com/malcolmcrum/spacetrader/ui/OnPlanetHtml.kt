@@ -1,10 +1,11 @@
 package com.malcolmcrum.spacetrader.ui
 
-import com.malcolmcrum.spacetrader.game.OnPlanet
+import com.malcolmcrum.spacetrader.game.*
 import kotlinx.html.*
 import kotlinx.html.stream.createHTML
 
-fun onPlanet(state: OnPlanet): String {
+fun onPlanet(game: Game): String {
+    val state = game.state as OnPlanet
     return createHTML().html {
         head {
             title {
@@ -13,25 +14,70 @@ fun onPlanet(state: OnPlanet): String {
         }
         body {
             table {
-                tr {
-                    th {
-                        +"Ship"
-                    }
-                    td {
-                        +"Price"
-                    }
-                }
+                headerRow("Status", game.player.name)
+                row("Credits", game.player.finances.credits)
+                row("Debt", game.player.finances.debt)
+                row("Escape Pod?", game.player.hasEscapePod)
+                row("Days", game.player.days)
+                row("Reputation", Reputation.of(game.player.reputationScore))
+                row("Police Record", PoliceRecord.of(game.player.policeRecordScore))
+            }
+            table {
+                headerRow("Ship", game.player.ship.text)
+                row("Crew", "${game.player.crew.size}/${game.player.ship.crewQuarters}")
+                row("Weapons", "${game.player.weapons.size}/${game.player.ship.weaponSlots}")
+                row("Shields", "${game.player.shields.size}/${game.player.ship.shieldSlots}")
+                row("Fuel Remaining", "${game.player.fuelLeft}/${game.player.ship.fuelTanks}")
+                row("Insurance?", game.player.hasInsurance)
+            }
+            table {
+                headerRow("Shipyard", "Price")
+                row("Refuel", (game.player.ship.fuelTanks - game.player.fuelLeft) * game.player.ship.fuelTanks)
                 state.shipyard.shipsAvailable.forEach {
-                    tr {
-                        td {
-                            it.text
-                        }
-                        td {
-                            it.basePrice
-                        }
-                    }
+                    row(it.text, it.basePrice)
                 }
             }
+            table {
+                headerRow("Equipment", "Price")
+                state.shipyard.weaponsAvailable.forEach {
+                    row(it.text, it.basePrice)
+                }
+                state.shipyard.shieldsAvailable.forEach {
+                    row(it.text, it.basePrice)
+                }
+                state.shipyard.gadgetsAvailable.forEach {
+                    row(it.text, it.basePrice)
+                }
+            }
+            table {
+                headerRow("Nearby Systems", "Distance")
+                game.galaxy.systems
+                        .filter { it != state.system }
+                        .filter { it.distanceTo(state.system) <= ShipType.GNAT.fuelTanks + 1 }
+                        .sortedBy { it.distanceTo(state.system) }
+                        .forEach { row(it.name, it.distanceTo(state.system)) }
+            }
+            table {
+                headerRow("Market", "Price")
+                state.
+            }
         }
+    }
+}
+
+fun TABLE.row(left: Any, right: Any) = tr {
+    td {
+        +left.toString()
+    }
+    td {
+        +right.toString()
+    }
+}
+fun TABLE.headerRow(left: Any, right: Any) = tr {
+    th {
+        +left.toString()
+    }
+    th {
+        +right.toString()
     }
 }
