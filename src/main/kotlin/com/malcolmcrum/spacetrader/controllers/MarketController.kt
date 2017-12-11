@@ -144,4 +144,8 @@ class MarketController(private val market: Market, private val system: SolarSyst
 
         return Math.max(0, price)
     }
+
+    fun getAmount(item: TradeItem): Int {
+        return market.amounts[item]!!
+    }
 }
