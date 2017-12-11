@@ -2,6 +2,7 @@ package com.malcolmcrum.spacetrader
 
 import com.malcolmcrum.spacetrader.game.*
 import com.malcolmcrum.spacetrader.model.Difficulty
+import com.malcolmcrum.spacetrader.model.Game
 import com.malcolmcrum.spacetrader.views.OnPlanet
 import java.util.*
 

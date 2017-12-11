@@ -1,6 +1,6 @@
 package com.malcolmcrum.spacetrader.ui
 
-import com.malcolmcrum.spacetrader.game.*
+import com.malcolmcrum.spacetrader.model.Game
 import com.malcolmcrum.spacetrader.model.PoliceRecord
 import com.malcolmcrum.spacetrader.model.Reputation
 import com.malcolmcrum.spacetrader.model.ShipType
