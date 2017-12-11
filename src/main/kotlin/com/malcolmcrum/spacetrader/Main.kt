@@ -2,7 +2,7 @@ package com.malcolmcrum.spacetrader
 
 import com.github.salomonbrys.kodein.Kodein
 import com.github.salomonbrys.kodein.with
-import com.malcolmcrum.spacetrader.game.Difficulty
+import com.malcolmcrum.spacetrader.model.Difficulty
 import com.malcolmcrum.spacetrader.ui.newGame
 import com.malcolmcrum.spacetrader.ui.onPlanet
 import org.http4k.core.HttpHandler

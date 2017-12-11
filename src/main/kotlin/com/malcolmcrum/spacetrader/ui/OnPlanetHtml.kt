@@ -1,6 +1,10 @@
 package com.malcolmcrum.spacetrader.ui
 
 import com.malcolmcrum.spacetrader.game.*
+import com.malcolmcrum.spacetrader.model.PoliceRecord
+import com.malcolmcrum.spacetrader.model.Reputation
+import com.malcolmcrum.spacetrader.model.ShipType
+import com.malcolmcrum.spacetrader.views.OnPlanet
 import kotlinx.html.*
 import kotlinx.html.stream.createHTML
 
@@ -59,7 +63,6 @@ fun onPlanet(game: Game): String {
             }
             table {
                 headerRow("Market", "Price")
-                state.
             }
         }
     }

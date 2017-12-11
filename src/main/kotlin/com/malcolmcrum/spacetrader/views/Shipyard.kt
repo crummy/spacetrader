@@ -1,4 +1,6 @@
-package com.malcolmcrum.spacetrader.game
+package com.malcolmcrum.spacetrader.views
+
+import com.malcolmcrum.spacetrader.model.*
 
 class Shipyard(val system: SolarSystem) {
     val escapePodAvailable = system.tech >= ShipType.FLEA.minTechLevel!!

@@ -1,5 +1,7 @@
 package com.malcolmcrum.spacetrader.game
 
+import com.malcolmcrum.spacetrader.model.ShipType
+import com.malcolmcrum.spacetrader.model.SolarSystem
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 

@@ -1,8 +1,8 @@
-package com.malcolmcrum.spacetrader.game
+package com.malcolmcrum.spacetrader.model
 
-import com.malcolmcrum.spacetrader.game.SpecialResource.*
-import com.malcolmcrum.spacetrader.game.SystemStatus.*
-import com.malcolmcrum.spacetrader.game.TradeItem.*
+import com.malcolmcrum.spacetrader.model.SpecialResource.*
+import com.malcolmcrum.spacetrader.model.SystemStatus.*
+import com.malcolmcrum.spacetrader.model.TradeItem.*
 
 val MAX_RANGE = 30
 

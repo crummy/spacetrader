@@ -1,5 +1,9 @@
 package com.malcolmcrum.spacetrader.game
 
+import com.malcolmcrum.spacetrader.model.Politics
+import com.malcolmcrum.spacetrader.model.SolarSystem
+import com.malcolmcrum.spacetrader.model.SystemSize
+import com.malcolmcrum.spacetrader.model.TechLevel
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 

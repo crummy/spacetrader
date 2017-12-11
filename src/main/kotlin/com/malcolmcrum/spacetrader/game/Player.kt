@@ -1,5 +1,7 @@
 package com.malcolmcrum.spacetrader.game
 
+import com.malcolmcrum.spacetrader.model.*
+
 data class Player(val name: String,
                   var difficulty: Difficulty,
                   var ship: ShipType = ShipType.GNAT,

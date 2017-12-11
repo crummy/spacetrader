@@ -1,8 +1,11 @@
-package com.malcolmcrum.spacetrader.game
+package com.malcolmcrum.spacetrader.views
+
+import com.malcolmcrum.spacetrader.game.GameState
+import com.malcolmcrum.spacetrader.game.Player
+import com.malcolmcrum.spacetrader.model.SolarSystem
 
 class OnPlanet(val system: SolarSystem, private val player: Player) : GameState {
     val shipyard = Shipyard(system)
-    val market = MarketItem(system)
 
     fun repairShip(amount: Int) {
         val newHullLeft = player.hullLeft + amount

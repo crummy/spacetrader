@@ -1,5 +1,6 @@
 package com.malcolmcrum.spacetrader.game
 
+import com.malcolmcrum.spacetrader.model.*
 import org.slf4j.LoggerFactory
 import java.util.*
 
