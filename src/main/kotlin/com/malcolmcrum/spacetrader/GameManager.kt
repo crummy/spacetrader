@@ -1,6 +1,8 @@
 package com.malcolmcrum.spacetrader
 
-import com.malcolmcrum.spacetrader.game.*
+import com.malcolmcrum.spacetrader.game.Galaxy
+import com.malcolmcrum.spacetrader.game.GalaxyGenerator
+import com.malcolmcrum.spacetrader.game.Player
 import com.malcolmcrum.spacetrader.model.Difficulty
 import com.malcolmcrum.spacetrader.model.Game
 import com.malcolmcrum.spacetrader.views.OnPlanet
@@ -27,7 +29,7 @@ class GameManager {
         val id = Id()
         val startingSystem = galaxyGenerator.findStartingSystem(player.ship, systems)
         val state = OnPlanet(startingSystem, player)
-        games.put(id, Game(galaxy, player, id, state))
+        games.put(id, Game(galaxy, player, id, difficulty, state))
         return id
     }
 }

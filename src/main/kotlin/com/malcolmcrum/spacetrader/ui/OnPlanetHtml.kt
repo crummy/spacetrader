@@ -61,9 +61,6 @@ fun onPlanet(game: Game): String {
                         .sortedBy { it.distanceTo(state.system) }
                         .forEach { row(it.name, it.distanceTo(state.system)) }
             }
-            table {
-                headerRow("Market", "Price")
-            }
         }
     }
 }

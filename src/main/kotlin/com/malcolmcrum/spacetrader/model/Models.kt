@@ -6,10 +6,6 @@ import com.malcolmcrum.spacetrader.model.TradeItem.*
 
 val MAX_RANGE = 30
 
-data class Cargo(val text: String) {
-
-}
-
 enum class ShipType(val text: String,
                     val cargoBays: Int,
                     val weaponSlots: Int,

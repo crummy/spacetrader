@@ -5,7 +5,7 @@ import com.malcolmcrum.spacetrader.model.*
 data class Player(val name: String,
                   var difficulty: Difficulty,
                   var ship: ShipType = ShipType.GNAT,
-                  val cargo: MutableList<Cargo> = ArrayList(),
+                  val cargo: MutableList<TradeItem> = ArrayList(),
                   val weapons: MutableList<Weapon> = ArrayList(),
                   var shields: MutableList<Shield> = ArrayList(),
                   val gadgets: MutableList<Gadget> = ArrayList(),

@@ -5,4 +5,4 @@ import com.malcolmcrum.spacetrader.game.Galaxy
 import com.malcolmcrum.spacetrader.game.GameState
 import com.malcolmcrum.spacetrader.game.Player
 
-data class Game (val galaxy: Galaxy, val player: Player, val id: GameManager.Id, var state: GameState)
+data class Game (val galaxy: Galaxy, val player: Player, val id: GameManager.Id, val difficulty: Difficulty, var state: GameState)
