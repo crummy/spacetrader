@@ -1,4 +1,4 @@
-package com.malcolmcrum.spacetrader.game
+package com.malcolmcrum.spacetrader.nouns
 
 class MercenaryGenerator {
     // TODO: names

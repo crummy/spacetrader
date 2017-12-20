@@ -1,7 +1,7 @@
 package com.malcolmcrum.spacetrader.controllers
 
-import com.malcolmcrum.spacetrader.game.random
 import com.malcolmcrum.spacetrader.model.*
+import com.malcolmcrum.spacetrader.nouns.random
 
 val MAX_SKILL = 10 // TODO: move elsewhere
 

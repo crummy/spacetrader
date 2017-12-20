@@ -1,15 +1,15 @@
 package com.malcolmcrum.spacetrader.ui
 
-import com.malcolmcrum.spacetrader.model.Game
-import com.malcolmcrum.spacetrader.model.PoliceRecord
-import com.malcolmcrum.spacetrader.model.Reputation
-import com.malcolmcrum.spacetrader.model.ShipType
+import com.malcolmcrum.spacetrader.controllers.MarketController
+import com.malcolmcrum.spacetrader.model.*
 import com.malcolmcrum.spacetrader.views.OnPlanet
 import kotlinx.html.*
 import kotlinx.html.stream.createHTML
 
 fun onPlanet(game: Game): String {
     val state = game.state as OnPlanet
+    val market = MarketController(state.system.market, state.system, game.difficulty)
+
     return createHTML().html {
         head {
             title {
@@ -56,11 +56,72 @@ fun onPlanet(game: Game): String {
             }
             table {
                 headerRow("Nearby Systems", "Distance")
-                game.galaxy.systems
+                game.galaxy.systems // TODO: Read this from a controller
                         .filter { it != state.system }
                         .filter { it.distanceTo(state.system) <= ShipType.GNAT.fuelTanks + 1 }
                         .sortedBy { it.distanceTo(state.system) }
-                        .forEach { row(it.name, it.distanceTo(state.system)) }
+                        .forEach {
+                            tr {
+                                td {
+                                    buttonLink(it.name, "/game/${game.id}/travel/${it.name}")
+                                }
+                                td {
+                                    +it.distanceTo(state.system).toString()
+                                }
+                            }
+                        }
+            }
+            table {
+                tr {
+                    th {
+                        +"Sell"
+                    }
+                    th {
+                        +"Amount"
+                    }
+                    th {
+                        +"Price"
+                    }
+                }
+                TradeItem.values().forEach { item ->
+                    tr {
+                        td {
+                            +item.text
+                        }
+                        td {
+                            +game.player.cargo.count { cargo -> cargo == item }.toString()
+                        }
+                        td {
+                            +market.getSellPrice(item, game.player.policeRecordScore).toString()
+                        }
+                    }
+                }
+            }
+            table {
+                tr {
+                    th {
+                        +"Buy"
+                    }
+                    th {
+                        +"Amount"
+                    }
+                    th {
+                        +"Price"
+                    }
+                }
+                TradeItem.values().forEach { item ->
+                    tr {
+                        td {
+                            +item.text
+                        }
+                        td {
+                            +"${market.getAmount(item)}"
+                        }
+                        td {
+                            +"${market.getBuyPrice(item, 0, game.player.policeRecordScore)}"
+                        }
+                    }
+                }
             }
         }
     }
@@ -80,5 +141,14 @@ fun TABLE.headerRow(left: Any, right: Any) = tr {
     }
     th {
         +right.toString()
+    }
+}
+
+fun TD.buttonLink(text: String, destination: String) = form {
+    action = destination
+    method = FormMethod.post
+    button {
+        type = ButtonType.submit
+        +text
     }
 }

@@ -6,11 +6,16 @@ import com.malcolmcrum.spacetrader.model.Difficulty
 import com.malcolmcrum.spacetrader.model.GameId
 import com.malcolmcrum.spacetrader.ui.newGame
 import com.malcolmcrum.spacetrader.ui.onPlanet
-import org.http4k.core.*
+import com.malcolmcrum.spacetrader.verbs.Travel
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
+import org.http4k.core.Request
+import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.body.form
+import org.http4k.core.then
 import org.http4k.filter.ResponseFilters
 import org.http4k.routing.bind
 import org.http4k.routing.path
@@ -41,13 +46,20 @@ fun main(args: Array<String>) {
                 val game = gameManager.games[id]!!
                 Response(OK).body(onPlanet(game))
             },
+            "/game/{id}/travel/{planet}" bind POST to { req ->
+                val id: GameId = req.path("id")!!
+                val game = gameManager.games[id]!!
+                val destination = req.path("planet")!!
+                Travel(game).to(destination)
+                Response(SEE_OTHER).header("location", "/game/$id")
+            },
             "/games" bind GET to {
                 Response(OK).body(gameManager.games.toString())
             },
             "/new" bind GET to {
                 Response(OK).body(newGame())
             },
-            "/new" bind Method.POST to { req ->
+            "/new" bind POST to { req ->
                 val name = req.form("name")!!
                 val difficulty = Difficulty.valueOf(req.form("difficulty") ?: "NORMAL")
                 val id = gameManager.newGame(name, difficulty)
@@ -56,7 +68,7 @@ fun main(args: Array<String>) {
     )
 
     val callLogger = ResponseFilters.ReportLatency { req: Request, resp: Response, duration: Duration ->
-        log.info("${req.uri} returned ${resp.status} and took ${duration.toMillis()}ms")
+        log.debug("${req.uri} returned ${resp.status} and took ${duration.toMillis()}ms")
     }
 
     callLogger.then(app).asServer(Jetty(8000)).start()

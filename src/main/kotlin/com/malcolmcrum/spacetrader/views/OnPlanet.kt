@@ -1,8 +1,8 @@
 package com.malcolmcrum.spacetrader.views
 
-import com.malcolmcrum.spacetrader.game.GameState
-import com.malcolmcrum.spacetrader.game.Player
 import com.malcolmcrum.spacetrader.model.SolarSystem
+import com.malcolmcrum.spacetrader.nouns.GameState
+import com.malcolmcrum.spacetrader.nouns.Player
 
 class OnPlanet(val system: SolarSystem, private val player: Player) : GameState {
     val shipyard = Shipyard(system)

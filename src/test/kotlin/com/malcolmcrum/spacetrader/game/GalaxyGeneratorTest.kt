@@ -2,6 +2,10 @@ package com.malcolmcrum.spacetrader.game
 
 import com.malcolmcrum.spacetrader.model.ShipType
 import com.malcolmcrum.spacetrader.model.SolarSystem
+import com.malcolmcrum.spacetrader.nouns.GALAXY_HEIGHT
+import com.malcolmcrum.spacetrader.nouns.GALAXY_WIDTH
+import com.malcolmcrum.spacetrader.nouns.GalaxyGenerator
+import com.malcolmcrum.spacetrader.nouns.MIN_DISTANCE
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 

@@ -1,11 +1,11 @@
 package com.malcolmcrum.spacetrader
 
-import com.malcolmcrum.spacetrader.game.Galaxy
-import com.malcolmcrum.spacetrader.game.GalaxyGenerator
-import com.malcolmcrum.spacetrader.game.Player
 import com.malcolmcrum.spacetrader.model.Difficulty
 import com.malcolmcrum.spacetrader.model.Game
 import com.malcolmcrum.spacetrader.model.GameId
+import com.malcolmcrum.spacetrader.nouns.Galaxy
+import com.malcolmcrum.spacetrader.nouns.GalaxyGenerator
+import com.malcolmcrum.spacetrader.nouns.Player
 import com.malcolmcrum.spacetrader.views.OnPlanet
 import org.slf4j.LoggerFactory
 import java.util.*
