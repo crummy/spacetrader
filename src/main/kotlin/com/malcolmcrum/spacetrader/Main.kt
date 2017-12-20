@@ -3,12 +3,13 @@ package com.malcolmcrum.spacetrader
 import com.github.salomonbrys.kodein.Kodein
 import com.github.salomonbrys.kodein.with
 import com.malcolmcrum.spacetrader.model.Difficulty
+import com.malcolmcrum.spacetrader.model.GameId
 import com.malcolmcrum.spacetrader.ui.newGame
 import com.malcolmcrum.spacetrader.ui.onPlanet
 import org.http4k.core.*
 import org.http4k.core.Method.GET
 import org.http4k.core.Status.Companion.OK
-import org.http4k.core.Status.Companion.TEMPORARY_REDIRECT
+import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.body.form
 import org.http4k.filter.ResponseFilters
 import org.http4k.routing.bind
@@ -35,10 +36,13 @@ val gameManager = GameManager()
 
 fun main(args: Array<String>) {
     val app: HttpHandler = routes(
-            "/game/{gameId}" bind GET to { req ->
-                val id = req.path("gameId")!!
-                val game = gameManager.games[GameManager.Id(id)]!!
+            "/game/{id}" bind GET to { req ->
+                val id: GameId = req.path("id")!!
+                val game = gameManager.games[id]!!
                 Response(OK).body(onPlanet(game))
+            },
+            "/games" bind GET to {
+                Response(OK).body(gameManager.games.toString())
             },
             "/new" bind GET to {
                 Response(OK).body(newGame())
@@ -47,7 +51,7 @@ fun main(args: Array<String>) {
                 val name = req.form("name")!!
                 val difficulty = Difficulty.valueOf(req.form("difficulty") ?: "NORMAL")
                 val id = gameManager.newGame(name, difficulty)
-                Response(TEMPORARY_REDIRECT).header("location", "/game/${id.value}")
+                Response(SEE_OTHER).header("location", "/game/$id")
             }
     )
 
