@@ -7,6 +7,7 @@ import com.malcolmcrum.spacetrader.nouns.GALAXY_WIDTH
 import com.malcolmcrum.spacetrader.nouns.GalaxyGenerator
 import com.malcolmcrum.spacetrader.nouns.MIN_DISTANCE
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.RepeatedTest
 import org.junit.jupiter.api.Test
 
 internal class GalaxyGeneratorTest {
@@ -56,12 +57,10 @@ internal class GalaxyGeneratorTest {
         systems.forEach { assertTrue(it.politics.compatibleWith(it.tech)) }
     }
 
-    @Test
+    @RepeatedTest(10)
     fun `verify we can always find a starting system`() {
-        repeat(10, {
-            val systems = galaxyGenerator.generateGalaxy()
-            galaxyGenerator.findStartingSystem(ShipType.GNAT, systems)
-        })
+        val systems = galaxyGenerator.generateGalaxy()
+        galaxyGenerator.findStartingSystem(ShipType.GNAT, systems)
     }
 
 }
