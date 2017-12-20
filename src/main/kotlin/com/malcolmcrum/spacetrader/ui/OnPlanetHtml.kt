@@ -15,6 +15,7 @@ fun onPlanet(game: Game): String {
             title {
                 +"SpaceTrader"
             }
+            styles()
         }
         body {
             table {

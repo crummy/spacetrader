@@ -13,6 +13,9 @@ fun market(game: Game): String {
     val controller = MarketController(state.system.market, state.system, game.difficulty)
 
     return createHTML().html {
+        head {
+            styles()
+        }
         body {
             h1 {
                 +"market"
@@ -36,7 +39,33 @@ fun market(game: Game): String {
                     tr {
                         game.player.cargo.count { cargo -> cargo == item }
                     }
-
+                    tr {
+                        controller.getSellPrice(item, game.player.policeRecordScore)
+                    }
+                }
+            }
+            table {
+                tr {
+                    th {
+                        +"Buy"
+                    }
+                    th {
+                        +"Amount"
+                    }
+                    th {
+                        +"Price"
+                    }
+                }
+                TradeItem.values().forEach { item ->
+                    tr {
+                        item.text
+                    }
+                    tr {
+                        controller.getAmount(item)
+                    }
+                    tr {
+                        controller.getBuyPrice(item, 0, game.player.policeRecordScore)
+                    }
                 }
             }
         }

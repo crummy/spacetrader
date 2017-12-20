@@ -5,6 +5,9 @@ import kotlinx.html.stream.createHTML
 
 fun newGame(): String {
     return createHTML().html {
+        head {
+            styles()
+        }
         body {
             h1 {
                 +"Space Trader"

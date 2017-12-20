@@ -15,8 +15,9 @@ const val MAX_CREW_MEMBER = 31
 
 private data class Position(val x: Int, val y: Int)
 
+private val log = LoggerFactory.getLogger(GalaxyGenerator::class.java)!!
+
 class GalaxyGenerator {
-    val log = LoggerFactory.getLogger(GalaxyGenerator::class.java)
 
     // TODO: This method still is quite C-ish. Needs improvement
     fun generateGalaxy(): List<SolarSystem> {
