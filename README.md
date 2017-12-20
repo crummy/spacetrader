@@ -1,3 +1,7 @@
+# NOTE: This is now a relic of a prior era and is kept for historical reasons only.
+
+I originally created this repo partially to port a great game, but mostly to learn Java. I never finished it unfortunately. But now I'm working on the same project but to learn Kotlin. This will be kept in a separate branch and left alone.
+
 # Space Trader (backend)
 
 This is the WIP backend for a web-based Space Trader clone. I'm aiming to reach feature-parity with the original
