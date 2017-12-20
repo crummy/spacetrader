@@ -51,7 +51,7 @@ class OnPlanet(val system: SolarSystem, private val player: Player) : GameState 
         // TODO
     }
 
-    fun warp(destination: SolarSystem) {
+    fun warp(destination: SolarSystem): GameState {
         // TODO: Ensure destination is in range
 
         payCosts(destination)
@@ -71,8 +71,7 @@ class OnPlanet(val system: SolarSystem, private val player: Player) : GameState 
         player.dayPasses()
 
         // TODO: travel
-
-
+        return OnPlanet(destination, player)
     }
 
     private fun payCosts(destination: SolarSystem) {

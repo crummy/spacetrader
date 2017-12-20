@@ -1,5 +1,6 @@
 package com.malcolmcrum.spacetrader.nouns
 
+import com.malcolmcrum.spacetrader.controllers.MarketController
 import com.malcolmcrum.spacetrader.model.*
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -126,9 +127,21 @@ class GalaxyGenerator {
     private fun SolarSystem.neighbours(range: Int, systems: List<SolarSystem>): Int {
         return systems.filter { it != this }.filter { it.distanceTo(this.x, this.y) <= range }.count()
     }
+
+    fun setPrices(systems: List<SolarSystem>, difficulty: Difficulty) {
+        systems.forEach { system ->
+            MarketController(system.market, system, difficulty).updatePrices()
+        }
+    }
+
+    fun setAmounts(systems: List<SolarSystem>, difficulty: Difficulty) {
+        systems.forEach { system ->
+            MarketController(system.market, system, difficulty).updateAmounts()
+        }
+    }
 }
 
-private val names = listOf<String>(
+private val names = listOf(
         "Acamar",
         "Adahn",		// The alternate personality for The Nameless One in "Planescape: Torment"
         "Aldea",

@@ -25,7 +25,7 @@ class OnPlanetRenderer : StateRenderer {
                     val onPlanet = game.state as OnPlanet
                     val systemName = req.path("systemName")!!
                     val destination = game.galaxy.getSystem(systemName)
-                    onPlanet.warp(destination)
+                    game.state = onPlanet.warp(destination)
                     Response(SEE_OTHER).header("location", "/game/$gameId")
                 },
                 "repair/{amount}" bind Method.POST to { req ->
@@ -65,6 +65,7 @@ class OnPlanetRenderer : StateRenderer {
                 styles()
             }
             body {
+                render(state.system, state.system)
                 table {
                     headerRow("Status", game.player.name)
                     row("Credits", game.player.finances.credits)
