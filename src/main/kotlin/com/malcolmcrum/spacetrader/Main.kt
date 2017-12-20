@@ -4,9 +4,9 @@ import com.github.salomonbrys.kodein.Kodein
 import com.github.salomonbrys.kodein.with
 import com.malcolmcrum.spacetrader.model.Difficulty
 import com.malcolmcrum.spacetrader.model.GameId
+import com.malcolmcrum.spacetrader.ui.OnPlanetRenderer
 import com.malcolmcrum.spacetrader.ui.newGame
-import com.malcolmcrum.spacetrader.ui.onPlanet
-import com.malcolmcrum.spacetrader.verbs.Travel
+import com.malcolmcrum.spacetrader.ui.rendererFor
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -40,19 +40,21 @@ private val log = LoggerFactory.getLogger("MAIN")!!
 val gameManager = GameManager()
 
 fun main(args: Array<String>) {
+    val rootPath = "/game/{gameId}"
     val app: HttpHandler = routes(
-            "/game/{id}" bind GET to { req ->
-                val id: GameId = req.path("id")!!
+            rootPath bind GET to { req ->
+                val id: GameId = req.path("gameId")!!
                 val game = gameManager.games[id]!!
-                Response(OK).body(onPlanet(game))
+                val renderer = rendererFor(game.state)
+                Response(SEE_OTHER).header("location", "/game/$id/${renderer.basePath()}")
             },
-            "/game/{id}/travel/{planet}" bind POST to { req ->
-                val id: GameId = req.path("id")!!
+            "$rootPath/onPlanet" bind GET to { req ->
+                val id: GameId = req.path("gameId")!!
                 val game = gameManager.games[id]!!
-                val destination = req.path("planet")!!
-                Travel(game).to(destination)
-                Response(SEE_OTHER).header("location", "/game/$id")
+                val renderer = rendererFor(game.state)
+                Response(OK).body(renderer.render(game))
             },
+            "$rootPath/${OnPlanetRenderer().basePath()}" bind OnPlanetRenderer().routes(),
             "/games" bind GET to {
                 Response(OK).body(gameManager.games.toString())
             },
@@ -68,7 +70,7 @@ fun main(args: Array<String>) {
     )
 
     val callLogger = ResponseFilters.ReportLatency { req: Request, resp: Response, duration: Duration ->
-        log.debug("${req.uri} returned ${resp.status} and took ${duration.toMillis()}ms")
+        log.debug("${req.method} ${req.uri} returned ${resp.status} and took ${duration.toMillis()}ms")
     }
 
     callLogger.then(app).asServer(Jetty(8000)).start()

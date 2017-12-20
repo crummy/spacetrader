@@ -1,5 +1,6 @@
 package com.malcolmcrum.spacetrader.views
 
+import com.malcolmcrum.spacetrader.model.ShipType
 import com.malcolmcrum.spacetrader.model.SolarSystem
 import com.malcolmcrum.spacetrader.nouns.GameState
 import com.malcolmcrum.spacetrader.nouns.Player
@@ -46,7 +47,7 @@ class OnPlanet(val system: SolarSystem, private val player: Player) : GameState 
         player.hasEscapePod = true
     }
 
-    fun buyShip() {
+    fun buyShip(type: ShipType) {
         // TODO
     }
 
