@@ -15,15 +15,16 @@ class MarketController(private val market: Market, private val system: SolarSyst
     }
 
     fun updatePrices() {
-        TradeItem.values().forEach {
+        TradeItem.values().filter { !isNotSold(it) }
+                .forEach {
             var price = standardPrice(it, system.size, system.tech, system.politics, system.specialResource)
             if (it.doublePriceStatus == system.status) {
-                price = price * 3 shr 1
+                price *= 2
             }
 
             price = price + (0..it.priceVariance).random() - (0..it.priceVariance).random()
 
-            market.basePrices[it] = price
+            market.basePrices[it] = Math.max(0, price)
         }
     }
 
@@ -108,23 +109,7 @@ class MarketController(private val market: Market, private val system: SolarSyst
         }
     }
 
-    private fun buyPrice(item: TradeItem, basePrice: Int): Int {
-        var buyPrice = basePrice
-
-        if (item.doublePriceStatus == system.status) {
-            buyPrice = buyPrice * 3 shr 1
-        }
-
-        buyPrice = buyPrice + (0..item.priceVariance).random() - (0..item.priceVariance).random()
-
-        return buyPrice
-    }
-
     private fun standardPrice(item: TradeItem, size: SystemSize, tech: TechLevel, politics: Politics, specialResource: SpecialResource?): Int {
-        if (item == TradeItem.NARCOTICS && !politics.drugsOk) return 0
-        if (item == TradeItem.FIREARMS && !politics.firearmsOk) return 0
-        if (item.techRequiredForUsage > tech) return 0
-
         var price = item.minTradePrice + (tech.ordinal * item.priceIncreasePerTechLevel)
 
         if (politics.desiredTradeItem == item) {
