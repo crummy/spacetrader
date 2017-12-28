@@ -54,6 +54,19 @@ internal class MarketControllerTest {
         }
     }
 
+    @RepeatedTest(100)
+    fun `verify buy price is never less than sell price`() {
+        val market = Market()
+        val controller = MarketController(market, randomSystem(), pickRandom(Difficulty.values()))
+        controller.updatePrices()
+
+        TradeItem.values().forEach { item ->
+            val buyPrice = controller.getBuyPrice(item, (0..MAX_SKILL).random(), (-100..100).random())
+            val sellPrice = controller.getSellPrice(item, (-100..100).random())
+            assertTrue(buyPrice >= sellPrice)
+        }
+    }
+
     private fun randomSystem(): SolarSystem {
         return SolarSystem("random",
                 0,
