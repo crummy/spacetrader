@@ -19,4 +19,9 @@ data class Finances(var credits: Int,
         }
     }
 
+    fun canAfford(price: Int): Boolean {
+        return credits > price
+        // TODO: ReserveMoney feature... or does it belong in the UI?
+    }
+
 }

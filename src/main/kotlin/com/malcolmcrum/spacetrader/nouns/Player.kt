@@ -9,7 +9,7 @@ data class Player(val name: String,
                   private val pilotSkill: Int,
                   val difficulty: Difficulty,
                   var ship: ShipType = ShipType.GNAT,
-                  val cargo: MutableList<TradeItem> = ArrayList(),
+                  val cargo: MutableList<Cargo> = ArrayList(),
                   val weapons: MutableList<Weapon> = ArrayList(),
                   var shields: MutableList<Shield> = ArrayList(),
                   val gadgets: MutableList<Gadget> = ArrayList(),
@@ -48,11 +48,6 @@ data class Player(val name: String,
     fun addShield(type: ShieldType) {
         assert(shields.size <= ship.shieldSlots)
         shields.add(Shield(type))
-    }
-
-    fun canAfford(price: Int): Boolean {
-        return finances.credits > price
-        // TODO: ReserveMoney feature... or does it belong in the UI?
     }
 
     fun tooMuchDebtToWarp(): Boolean {

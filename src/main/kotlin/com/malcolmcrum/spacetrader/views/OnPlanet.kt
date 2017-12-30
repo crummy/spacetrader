@@ -14,7 +14,7 @@ class OnPlanet(val system: SolarSystem, private val player: Player) : GameState 
             throw Exception("Adding $amount to hull leaves us with greater hull strength than our ship can take")
         }
         val repairCost = amount * player.ship.repairCosts
-        if (! player.canAfford(repairCost)) {
+        if (! player.finances.canAfford(repairCost)) {
             throw Exception("Cannot afford $repairCost of repairs")
         }
         player.hullLeft = newHullLeft
@@ -27,7 +27,7 @@ class OnPlanet(val system: SolarSystem, private val player: Player) : GameState 
             throw Exception("Adding $amount to fuel leaves us with more fuel than we can carry")
         }
         val fuelCost = amount * player.ship.costOfFuel
-        if (! player.canAfford(fuelCost)) {
+        if (! player.finances.canAfford(fuelCost)) {
             throw Exception("Cannot afford $fuelCost of fuel")
         }
         player.fuelLeft = newFuel
@@ -41,7 +41,7 @@ class OnPlanet(val system: SolarSystem, private val player: Player) : GameState 
             throw Exception("No escape pod available")
         }
         val escapePodCost = 2000
-        if (! player.canAfford(escapePodCost)) {
+        if (! player.finances.canAfford(escapePodCost)) {
             throw Exception("Cannot afford $escapePodCost")
         }
         player.hasEscapePod = true
@@ -80,15 +80,15 @@ class OnPlanet(val system: SolarSystem, private val player: Player) : GameState 
             throw Exception("Debt ${player.finances.debt} too great to warp")
         }
         val crewCosts = player.crewCost()
-        if (! player.canAfford(crewCosts)) {
+        if (! player.finances.canAfford(crewCosts)) {
             throw Exception("Cannot afford to pay $crewCosts to mercenaries")
         }
         val insuranceCost = player.getInsuranceCost()
-        if (!player.canAfford(insuranceCost + crewCosts)) {
+        if (!player.finances.canAfford(insuranceCost + crewCosts)) {
             throw Exception("Cannot afford to pay $insuranceCost for insurance and $crewCosts to mercenaries")
         }
         val wormholeCost = wormholeCost(system, destination)
-        if (!player.canAfford(insuranceCost + crewCosts + wormholeCost)) {
+        if (!player.finances.canAfford(insuranceCost + crewCosts + wormholeCost)) {
             throw Exception("Cannot afford to pay $wormholeCost for wormhole")
         }
         // TODO: skip costs if !viaSingularity

@@ -130,13 +130,16 @@ class GalaxyGenerator {
 
     fun setPrices(systems: List<SolarSystem>, difficulty: Difficulty) {
         systems.forEach { system ->
-            MarketController(system.market, system, difficulty).updatePrices()
+            // TODO: Remove unneeded dependencies out of here! Split into controller and view!
+            MarketController(system.market, system, difficulty, mutableListOf(), Finances(0, 0), ShipType.BEETLE).updatePrices()
         }
     }
 
     fun setAmounts(systems: List<SolarSystem>, difficulty: Difficulty) {
-        systems.forEach { system ->
-            MarketController(system.market, system, difficulty).updateAmounts()
+        systems.forEach { system->
+            // TODO: Remove unneeded dependencies out of here! Split into controller and view!
+
+            MarketController(system.market, system, difficulty, mutableListOf(), Finances(0, 0), ShipType.BEETLE).updateAmounts()
         }
     }
 }

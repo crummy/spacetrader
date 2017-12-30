@@ -50,12 +50,22 @@ class OnPlanetRenderer : StateRenderer {
                     val onPlanet = game.state as OnPlanet
                     onPlanet.buyEscapePod()
                     Response(SEE_OTHER).header("location", "/game/$game")
+                },
+                "market/buy/{item}/{amount}" bind Method.POST to { req ->
+                    val gameId: GameId = req.path("gameId")!!
+                    val game = gameManager.games[gameId]!!
+                    val onPlanet = game.state as OnPlanet
+                    val item = TradeItem.valueOf(req.path("item")!!)
+                    val amount = req.path("amount")!!.toInt()
+                    val market = MarketController(onPlanet.system.market, onPlanet.system, game.difficulty, game.player.cargo, game.player.finances, game.player.ship)
+                    market.buy(item, amount, game.player.traderSkill(), game.player.policeRecordScore)
+                    Response(SEE_OTHER).header("location", "/game/$game")
                 })
     }
 
     override fun render(game: Game): String {
         val state = game.state as OnPlanet
-        val market = MarketController(state.system.market, state.system, game.difficulty)
+        val market = MarketController(state.system.market, state.system, game.difficulty, game.player.cargo, game.player.finances, game.player.ship)
 
         return createHTML().html {
             head {
@@ -173,7 +183,7 @@ class OnPlanetRenderer : StateRenderer {
                                 +item.text
                             }
                             td {
-                                +game.player.cargo.count { cargo -> cargo == item }.toString()
+                                +game.player.cargo.count { cargo -> cargo.item == item }.toString()
                             }
                             td {
                                 +market.getSellPrice(item, game.player.policeRecordScore).toString()
