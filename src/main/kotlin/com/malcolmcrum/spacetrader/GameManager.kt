@@ -18,6 +18,8 @@ class GameManager {
     private val galaxyGenerator = GalaxyGenerator()
 
     fun newGame(commanderName: String, pilot: Int, fighter: Int, trader: Int, engineer: Int, difficulty: Difficulty): GameId {
+        // TODO: Assert each skill is between 0 and 10
+        // TODO: Assert total skills == 20
         val systems = galaxyGenerator.generateGalaxy()
         galaxyGenerator.placeMercenaries(systems)
         galaxyGenerator.placeSpecialEvents(systems)

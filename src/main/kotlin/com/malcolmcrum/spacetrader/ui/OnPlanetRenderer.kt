@@ -195,6 +195,9 @@ class OnPlanetRenderer : StateRenderer {
                         th {
                             +"Purchase?"
                         }
+                        th {
+                            +"Total"
+                        }
                     }
                     TradeItem.values().forEach { item ->
                         tr {
@@ -205,13 +208,22 @@ class OnPlanetRenderer : StateRenderer {
                                 +"${market.getAmount(item)}"
                             }
                             td {
-                                +"${market.getBuyPrice(item, 0, game.player.policeRecordScore)}"
+                                id = "${item.name}UnitPrice"
+                                +"${market.getBuyPrice(item, game.player.traderSkill(), game.player.policeRecordScore)}"
                             }
+                            val amount = market.getAmount(item)
+                            val canAfford = market.getBuyPrice(item, game.player.traderSkill(), game.player.policeRecordScore) / game.player.finances.credits
                             td {
                                 textInput {
-                                    val amount = market.getAmount(item)
-                                    val canAfford = market.getBuyPrice(item, game.player.traderSkill(), game.player.policeRecordScore) / game.player.finances.credits
+                                    id = "${item.name}BuyAmount"
                                     value = Math.max(amount, canAfford).toString()
+                                    onChange = "document.getElementById('${item.name}BuyButton').innerHTML = parseInt(document.getElementById('${item.name}UnitPrice').innerHTML) * parseInt(document.getElementById('${item.name}BuyAmount').value)"
+                                }
+                            }
+                            td {
+                                button {
+                                    id = "${item.name}BuyButton"
+                                    +"${Math.max(amount, canAfford) * market.getBuyPrice(item, game.player.traderSkill(), game.player.policeRecordScore)}"
                                 }
                             }
                         }
