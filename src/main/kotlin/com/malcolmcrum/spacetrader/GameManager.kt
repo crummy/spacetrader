@@ -17,13 +17,13 @@ class GameManager {
 
     private val galaxyGenerator = GalaxyGenerator()
 
-    fun newGame(commanderName: String, difficulty: Difficulty): GameId {
+    fun newGame(commanderName: String, pilot: Int, fighter: Int, trader: Int, engineer: Int, difficulty: Difficulty): GameId {
         val systems = galaxyGenerator.generateGalaxy()
         galaxyGenerator.placeMercenaries(systems)
         galaxyGenerator.placeSpecialEvents(systems)
         galaxyGenerator.setPrices(systems, difficulty)
         galaxyGenerator.setAmounts(systems, difficulty)
-        val player = Player(commanderName, difficulty)
+        val player = Player(commanderName, trader, fighter, engineer, pilot, difficulty)
         val galaxy = Galaxy(systems, 0, difficulty)
 
         val id = createGameId()

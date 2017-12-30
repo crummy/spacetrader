@@ -192,6 +192,9 @@ class OnPlanetRenderer : StateRenderer {
                         th {
                             +"Price"
                         }
+                        th {
+                            +"Purchase?"
+                        }
                     }
                     TradeItem.values().forEach { item ->
                         tr {
@@ -203,6 +206,13 @@ class OnPlanetRenderer : StateRenderer {
                             }
                             td {
                                 +"${market.getBuyPrice(item, 0, game.player.policeRecordScore)}"
+                            }
+                            td {
+                                textInput {
+                                    val amount = market.getAmount(item)
+                                    val canAfford = market.getBuyPrice(item, game.player.traderSkill(), game.player.policeRecordScore) / game.player.finances.credits
+                                    value = Math.max(amount, canAfford).toString()
+                                }
                             }
                         }
                     }

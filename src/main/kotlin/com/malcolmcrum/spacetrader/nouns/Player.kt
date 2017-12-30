@@ -3,7 +3,11 @@ package com.malcolmcrum.spacetrader.nouns
 import com.malcolmcrum.spacetrader.model.*
 
 data class Player(val name: String,
-                  var difficulty: Difficulty,
+                  private val traderSkill: Int,
+                  private val fighterSkill: Int,
+                  private val engineerSkill: Int,
+                  private val pilotSkill: Int,
+                  val difficulty: Difficulty,
                   var ship: ShipType = ShipType.GNAT,
                   val cargo: MutableList<TradeItem> = ArrayList(),
                   val weapons: MutableList<Weapon> = ArrayList(),
@@ -20,6 +24,11 @@ data class Player(val name: String,
                   var days: Int = 0,
                   var policeRecordScore: Int = 0,
                   var reputationScore: Int = 0) {
+
+    fun traderSkill(): Int {
+        val maxCrewTraderSkill: Int = crew.maxBy { it.trader }?.trader ?: 0
+        return Math.max(traderSkill, maxCrewTraderSkill)
+    }
 
     fun getHull() = Amount(hullLeft, ship.hullStrength)
 
