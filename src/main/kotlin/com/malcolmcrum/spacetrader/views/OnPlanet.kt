@@ -7,6 +7,14 @@ import com.malcolmcrum.spacetrader.model.SolarSystem
 import com.malcolmcrum.spacetrader.model.TradeItem
 
 class OnPlanet(val system: SolarSystem, private val player: Player) : GameState {
+    // TODO: Should this be in GameManager?
+    init {
+        val market = MarketController(system.market, system, player.difficulty)
+        market.updatePrices()
+        market.updateAmounts()
+        // Galaxy(systems).shuffleStatuses()
+    }
+
     val market = MarketController(system.market, system, player.difficulty)
     val shipyard = Shipyard(system)
 
