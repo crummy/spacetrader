@@ -24,4 +24,8 @@ data class Finances(var credits: Int,
         // TODO: ReserveMoney feature... or does it belong in the UI?
     }
 
+    fun add(revenue: Int) {
+        credits += revenue
+    }
+
 }

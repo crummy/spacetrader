@@ -137,4 +137,8 @@ class MarketController(private val market: Market, private val system: SolarSyst
     fun remove(item: TradeItem, amount: Int) {
         market.amounts[item]!!.minus(amount)
     }
+
+    fun add(item: TradeItem, amount: Int) {
+        market.amounts[item]!!.plus(amount)
+    }
 }

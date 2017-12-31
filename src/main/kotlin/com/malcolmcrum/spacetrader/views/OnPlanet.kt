@@ -2,7 +2,6 @@ package com.malcolmcrum.spacetrader.views
 
 import com.malcolmcrum.spacetrader.controllers.MarketController
 import com.malcolmcrum.spacetrader.model.*
-import com.malcolmcrum.spacetrader.model.Player
 
 class OnPlanet(val system: SolarSystem, private val player: Player, private val difficulty: Difficulty) : GameState {
     val market = MarketController(system.market, system, difficulty)
@@ -65,6 +64,25 @@ class OnPlanet(val system: SolarSystem, private val player: Player, private val 
         repeat(amount) {
             player.cargo.add(Cargo(item, buyPrice))
         }
+    }
+
+    fun sellTradeItem(item: TradeItem, amount: Int) {
+        if (market.getAmount(item) < amount) {
+            throw Exception("Cannot buy $amount of $item; there are only ${market.getAmount(item)}")
+        }
+        if (player.cargo.count { it.item == item } < amount) {
+            throw Exception("Cannot sell $amount of $item; player does not have enough")
+        }
+
+        market.add(item, amount)
+        for (i in (0..amount)) {
+            val soldCargo = player.cargo.last { it.item == item }
+            player.cargo.remove(soldCargo)
+        }
+
+        val sellPrice = market.getSellPrice(item, player.policeRecordScore)
+        val revenue = sellPrice * amount
+        player.finances.add(revenue)
     }
 
     fun warp(destination: SolarSystem): GameState {

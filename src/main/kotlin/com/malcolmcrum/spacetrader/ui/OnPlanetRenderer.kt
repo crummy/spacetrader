@@ -9,6 +9,7 @@ import kotlinx.html.stream.createHTML
 import org.http4k.core.Method
 import org.http4k.core.Response
 import org.http4k.core.Status.Companion.SEE_OTHER
+import org.http4k.core.body.form
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.path
@@ -26,7 +27,7 @@ class OnPlanetRenderer : StateRenderer {
                     val systemName = req.path("systemName")!!
                     val destination = game.galaxy.getSystem(systemName)
                     game.state = onPlanet.warp(destination)
-                    Response(SEE_OTHER).header("location", "/game/$gameId")
+                    Response(SEE_OTHER).header("location", "/game/${game.id}")
                 },
                 "repair/{amount}" bind Method.POST to { req ->
                     val gameId: GameId = req.path("gameId")!!
@@ -34,7 +35,7 @@ class OnPlanetRenderer : StateRenderer {
                     val onPlanet = game.state as OnPlanet
                     val amount = req.path("amount")!!
                     onPlanet.repairShip(amount.toInt())
-                    Response(SEE_OTHER).header("location", "/game/$gameId")
+                    Response(SEE_OTHER).header("location", "/game/${game.id}")
                 },
                 "refuel/{amount}" bind Method.POST to { req ->
                     val gameId: GameId = req.path("gameId")!!
@@ -42,23 +43,32 @@ class OnPlanetRenderer : StateRenderer {
                     val onPlanet = game.state as OnPlanet
                     val amount = req.path("amount")!!
                     onPlanet.refuelShip(amount.toInt())
-                    Response(SEE_OTHER).header("location", "/game/$gameId")
+                    Response(SEE_OTHER).header("location", "/game/${game.id}")
                 },
                 "buyEscapePod" bind Method.POST to { req ->
                     val gameId: GameId = req.path("gameId")!!
                     val game = gameManager.games[gameId]!!
                     val onPlanet = game.state as OnPlanet
                     onPlanet.buyEscapePod()
-                    Response(SEE_OTHER).header("location", "/game/$game")
+                    Response(SEE_OTHER).header("location", "/game/${game.id}")
                 },
-                "market/buy/{item}/{amount}" bind Method.POST to { req ->
+                "market/buy" bind Method.POST to { req ->
                     val gameId: GameId = req.path("gameId")!!
                     val game = gameManager.games[gameId]!!
                     val onPlanet = game.state as OnPlanet
-                    val item = TradeItem.valueOf(req.path("item")!!)
-                    val amount = req.path("amount")!!.toInt()
+                    val item = TradeItem.valueOf(req.form("item")!!)
+                    val amount = req.form("${item}BuyAmount")!!.toInt()
                     onPlanet.buyTradeItem(item, amount)
-                    Response(SEE_OTHER).header("location", "/game/$game")
+                    Response(SEE_OTHER).header("location", "/game/${game.id}")
+                },
+                "market/sell" bind Method.POST to { req ->
+                    val gameId: GameId = req.path("gameId")!!
+                    val game = gameManager.games[gameId]!!
+                    val onPlanet = game.state as OnPlanet
+                    val item = TradeItem.valueOf(req.form("item")!!)
+                    val amount = req.form("${item}SellAmount")!!.toInt()
+                    onPlanet.sellTradeItem(item, amount)
+                    Response(SEE_OTHER).header("location", "/game/${game.id}")
                 })
     }
 
@@ -164,75 +174,108 @@ class OnPlanetRenderer : StateRenderer {
                                 }
                             }
                 }
-                table {
-                    tr {
-                        th {
-                            +"Sell"
-                        }
-                        th {
-                            +"Amount"
-                        }
-                        th {
-                            +"Price"
-                        }
-                    }
-                    TradeItem.values().forEach { item ->
+                form {
+                    action = "/game/${game.id}/onPlanet/market/buy"
+                    method = FormMethod.post
+                    table {
                         tr {
-                            td {
-                                +item.text
+                            th {
+                                +"Buy"
                             }
-                            td {
-                                +game.player.cargo.count { cargo -> cargo.item == item }.toString()
+                            th {
+                                +"Available"
                             }
-                            td {
-                                +market.getSellPrice(item, game.player.policeRecordScore).toString()
+                            th {
+                                +"Price"
+                            }
+                            th {
+                                +"Amount?"
+                            }
+                            th {
+                                +"Total"
+                            }
+                        }
+                        TradeItem.values().forEach { item ->
+                            tr {
+                                td {
+                                    +item.text
+                                }
+                                td {
+                                    +"${market.getAmount(item)}"
+                                }
+                                td {
+                                    id = "${item.name}UnitPrice"
+                                    +"${market.getBuyPrice(item, game.player.traderSkill(), game.player.policeRecordScore)} cr."
+                                }
+                                val amount = market.getAmount(item)
+                                val canAfford = market.getBuyPrice(item, game.player.traderSkill(), game.player.policeRecordScore) / game.player.finances.credits
+                                td {
+                                    textInput {
+                                        id = "${item.name}BuyAmount"
+                                        name = "${item.name}BuyAmount"
+                                        value = Math.max(amount, canAfford).toString()
+                                        onChange = "document.getElementById('${item.name}BuyButton').innerHTML = parseInt(document.getElementById('${item.name}UnitPrice').innerHTML) * parseInt(document.getElementById('${item.name}BuyAmount').value)"
+                                    }
+                                }
+                                td {
+                                    button {
+                                        id = "${item.name}BuyButton"
+                                        type = ButtonType.submit
+                                        name = "item"
+                                        value = item.name
+                                        +"${Math.max(amount, canAfford) * market.getBuyPrice(item, game.player.traderSkill(), game.player.policeRecordScore)}"
+                                    }
+                                }
                             }
                         }
                     }
                 }
-                table {
-                    tr {
-                        th {
-                            +"Buy"
-                        }
-                        th {
-                            +"Amount"
-                        }
-                        th {
-                            +"Price"
-                        }
-                        th {
-                            +"Purchase?"
-                        }
-                        th {
-                            +"Total"
-                        }
-                    }
-                    TradeItem.values().forEach { item ->
+                form {
+                    action = "/game/${game.id}/onPlanet/market/sell"
+                    method = FormMethod.post
+                    table {
                         tr {
-                            td {
-                                +item.text
+                            th {
+                                +"Sell"
                             }
-                            td {
-                                +"${market.getAmount(item)}"
+                            th {
+                                +"Available"
                             }
-                            td {
-                                id = "${item.name}UnitPrice"
-                                +"${market.getBuyPrice(item, game.player.traderSkill(), game.player.policeRecordScore)}"
+                            th {
+                                +"Price"
                             }
-                            val amount = market.getAmount(item)
-                            val canAfford = market.getBuyPrice(item, game.player.traderSkill(), game.player.policeRecordScore) / game.player.finances.credits
-                            td {
-                                textInput {
-                                    id = "${item.name}BuyAmount"
-                                    value = Math.max(amount, canAfford).toString()
-                                    onChange = "document.getElementById('${item.name}BuyButton').innerHTML = parseInt(document.getElementById('${item.name}UnitPrice').innerHTML) * parseInt(document.getElementById('${item.name}BuyAmount').value)"
+                            th {
+                                +"Amount?"
+                            }
+                            th {
+                                +"Total"
+                            }
+                        }
+                        TradeItem.values().forEach { item ->
+                            tr {
+                                val amountInCargo = +game.player.cargo.count { cargo -> cargo.item == item }
+                                td {
+                                    +item.text
                                 }
-                            }
-                            td {
-                                button {
-                                    id = "${item.name}BuyButton"
-                                    +"${Math.max(amount, canAfford) * market.getBuyPrice(item, game.player.traderSkill(), game.player.policeRecordScore)}"
+                                td {
+                                    +amountInCargo.toString()
+                                }
+                                td {
+                                    id = "${item.name}SellPrice"
+                                    +"${market.getSellPrice(item, game.player.policeRecordScore)} cr."
+                                }
+                                td {
+                                    textInput {
+                                        id = "${item.name}SellAmount"
+                                        value = amountInCargo.toString()
+                                        onChange = "document.getElementById('${item.name}SellButton').innerHTML = parseInt(document.getElementById('${item.name}SellPrice').innerHTML) * parseInt(document.getElementById('${item.name}SellAmount').value)"
+                                    }
+                                }
+                                td {
+                                    button {
+                                        id = "${item.name}SellButton"
+                                        +"${amountInCargo * market.getSellPrice(item, game.player.policeRecordScore)}"
+                                    }
                                 }
                             }
                         }
