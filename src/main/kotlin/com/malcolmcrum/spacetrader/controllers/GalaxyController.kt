@@ -1,7 +1,9 @@
-package com.malcolmcrum.spacetrader.nouns
+package com.malcolmcrum.spacetrader.controllers
 
-import com.malcolmcrum.spacetrader.controllers.MarketController
 import com.malcolmcrum.spacetrader.model.*
+import com.malcolmcrum.spacetrader.nouns.pickRandom
+import com.malcolmcrum.spacetrader.nouns.random
+import com.malcolmcrum.spacetrader.nouns.randomSkillLevel
 import org.slf4j.LoggerFactory
 import java.util.*
 
@@ -16,9 +18,10 @@ const val MAX_CREW_MEMBER = 31
 
 private data class Position(val x: Int, val y: Int)
 
-private val log = LoggerFactory.getLogger(GalaxyGenerator::class.java)!!
+private val log = LoggerFactory.getLogger(GalaxyController::class.java)!!
 
-class GalaxyGenerator {
+// TODO: Is this really a controller?
+class GalaxyController {
 
     // TODO: This method still is quite C-ish. Needs improvement
     fun generateGalaxy(): List<SolarSystem> {
@@ -131,7 +134,7 @@ class GalaxyGenerator {
     fun setPrices(systems: List<SolarSystem>, difficulty: Difficulty) {
         systems.forEach { system ->
             // TODO: Remove unneeded dependencies out of here! Split into controller and view!
-            MarketController(system.market, system, difficulty, mutableListOf(), Finances(0, 0), ShipType.BEETLE).updatePrices()
+            MarketController(system.market, system, difficulty).updatePrices()
         }
     }
 
@@ -139,7 +142,7 @@ class GalaxyGenerator {
         systems.forEach { system->
             // TODO: Remove unneeded dependencies out of here! Split into controller and view!
 
-            MarketController(system.market, system, difficulty, mutableListOf(), Finances(0, 0), ShipType.BEETLE).updateAmounts()
+            MarketController(system.market, system, difficulty).updateAmounts()
         }
     }
 }
