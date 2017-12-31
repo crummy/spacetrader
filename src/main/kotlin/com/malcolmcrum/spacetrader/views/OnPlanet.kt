@@ -69,9 +69,7 @@ class OnPlanet(val system: SolarSystem, private val player: Player) : GameState 
     }
 
     fun sellTradeItem(item: TradeItem, amount: Int) {
-        if (market.getAmount(item) < amount) {
-            throw Exception("Cannot buy $amount of $item; there are only ${market.getAmount(item)}")
-        }
+        // TODO: Ensure that this system is buying this item
         if (player.cargo.count(item) < amount) {
             throw Exception("Cannot sell $amount of $item; player does not have enough")
         }

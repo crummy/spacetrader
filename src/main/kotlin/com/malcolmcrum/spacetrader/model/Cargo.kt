@@ -15,6 +15,10 @@ class Hold(private val items: MutableList<Cargo>, private var shipType: ShipType
         }
     }
 
+    fun fullBays(): Int {
+        return items.size
+    }
+
     fun emptyBays(): Int {
         return shipType.cargoBays - items.size
     }

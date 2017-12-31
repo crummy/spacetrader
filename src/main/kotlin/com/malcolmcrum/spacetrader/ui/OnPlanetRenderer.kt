@@ -99,7 +99,9 @@ class OnPlanetRenderer : StateRenderer {
                     row("Crew", "${game.player.crew.size}/${game.player.ship.crewQuarters}")
                     row("Weapons", "${game.player.weapons.size}/${game.player.ship.weaponSlots}")
                     row("Shields", "${game.player.shields.size}/${game.player.ship.shieldSlots}")
+                    row("Gadgets", "${game.player.gadgets.size}/${game.player.ship.gadgetSlots}")
                     row("Fuel Remaining", "${game.player.fuelLeft}/${game.player.ship.fuelTanks}")
+                    row("Cargo Hold", "${game.player.cargo.fullBays()}/${game.player.ship.cargoBays}")
                     row("Insurance?", game.player.hasInsurance)
                 }
                 table {
@@ -202,7 +204,7 @@ class OnPlanetRenderer : StateRenderer {
                                     +item.text
                                 }
                                 td {
-                                    +amount
+                                    +amount.toString()
                                 }
                                 td {
                                     id = "${item.name}UnitPrice"
