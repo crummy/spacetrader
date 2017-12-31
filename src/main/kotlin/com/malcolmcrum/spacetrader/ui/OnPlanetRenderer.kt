@@ -57,15 +57,14 @@ class OnPlanetRenderer : StateRenderer {
                     val onPlanet = game.state as OnPlanet
                     val item = TradeItem.valueOf(req.path("item")!!)
                     val amount = req.path("amount")!!.toInt()
-                    val market = MarketController(onPlanet.system.market, onPlanet.system, game.difficulty, game.player.cargo, game.player.finances, game.player.ship)
-                    market.buy(item, amount, game.player.traderSkill(), game.player.policeRecordScore)
+                    onPlanet.buyTradeItem(item, amount)
                     Response(SEE_OTHER).header("location", "/game/$game")
                 })
     }
 
     override fun render(game: Game): String {
         val state = game.state as OnPlanet
-        val market = MarketController(state.system.market, state.system, game.difficulty, game.player.cargo, game.player.finances, game.player.ship)
+        val market = MarketController(state.system.market, state.system, game.difficulty)
 
         return createHTML().html {
             head {

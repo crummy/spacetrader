@@ -1,11 +1,16 @@
 package com.malcolmcrum.spacetrader.views
 
+import com.malcolmcrum.spacetrader.controllers.MarketController
+import com.malcolmcrum.spacetrader.model.Difficulty
 import com.malcolmcrum.spacetrader.model.ShipType
 import com.malcolmcrum.spacetrader.model.SolarSystem
+import com.malcolmcrum.spacetrader.model.TradeItem
+import com.malcolmcrum.spacetrader.nouns.Cargo
 import com.malcolmcrum.spacetrader.nouns.GameState
 import com.malcolmcrum.spacetrader.nouns.Player
 
-class OnPlanet(val system: SolarSystem, private val player: Player) : GameState {
+class OnPlanet(val system: SolarSystem, private val player: Player, private val difficulty: Difficulty) : GameState {
+    val market = MarketController(system.market, system, difficulty)
     val shipyard = Shipyard(system)
 
     fun repairShip(amount: Int) {
@@ -51,6 +56,22 @@ class OnPlanet(val system: SolarSystem, private val player: Player) : GameState 
         // TODO
     }
 
+    fun buyTradeItem(item: TradeItem, amount: Int) {
+        val buyPrice = market.getBuyPrice(item, player.traderSkill(), player.policeRecordScore)
+        val cost = buyPrice * amount
+        if (! player.finances.canAfford(cost)) {
+            throw Exception("Cannot afford $cost of $item")
+        }
+        val freeCargoSpace = player.ship.cargoBays - player.cargo.size
+        if (amount > freeCargoSpace) {
+            throw Exception("No room for $amount of $item")
+        }
+        market.remove(item, amount)
+        repeat(amount) {
+            player.cargo.add(Cargo(item, buyPrice))
+        }
+    }
+
     fun warp(destination: SolarSystem): GameState {
         // TODO: Ensure destination is in range
 
@@ -71,7 +92,7 @@ class OnPlanet(val system: SolarSystem, private val player: Player) : GameState 
         player.dayPasses()
 
         // TODO: travel
-        return OnPlanet(destination, player)
+        return OnPlanet(destination, player, difficulty)
     }
 
     private fun payCosts(destination: SolarSystem) {

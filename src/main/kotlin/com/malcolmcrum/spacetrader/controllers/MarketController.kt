@@ -1,14 +1,11 @@
 package com.malcolmcrum.spacetrader.controllers
 
 import com.malcolmcrum.spacetrader.model.*
-import com.malcolmcrum.spacetrader.nouns.Cargo
-import com.malcolmcrum.spacetrader.nouns.Finances
 import com.malcolmcrum.spacetrader.nouns.random
 
 val MAX_SKILL = 10 // TODO: move elsewhere
 
-class MarketController(private val market: Market, private val system: SolarSystem, private val difficulty: Difficulty,
-                       private val cargo: MutableList<Cargo>, private val finances: Finances, private val shipType: ShipType) {
+class MarketController(private val market: Market, private val system: SolarSystem, private val difficulty: Difficulty) {
     fun updateAmounts() {
         when {
             market.countdown > getInitialCountdown(difficulty) -> market.countdown = getInitialCountdown(difficulty)
@@ -137,19 +134,7 @@ class MarketController(private val market: Market, private val system: SolarSyst
         return market.amounts[item]!!
     }
 
-    fun buy(item: TradeItem, amount: Int, tradeSkill: Int, policeRecordScore: Int) {
-        val buyPrice = getBuyPrice(item, tradeSkill, policeRecordScore)
-        val cost = buyPrice * amount
-        if (! finances.canAfford(cost)) {
-            throw Exception("Cannot afford $cost of $item")
-        }
-        val freeCargoSpace = shipType.cargoBays - cargo.size
-        if (amount > freeCargoSpace) {
-            throw Exception("No room for $amount of $item")
-        }
+    fun remove(item: TradeItem, amount: Int) {
         market.amounts[item]!!.minus(amount)
-        repeat(amount) {
-            cargo.add(Cargo(item, buyPrice))
-        }
     }
 }
