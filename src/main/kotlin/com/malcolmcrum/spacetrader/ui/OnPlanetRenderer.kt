@@ -168,7 +168,8 @@ class OnPlanetRenderer : StateRenderer {
                             .forEach {
                                 tr {
                                     td {
-                                        buttonLink(it.name, "/game/${game.id}/onPlanet/warp/${it.name}")
+                                        val inRange = it.distanceTo(state.system) <= game.player.fuelLeft
+                                        buttonLink(it.name, "/game/${game.id}/onPlanet/warp/${it.name}", inRange)
                                     }
                                     td {
                                         +it.distanceTo(state.system).toString()
@@ -315,10 +316,11 @@ fun TABLE.headerRow(left: Any, right: Any) = tr {
     }
 }
 
-fun TD.buttonLink(text: String, destination: String) = form {
+fun TD.buttonLink(text: String, destination: String, isEnabled: Boolean = true) = form {
     action = destination
     method = FormMethod.post
     button {
+        disabled = ! isEnabled
         type = ButtonType.submit
         +text
     }
