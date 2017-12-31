@@ -1,10 +1,13 @@
 package com.malcolmcrum.spacetrader.views
 
 import com.malcolmcrum.spacetrader.controllers.MarketController
-import com.malcolmcrum.spacetrader.model.*
+import com.malcolmcrum.spacetrader.model.Player
+import com.malcolmcrum.spacetrader.model.ShipType
+import com.malcolmcrum.spacetrader.model.SolarSystem
+import com.malcolmcrum.spacetrader.model.TradeItem
 
-class OnPlanet(val system: SolarSystem, private val player: Player, private val difficulty: Difficulty) : GameState {
-    val market = MarketController(system.market, system, difficulty)
+class OnPlanet(val system: SolarSystem, private val player: Player) : GameState {
+    val market = MarketController(system.market, system, player.difficulty)
     val shipyard = Shipyard(system)
 
     fun repairShip(amount: Int) {
@@ -56,29 +59,26 @@ class OnPlanet(val system: SolarSystem, private val player: Player, private val 
         if (! player.finances.canAfford(cost)) {
             throw Exception("Cannot afford $cost of $item")
         }
-        val freeCargoSpace = player.ship.cargoBays - player.cargo.size
-        if (amount > freeCargoSpace) {
+        if (amount > player.cargo.emptyBays()) {
             throw Exception("No room for $amount of $item")
         }
         market.remove(item, amount)
-        repeat(amount) {
-            player.cargo.add(Cargo(item, buyPrice))
-        }
+        player.cargo.add(item, amount, buyPrice)
+
+        player.finances.remove(cost)
     }
 
     fun sellTradeItem(item: TradeItem, amount: Int) {
         if (market.getAmount(item) < amount) {
             throw Exception("Cannot buy $amount of $item; there are only ${market.getAmount(item)}")
         }
-        if (player.cargo.count { it.item == item } < amount) {
+        if (player.cargo.count(item) < amount) {
             throw Exception("Cannot sell $amount of $item; player does not have enough")
         }
 
         market.add(item, amount)
-        for (i in (0..amount)) {
-            val soldCargo = player.cargo.last { it.item == item }
-            player.cargo.remove(soldCargo)
-        }
+
+        player.cargo.remove(item, amount)
 
         val sellPrice = market.getSellPrice(item, player.policeRecordScore)
         val revenue = sellPrice * amount
@@ -105,7 +105,7 @@ class OnPlanet(val system: SolarSystem, private val player: Player, private val 
         player.dayPasses()
 
         // TODO: travel
-        return OnPlanet(destination, player, difficulty)
+        return OnPlanet(destination, player)
     }
 
     private fun payCosts(destination: SolarSystem) {

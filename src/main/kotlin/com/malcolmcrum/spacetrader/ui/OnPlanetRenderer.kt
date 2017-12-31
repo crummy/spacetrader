@@ -197,17 +197,17 @@ class OnPlanetRenderer : StateRenderer {
                         }
                         TradeItem.values().forEach { item ->
                             tr {
+                                val amount = market.getAmount(item)
                                 td {
                                     +item.text
                                 }
                                 td {
-                                    +"${market.getAmount(item)}"
+                                    +amount
                                 }
                                 td {
                                     id = "${item.name}UnitPrice"
                                     +"${market.getBuyPrice(item, game.player.traderSkill(), game.player.policeRecordScore)} cr."
                                 }
-                                val amount = market.getAmount(item)
                                 val canAfford = market.getBuyPrice(item, game.player.traderSkill(), game.player.policeRecordScore) / game.player.finances.credits
                                 td {
                                     textInput {
@@ -223,6 +223,9 @@ class OnPlanetRenderer : StateRenderer {
                                         type = ButtonType.submit
                                         name = "item"
                                         value = item.name
+                                        if (amount == 0) {
+                                            disabled = true
+                                        }
                                         +"${Math.max(amount, canAfford) * market.getBuyPrice(item, game.player.traderSkill(), game.player.policeRecordScore)}"
                                     }
                                 }
@@ -253,7 +256,7 @@ class OnPlanetRenderer : StateRenderer {
                         }
                         TradeItem.values().forEach { item ->
                             tr {
-                                val amountInCargo = +game.player.cargo.count { cargo -> cargo.item == item }
+                                val amountInCargo = +game.player.cargo.count(item)
                                 td {
                                     +item.text
                                 }
@@ -267,6 +270,7 @@ class OnPlanetRenderer : StateRenderer {
                                 td {
                                     textInput {
                                         id = "${item.name}SellAmount"
+                                        name = "${item.name}SellAmount"
                                         value = amountInCargo.toString()
                                         onChange = "document.getElementById('${item.name}SellButton').innerHTML = parseInt(document.getElementById('${item.name}SellPrice').innerHTML) * parseInt(document.getElementById('${item.name}SellAmount').value)"
                                     }
@@ -274,6 +278,12 @@ class OnPlanetRenderer : StateRenderer {
                                 td {
                                     button {
                                         id = "${item.name}SellButton"
+                                        type = ButtonType.submit
+                                        name = "item"
+                                        value = item.name
+                                        if (amountInCargo == 0) {
+                                            disabled = true
+                                        }
                                         +"${amountInCargo * market.getSellPrice(item, game.player.policeRecordScore)}"
                                     }
                                 }

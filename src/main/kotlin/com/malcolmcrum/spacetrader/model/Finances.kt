@@ -28,4 +28,8 @@ data class Finances(var credits: Int,
         credits += revenue
     }
 
+    fun remove(cost: Int) {
+        credits -= cost
+    }
+
 }

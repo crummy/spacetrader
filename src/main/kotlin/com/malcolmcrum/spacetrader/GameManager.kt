@@ -1,11 +1,11 @@
 package com.malcolmcrum.spacetrader
 
+import com.malcolmcrum.spacetrader.controllers.GalaxyController
 import com.malcolmcrum.spacetrader.model.Difficulty
 import com.malcolmcrum.spacetrader.model.Game
 import com.malcolmcrum.spacetrader.model.GameId
-import com.malcolmcrum.spacetrader.nouns.Galaxy
-import com.malcolmcrum.spacetrader.controllers.GalaxyController
 import com.malcolmcrum.spacetrader.model.Player
+import com.malcolmcrum.spacetrader.nouns.Galaxy
 import com.malcolmcrum.spacetrader.views.OnPlanet
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -30,7 +30,7 @@ class GameManager {
 
         val id = createGameId()
         val startingSystem = galaxyGenerator.findStartingSystem(player.ship, systems)
-        val state = OnPlanet(startingSystem, player, difficulty)
+        val state = OnPlanet(startingSystem, player)
         games.put(id, Game(galaxy, player, id, difficulty, state))
 
         log.info("Created game $id for player $commanderName")
