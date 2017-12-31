@@ -1,4 +1,4 @@
-package com.malcolmcrum.spacetrader.nouns
+package com.malcolmcrum.spacetrader.model
 
 data class Finances(var credits: Int,
                     var debt: Int) {

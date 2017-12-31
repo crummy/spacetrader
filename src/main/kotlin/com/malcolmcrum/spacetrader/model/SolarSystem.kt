@@ -18,7 +18,7 @@ data class SolarSystem(val name: String,
     //val market: Map<TradeItem, Int> = TradeItem.values().associateBy({it}, {0})
 
     override fun toString(): String {
-        return "[$x, $y]"
+        return "$name[$x, $y]"
     }
 
     fun hasWormholeTo(system: SolarSystem): Boolean {

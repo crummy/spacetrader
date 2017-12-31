@@ -1,7 +1,7 @@
 package com.malcolmcrum.spacetrader.ui
 
 import com.malcolmcrum.spacetrader.model.Game
-import com.malcolmcrum.spacetrader.nouns.GameState
+import com.malcolmcrum.spacetrader.views.GameState
 import com.malcolmcrum.spacetrader.views.OnPlanet
 import org.http4k.routing.RoutingHttpHandler
 

@@ -1,13 +1,8 @@
 package com.malcolmcrum.spacetrader.views
 
 import com.malcolmcrum.spacetrader.controllers.MarketController
-import com.malcolmcrum.spacetrader.model.Difficulty
-import com.malcolmcrum.spacetrader.model.ShipType
-import com.malcolmcrum.spacetrader.model.SolarSystem
-import com.malcolmcrum.spacetrader.model.TradeItem
-import com.malcolmcrum.spacetrader.nouns.Cargo
-import com.malcolmcrum.spacetrader.nouns.GameState
-import com.malcolmcrum.spacetrader.nouns.Player
+import com.malcolmcrum.spacetrader.model.*
+import com.malcolmcrum.spacetrader.model.Player
 
 class OnPlanet(val system: SolarSystem, private val player: Player, private val difficulty: Difficulty) : GameState {
     val market = MarketController(system.market, system, difficulty)

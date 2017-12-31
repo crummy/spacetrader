@@ -4,7 +4,6 @@ import com.malcolmcrum.spacetrader.model.Difficulty
 import com.malcolmcrum.spacetrader.model.SolarSystem
 import com.malcolmcrum.spacetrader.model.SystemStatus
 
-
 class Galaxy(val systems: List<SolarSystem>, val startCountdown: Int, val difficulty: Difficulty) {
 
     fun shuffleStatuses() {
