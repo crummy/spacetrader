@@ -62,12 +62,12 @@ fun main(args: Array<String>) {
                 Response(OK).body(newGame())
             },
             "/new" bind POST to { req ->
-                val name = req.form("name")!!
-                val difficulty = Difficulty.valueOf(req.form("difficulty") ?: "NORMAL")
-                val traderSkill = req.form("trader")!!.toInt()
-                val fighterSkill = req.form("fighter")!!.toInt()
-                val pilotSkill = req.form("pilot")!!.toInt()
-                val engineerSkill = req.form("engineer")!!.toInt()
+                val name: String = req.form("name")!!
+                val difficulty: Difficulty = Difficulty.valueOf(req.form("difficulty") ?: "NORMAL")
+                val traderSkill: Int = req.form("trader")!!.toInt()
+                val fighterSkill: Int = req.form("fighter")!!.toInt()
+                val pilotSkill: Int = req.form("pilot")!!.toInt()
+                val engineerSkill: Int = req.form("engineer")!!.toInt()
                 val id = gameManager.newGame(name, pilotSkill, fighterSkill, traderSkill, engineerSkill, difficulty)
                 Response(SEE_OTHER).header("location", "/game/$id")
             }

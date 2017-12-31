@@ -18,7 +18,7 @@ internal class OnPlanetTest {
         val market = MarketController(system.market, system, difficulty)
         market.updateAmounts()
         market.updatePrices()
-        player = Player("player", 5, 5, 5, 5, difficulty)
+        player = Player("player", 5, 5, 5, 5, difficulty, finances = Finances(Int.MAX_VALUE, 0))
         planet = OnPlanet(system, player)
     }
 
@@ -27,7 +27,6 @@ internal class OnPlanetTest {
         val item = TradeItem.values().first { item -> planet.market.getAmount(item) > 0 }
         val amount = planet.market.getAmount(item)
         val cost = planet.market.getBuyPrice(item, player.traderSkill(), player.policeRecordScore) * amount
-        player.finances.add(cost)
         val creditsBefore = player.finances.credits
 
         planet.buyTradeItem(item, amount)
@@ -40,7 +39,6 @@ internal class OnPlanetTest {
     fun sellTradeItem() {
         val item = TradeItem.values().first { item -> planet.market.getAmount(item) > 0 }
         val cost = planet.market.getBuyPrice(item, player.traderSkill(), player.policeRecordScore)
-        player.finances.add(cost)
         planet.buyTradeItem(item, 1)
 
         val price = planet.market.getSellPrice(item, player.policeRecordScore)
