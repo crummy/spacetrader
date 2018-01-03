@@ -59,6 +59,20 @@ class OnPlanetRenderer : StateRenderer {
                     }
                     Response(SEE_OTHER).header("location", "/game/${game.id}")
                 },
+                "sell/{type}/{item}" bind Method.POST to { req ->
+                    val gameId: GameId = req.path("gameId")!!
+                    val game = gameManager.games[gameId]!!
+                    val onPlanet = game.state as OnPlanet
+                    val type = req.path("type")!!
+                    val item = req.path("item")!!
+                    when (type) {
+                        "weapon" -> onPlanet.sellWeapon(Weapon.valueOf(item))
+                        "shield" -> onPlanet.sellShield(ShieldType.valueOf(item))
+                        "gadget" -> onPlanet.sellGadget(Gadget.valueOf(item))
+                        else -> throw Exception("Unrecognized type: $type")
+                    }
+                    Response(SEE_OTHER).header("location", "/game/${game.id}")
+                },
                 "buyEscapePod" bind Method.POST to { req ->
                     val gameId: GameId = req.path("gameId")!!
                     val game = gameManager.games[gameId]!!

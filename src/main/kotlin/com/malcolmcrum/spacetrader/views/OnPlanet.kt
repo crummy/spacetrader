@@ -54,6 +54,30 @@ class OnPlanet(val system: SolarSystem, private val player: Player) : GameState 
         player.hasEscapePod = true
     }
 
+    // TODO: Share logic between the sellWeapon, sellGadget and sellShield
+    fun sellWeapon(type: Weapon) {
+        if (! player.weapons.contains(type)) {
+            throw Exception("Player doesn't have a $type to sell")
+        }
+        player.weapons.remove(type) // TODO: will this remove only one?
+        player.finances.add(type.sellPrice())
+    }
+
+    fun sellGadget(type: Gadget) {
+        if (! player.gadgets.contains(type)) {
+            throw Exception("Player doesn't have a $type to sell")
+        }
+        player.gadgets.remove(type) // TODO: will this remove only one?
+        player.finances.add(type.sellPrice())
+    }
+
+    fun sellShield(type: ShieldType) {
+        val shield = player.shields.find { it.type == type } ?: throw Exception("Player doesn't have a $type to sell")
+
+        player.shields.remove(shield)
+        player.finances.add(type.sellPrice())
+    }
+
     // TODO: Share logic between the buyWeapon, buyGadget and buyShield
     fun buyWeapon(type: Weapon) {
         if (type.minTechLevel == null) {
@@ -85,7 +109,7 @@ class OnPlanet(val system: SolarSystem, private val player: Player) : GameState 
         if (! player.finances.canAfford(cost)) {
             throw Exception("Cannot afford $cost to buy $type")
         }
-        if (player.weapons.size > player.ship.weaponSlots) {
+        if (player.gadgets.size > player.ship.gadgetSlots) {
             throw Exception("No slot on ship for gadget")
         }
 
@@ -104,8 +128,8 @@ class OnPlanet(val system: SolarSystem, private val player: Player) : GameState 
         if (! player.finances.canAfford(cost)) {
             throw Exception("Cannot afford $cost to buy $type")
         }
-        if (player.weapons.size > player.ship.weaponSlots) {
-            throw Exception("No slot on ship for weapon")
+        if (player.shields.size > player.ship.shieldSlots) {
+            throw Exception("No slot on ship for shield")
         }
 
         player.shields.add(Shield(type, type.power))
