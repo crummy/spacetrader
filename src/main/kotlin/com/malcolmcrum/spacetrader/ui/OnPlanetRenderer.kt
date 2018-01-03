@@ -45,6 +45,20 @@ class OnPlanetRenderer : StateRenderer {
                     onPlanet.refuelShip(amount.toInt())
                     Response(SEE_OTHER).header("location", "/game/${game.id}")
                 },
+                "buy/{type}/{item}" bind Method.POST to { req ->
+                    val gameId: GameId = req.path("gameId")!!
+                    val game = gameManager.games[gameId]!!
+                    val onPlanet = game.state as OnPlanet
+                    val type = req.path("type")!!
+                    val item = req.path("item")!!
+                    when (type) {
+                        "weapon" -> onPlanet.buyWeapon(Weapon.valueOf(item))
+                        "shield" -> onPlanet.buyShield(ShieldType.valueOf(item))
+                        "gadget" -> onPlanet.buyGadget(Gadget.valueOf(item))
+                        else -> throw Exception("Unrecognized type: $type")
+                    }
+                    Response(SEE_OTHER).header("location", "/game/${game.id}")
+                },
                 "buyEscapePod" bind Method.POST to { req ->
                     val gameId: GameId = req.path("gameId")!!
                     val game = gameManager.games[gameId]!!
@@ -150,13 +164,34 @@ class OnPlanetRenderer : StateRenderer {
                 table {
                     headerRow("Equipment", "Price")
                     state.shipyard.weaponsAvailable.forEach {
-                        row(it.text, it.basePrice)
+                        tr {
+                            td {
+                                +it.text
+                            }
+                            td {
+                                buttonLink(it.basePrice.toString(), "/game/${game.id}/onPlanet/buy/weapon/${it.name}")
+                            }
+                        }
                     }
                     state.shipyard.shieldsAvailable.forEach {
-                        row(it.text, it.basePrice)
+                        tr {
+                            td {
+                                +it.text
+                            }
+                            td {
+                                buttonLink(it.basePrice.toString(), "/game/${game.id}/onPlanet/buy/shield/${it.name}")
+                            }
+                        }
                     }
                     state.shipyard.gadgetsAvailable.forEach {
-                        row(it.text, it.basePrice)
+                        tr {
+                            td {
+                                +it.text
+                            }
+                            td {
+                                buttonLink(it.basePrice.toString(), "/game/${game.id}/onPlanet/buy/gadget/${it.name}")
+                            }
+                        }
                     }
                 }
                 table {

@@ -1,10 +1,7 @@
 package com.malcolmcrum.spacetrader.views
 
 import com.malcolmcrum.spacetrader.controllers.MarketController
-import com.malcolmcrum.spacetrader.model.Player
-import com.malcolmcrum.spacetrader.model.ShipType
-import com.malcolmcrum.spacetrader.model.SolarSystem
-import com.malcolmcrum.spacetrader.model.TradeItem
+import com.malcolmcrum.spacetrader.model.*
 
 class OnPlanet(val system: SolarSystem, private val player: Player) : GameState {
     // TODO: Should this be in GameManager?
@@ -57,6 +54,64 @@ class OnPlanet(val system: SolarSystem, private val player: Player) : GameState 
         player.hasEscapePod = true
     }
 
+    // TODO: Share logic between the buyWeapon, buyGadget and buyShield
+    fun buyWeapon(type: Weapon) {
+        if (type.minTechLevel == null) {
+            throw Exception("$type cannot be purchased")
+        }
+        if (type.minTechLevel.ordinal > system.tech.ordinal) {
+            throw Exception("$type requires ${type.minTechLevel} but $system is at ${system.tech}")
+        }
+        val cost = type.basePrice
+        if (! player.finances.canAfford(cost)) {
+            throw Exception("Cannot afford $cost to buy $type")
+        }
+        if (player.weapons.size > player.ship.weaponSlots) {
+            throw Exception("No slot on ship for weapon")
+        }
+
+        player.weapons.add(type)
+        player.finances.spend(cost)
+    }
+
+    fun buyGadget(type: Gadget) {
+        if (type.minTechLevel == null) {
+            throw Exception("$type cannot be purchased")
+        }
+        if (type.minTechLevel.ordinal > system.tech.ordinal) {
+            throw Exception("$type requires ${type.minTechLevel} but $system is at ${system.tech}")
+        }
+        val cost = type.basePrice
+        if (! player.finances.canAfford(cost)) {
+            throw Exception("Cannot afford $cost to buy $type")
+        }
+        if (player.weapons.size > player.ship.weaponSlots) {
+            throw Exception("No slot on ship for gadget")
+        }
+
+        player.gadgets.add(type)
+        player.finances.spend(cost)
+    }
+
+    fun buyShield(type: ShieldType) {
+        if (type.minTechLevel == null) {
+            throw Exception("$type cannot be purchased")
+        }
+        if (type.minTechLevel.ordinal > system.tech.ordinal) {
+            throw Exception("$type requires ${type.minTechLevel} but $system is at ${system.tech}")
+        }
+        val cost = type.basePrice
+        if (! player.finances.canAfford(cost)) {
+            throw Exception("Cannot afford $cost to buy $type")
+        }
+        if (player.weapons.size > player.ship.weaponSlots) {
+            throw Exception("No slot on ship for weapon")
+        }
+
+        player.shields.add(Shield(type, type.power))
+        player.finances.spend(cost)
+    }
+
     fun buyShip(type: ShipType) {
         // TODO
     }
@@ -73,7 +128,7 @@ class OnPlanet(val system: SolarSystem, private val player: Player) : GameState 
         market.remove(item, amount)
         player.cargo.add(item, amount, buyPrice)
 
-        player.finances.remove(cost)
+        player.finances.spend(cost)
     }
 
     fun sellTradeItem(item: TradeItem, amount: Int) {
