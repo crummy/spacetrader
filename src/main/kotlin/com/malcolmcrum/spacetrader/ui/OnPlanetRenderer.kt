@@ -124,13 +124,26 @@ class OnPlanetRenderer : StateRenderer {
                 }
                 table {
                     headerRow("Ship", game.player.ship.text)
-                    row("Crew", "${game.player.crew.size}/${game.player.ship.crewQuarters}")
-                    row("Weapons", "${game.player.weapons.size}/${game.player.ship.weaponSlots}")
-                    row("Shields", "${game.player.shields.size}/${game.player.ship.shieldSlots}")
-                    row("Gadgets", "${game.player.gadgets.size}/${game.player.ship.gadgetSlots}")
-                    row("Fuel Remaining", "${game.player.fuelLeft}/${game.player.ship.fuelTanks}")
-                    row("Cargo Hold", "${game.player.cargo.fullBays()}/${game.player.ship.cargoBays}")
-                    row("Insurance?", game.player.hasInsurance)
+                    headerRow("Crew", "${game.player.crew.size}/${game.player.ship.crewQuarters}")
+                    game.player.crew.forEach {
+                        row(it.name, "Fire")
+                    }
+                    headerRow("Weapons", "${game.player.weapons.size}/${game.player.ship.weaponSlots}")
+                    game.player.weapons.forEach {
+                        row(it.name, "Sell")
+                    }
+                    headerRow("Shields", "${game.player.shields.size}/${game.player.ship.shieldSlots}")
+                    game.player.shields.forEach {
+                        row(it.type.name, "Sell")
+                    }
+                    headerRow("Gadgets", "${game.player.gadgets.size}/${game.player.ship.gadgetSlots}")
+                    game.player.gadgets.forEach {
+                        row(it.name, "Sell")
+                    }
+                    headerRow("Fuel Remaining", "${game.player.fuelLeft}/${game.player.ship.fuelTanks}")
+                    headerRow("Cargo Hold", "${game.player.cargo.fullBays()}/${game.player.ship.cargoBays}")
+                    headerRow("Insurance?", game.player.hasInsurance)
+                    headerRow("Escape pod?", game.player.hasEscapePod)
                 }
                 table {
                     headerRow("Shipyard", "Price")

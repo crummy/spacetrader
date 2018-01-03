@@ -203,7 +203,7 @@ enum class Weapon(val text: String,
     fun sellPrice(): Int = basePrice * 3/4
 }
 
-data class CrewMember(val text: String,
+data class CrewMember(val name: String,
                       val pilot: Int,
                       val fighter: Int,
                       val trader: Int,
