@@ -38,4 +38,8 @@ class Hold(private val items: MutableList<Cargo>, private var shipType: ShipType
                 .average()
                 .toInt()
     }
+
+    fun totalWorth(): Int {
+        return items.sumBy { it.buyPrice }
+    }
 }

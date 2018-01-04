@@ -1,4 +1,4 @@
-package com.malcolmcrum.spacetrader.views
+package com.malcolmcrum.spacetrader.states
 
 import com.malcolmcrum.spacetrader.controllers.MarketController
 import com.malcolmcrum.spacetrader.model.*
@@ -60,7 +60,7 @@ class OnPlanet(val system: SolarSystem, private val player: Player) : GameState 
             throw Exception("Player doesn't have a $type to sell")
         }
         player.weapons.remove(type) // TODO: will this remove only one?
-        player.finances.add(type.sellPrice())
+        player.finances.deposit(type.sellPrice())
     }
 
     fun sellGadget(type: Gadget) {
@@ -68,14 +68,14 @@ class OnPlanet(val system: SolarSystem, private val player: Player) : GameState 
             throw Exception("Player doesn't have a $type to sell")
         }
         player.gadgets.remove(type) // TODO: will this remove only one?
-        player.finances.add(type.sellPrice())
+        player.finances.deposit(type.sellPrice())
     }
 
     fun sellShield(type: ShieldType) {
         val shield = player.shields.find { it.type == type } ?: throw Exception("Player doesn't have a $type to sell")
 
         player.shields.remove(shield)
-        player.finances.add(type.sellPrice())
+        player.finances.deposit(type.sellPrice())
     }
 
     // TODO: Share logic between the buyWeapon, buyGadget and buyShield
@@ -167,7 +167,7 @@ class OnPlanet(val system: SolarSystem, private val player: Player) : GameState 
 
         val sellPrice = market.getSellPrice(item, player.policeRecordScore)
         val revenue = sellPrice * amount
-        player.finances.add(revenue)
+        player.finances.deposit(revenue)
     }
 
     fun warp(destination: SolarSystem): GameState {

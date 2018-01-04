@@ -4,7 +4,17 @@ data class Finances(var credits: Int,
                     var debt: Int) {
     fun spend(amount: Int) {
         credits -= amount
-        assert(credits > 0)
+        assert(credits >= 0)
+    }
+
+    fun withdraw(amount: Int) {
+        val extraDebt = credits - amount
+        if (extraDebt < 0) {
+            credits = 0
+            debt += Math.abs(extraDebt)
+        } else {
+            spend(amount)
+        }
     }
 
     fun payInterest() { // TODO: this probably doesn't belong in a data class
@@ -24,7 +34,7 @@ data class Finances(var credits: Int,
         // TODO: ReserveMoney feature... or does it belong in the UI?
     }
 
-    fun add(revenue: Int) {
+    fun deposit(revenue: Int) {
         credits += revenue
     }
 

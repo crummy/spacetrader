@@ -1,8 +1,8 @@
 package com.malcolmcrum.spacetrader.ui
 
 import com.malcolmcrum.spacetrader.model.Game
-import com.malcolmcrum.spacetrader.views.GameState
-import com.malcolmcrum.spacetrader.views.OnPlanet
+import com.malcolmcrum.spacetrader.states.GameState
+import com.malcolmcrum.spacetrader.states.OnPlanet
 import org.http4k.routing.RoutingHttpHandler
 
 interface StateRenderer {

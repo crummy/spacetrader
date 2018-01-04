@@ -3,7 +3,7 @@ package com.malcolmcrum.spacetrader.ui
 import com.malcolmcrum.spacetrader.controllers.MarketController
 import com.malcolmcrum.spacetrader.gameManager
 import com.malcolmcrum.spacetrader.model.*
-import com.malcolmcrum.spacetrader.views.OnPlanet
+import com.malcolmcrum.spacetrader.states.OnPlanet
 import kotlinx.html.*
 import kotlinx.html.stream.createHTML
 import org.http4k.core.Method

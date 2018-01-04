@@ -1,4 +1,4 @@
-package com.malcolmcrum.spacetrader.views
+package com.malcolmcrum.spacetrader.states
 
 import com.malcolmcrum.spacetrader.model.*
 
