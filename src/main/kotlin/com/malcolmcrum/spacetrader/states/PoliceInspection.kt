@@ -1,10 +1,10 @@
 package com.malcolmcrum.spacetrader.states
 
-import com.malcolmcrum.spacetrader.model.Difficulty
-import com.malcolmcrum.spacetrader.model.Hold
-import com.malcolmcrum.spacetrader.model.Player
-import com.malcolmcrum.spacetrader.model.TradeItem
+import com.malcolmcrum.spacetrader.model.*
 import kotlin.reflect.KFunction0
+
+private val TRAFFICKING = -1
+private val FLEE_FROM_INSPECTION = -2
 
 class PoliceInspection(val cargo: Hold, val player: Player) : Encounter() {
     override fun description(): String {
@@ -27,17 +27,28 @@ class PoliceInspection(val cargo: Hold, val player: Player) : Encounter() {
                 fine += (50 - (fine % 50))
             }
             fine = Math.max(100, Math.min(fine, 10000))
-            player.finances.spend(10000)
+            player.finances.withdraw(fine)
+            player.policeRecordScore += TRAFFICKING
+
+            return LeaveEncounter("You have been fined $fine") // TODO fix text
+        } else {
+            // TODO: check wildstatus, reactorstatus
+            player.policeRecordScore -= TRAFFICKING
+            return LeaveEncounter("NoIllegalGoodsAlert") // TODO fix text
         }
-        return this //TODO
     }
 
     fun flee(): GameState {
-        return this // TODO
+        if (player.policeRecordScore > PoliceRecord.DUBIOUS.score) {
+            player.policeRecordScore = PoliceRecord.DUBIOUS.score - if (player.difficulty < Difficulty.NORMAL) 0 else 1
+        } else {
+            player.policeRecordScore += FLEE_FROM_INSPECTION
+        }
+        return this //return PoliceAttack()
     }
 
     fun attack(): GameState {
-        return this // TODO
+        return this
     }
 
 }
