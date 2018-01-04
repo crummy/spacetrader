@@ -330,7 +330,13 @@ class OnPlanetRenderer : StateRenderer {
                                 }
                                 td {
                                     id = "${item.name}SellPrice"
-                                    +"${market.getSellPrice(item, game.player.policeRecordScore)} cr."
+                                    val sellPrice = market.getSellPrice(item, game.player.policeRecordScore)
+                                    var text = "$sellPrice cr."
+                                    if (amountInCargo > 0) {
+                                        val profit = sellPrice - game.player.cargo.purchasePrice(item)
+                                        text += " ($profit)"
+                                    }
+                                    +text
                                 }
                                 td {
                                     textInput {

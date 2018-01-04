@@ -30,4 +30,12 @@ class Hold(private val items: MutableList<Cargo>, private var shipType: ShipType
             items.remove(toRemove)
         }
     }
+
+    fun purchasePrice(item: TradeItem): Int {
+        return items
+                .filter { it.item == item }
+                .map { it.buyPrice }
+                .average()
+                .toInt()
+    }
 }
