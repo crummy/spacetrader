@@ -38,6 +38,7 @@ class Travel(private val player: Player, private val destination: SolarSystem, p
 
             // TODO: mantis
         }
+        return Travel(player, destination, clicks - 1)
     }
 
     private fun traderStrength(): Int {
@@ -57,7 +58,7 @@ class Travel(private val player: Player, private val destination: SolarSystem, p
     }
 
     private fun policeEncounter(): GameState {
-        return
+        return this
     }
 
     private fun pirateEncounter(): GameState {
