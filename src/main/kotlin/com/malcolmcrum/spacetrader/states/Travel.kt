@@ -47,7 +47,7 @@ class Travel(private val player: Player, private val destination: SolarSystem) {
         return warp(clicks - 1)
     }
 
-    private fun arrival(): GameState {
+    private fun arrival(): GameState { // TODO: should this be in OnPlanet init?
         // TODO: handle reactor status
 
         // TODO: handle tribbles
@@ -76,14 +76,17 @@ class Travel(private val player: Player, private val destination: SolarSystem) {
     }
 
     private fun policeEncounter(): GameState {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val opponent = OpponentGenerator(player, destination).generatePolice()
+        return PoliceInspection(opponent, player)
     }
 
     private fun pirateEncounter(): GameState {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val opponent = OpponentGenerator(player, destination).generatePirate()
+        TODO()
     }
 
     private fun traderEncounter(): GameState {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val opponent = OpponentGenerator(player, destination).generateTrader()
+        TODO()
     }
 }

@@ -1,12 +1,18 @@
 package com.malcolmcrum.spacetrader.states
 
-import com.malcolmcrum.spacetrader.model.*
+import com.malcolmcrum.spacetrader.model.Difficulty
+import com.malcolmcrum.spacetrader.model.Player
+import com.malcolmcrum.spacetrader.model.PoliceRecord
+import com.malcolmcrum.spacetrader.model.TradeItem
+import com.malcolmcrum.spacetrader.nouns.Ship
 import kotlin.reflect.KFunction0
 
 private val TRAFFICKING = -1
 private val FLEE_FROM_INSPECTION = -2
 
-class PoliceInspection(val cargo: Hold, val player: Player) : Encounter() {
+class PoliceInspection(opponent: Ship, val player: Player) : Encounter(opponent) {
+    private val cargo = player.cargo
+
     override fun description(): String {
         return "The police summon you to submit to an inspection."
     }
@@ -44,11 +50,11 @@ class PoliceInspection(val cargo: Hold, val player: Player) : Encounter() {
         } else {
             player.policeRecordScore += FLEE_FROM_INSPECTION
         }
-        return this //return PoliceAttack()
+        TODO() //return PoliceAttack()
     }
 
     fun attack(): GameState {
-        return this
+        TODO()
     }
 
 }

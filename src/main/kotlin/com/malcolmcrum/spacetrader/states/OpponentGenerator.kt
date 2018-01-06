@@ -60,15 +60,19 @@ class OpponentGenerator(private val player: Player, private val destination: Sol
         return Ship(ship, gadgets, shields, weapons, hold, ship.fuelTanks, crew, 0, hullStrength)
     }
 
-    fun generateTrader() {
+    fun generateTrader(): Ship {
         var attempts = 1
         ship = pickShip(BASE_TYPES.TRADER, attempts)
         attempts = Math.max( 1, (player.currentWorth() / 150000) + player.difficulty.ordinal - Difficulty.NORMAL.ordinal)
+
+        TODO()
     }
 
-    fun generateMantis() {
+    fun generateMantis(): Ship {
         var attempts = 1 + player.difficulty.ordinal
         ship = ShipType.MANTIS
+
+        TODO()
     }
 
     private fun createCrew(difficulty: Difficulty, maxCrewMembers: Int): List<CrewMember> {
