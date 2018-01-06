@@ -1,8 +1,10 @@
 package com.malcolmcrum.spacetrader.model
 
+import com.malcolmcrum.spacetrader.controllers.MAX_SKILL
 import com.malcolmcrum.spacetrader.model.SpecialResource.*
 import com.malcolmcrum.spacetrader.model.SystemStatus.*
 import com.malcolmcrum.spacetrader.model.TradeItem.*
+import com.malcolmcrum.spacetrader.nouns.random
 
 val MAX_RANGE = 30
 
@@ -177,8 +179,8 @@ enum class Gadget(val text: String,
                   val basePrice: Int,
                   val minTechLevel: TechLevel?,
                   val chance: Int) {
-    EXTRA_CARGO_BAYS("5 extra cargo bays", 	2500, TechLevel.of(4), 35), // 5 extra holds
-    AUTOREPAIR("Auto-repair system",     7500, TechLevel.of(5), 20), // Increases engineer's effectivity
+    EXTRA_CARGO_BAYS("5 extra cargo bays",2500, TechLevel.of(4), 35), // 5 extra holds
+    AUTOREPAIR("Auto-repair system",7500, TechLevel.of(5), 20), // Increases engineer's effectivity
     NAVIGATING("Navigating system", 	   15000, TechLevel.of(6), 20), // Increases pilot's effectivity
     TARGETING("Targeting system",	   25000, TechLevel.of(6), 20), // Increases fighter's effectivity
     CLOAKING("Cloaking device",      100000, TechLevel.of(7), 5), // If you have a good engineer, nor pirates nor police will notice you
@@ -208,7 +210,16 @@ data class CrewMember(val name: String,
                       val fighter: Int,
                       val trader: Int,
                       val engineer: Int,
-                      var curSystem: SolarSystem) {
+                      var curSystem: SolarSystem?) {
+    constructor(name: String) : this(
+            name,
+            (1..MAX_SKILL).random(),
+            (1..MAX_SKILL).random(),
+            (1..MAX_SKILL).random(),
+            (1..MAX_SKILL).random(),
+            null
+    )
+
     fun dailyCost(): Int {
         // TODO: handle wildstatus
         return (pilot + fighter + trader + engineer) * 3

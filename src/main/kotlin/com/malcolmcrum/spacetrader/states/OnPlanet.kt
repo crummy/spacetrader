@@ -178,19 +178,19 @@ class OnPlanet(val system: SolarSystem, private val player: Player) : GameState 
         player.rechargeShields()
 
         val travelViaWormhole = system.hasWormholeTo(destination)
+        val distance: Int
         if (travelViaWormhole) { // TODO: or viaSingularity
             // TODO: special handling
-            var distance = 0
+            distance = 0
         } else {
-            var distance = system.distanceTo(destination)
+            distance = system.distanceTo(destination)
             player.fuelLeft -= distance // TODO: or min(distance, getFuel())?
         }
 
         // TODO: if !viaSingularity:
         player.dayPasses()
 
-        // TODO: travel
-        return OnPlanet(destination, player)
+        return Travel(player, destination).warp(distance)
     }
 
     private fun payCosts(destination: SolarSystem) {

@@ -6,10 +6,16 @@ import com.malcolmcrum.spacetrader.model.ShipType
 import com.malcolmcrum.spacetrader.model.SolarSystem
 import com.malcolmcrum.spacetrader.nouns.random
 
-class Travel(private val player: Player, private val destination: SolarSystem, private val clicks: Int) : GameState {
+class Travel(private val player: Player, private val destination: SolarSystem) {
     var raidedByPirates = false
 
-    fun travel(): GameState {
+    fun warp(clicks: Int): GameState {
+        assert(clicks >= 0)
+        if (clicks == 0) {
+            // TODO: handle post-Marie looting
+            return arrival()
+        }
+
         // TODO: handle going through rip
 
         // TODO: random chance of repairs
@@ -38,7 +44,19 @@ class Travel(private val player: Player, private val destination: SolarSystem, p
 
             // TODO: mantis
         }
-        return Travel(player, destination, clicks - 1)
+        return warp(clicks - 1)
+    }
+
+    private fun arrival(): GameState {
+        // TODO: handle reactor status
+
+        // TODO: handle tribbles
+
+        // TODO: repair a little bit
+
+        // TODO: easter egg
+
+        return OnPlanet(destination, player)
     }
 
     private fun traderStrength(): Int {
@@ -58,7 +76,7 @@ class Travel(private val player: Player, private val destination: SolarSystem, p
     }
 
     private fun policeEncounter(): GameState {
-        return this
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     private fun pirateEncounter(): GameState {
