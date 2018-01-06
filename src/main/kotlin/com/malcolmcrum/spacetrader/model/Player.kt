@@ -9,7 +9,7 @@ data class Player(val name: String,
                   private val pilotSkill: Int,
                   val difficulty: Difficulty,
                   var ship: ShipType = ShipType.GNAT,
-                  val cargo: Hold = Hold(ship),
+                  private val cargo: MutableList<Cargo> = ArrayList(),
                   val weapons: MutableList<Weapon> = ArrayList(),
                   var shields: MutableList<Shield> = ArrayList(),
                   val gadgets: MutableList<Gadget> = ArrayList(),
@@ -25,6 +25,8 @@ data class Player(val name: String,
                   var policeRecordScore: Int = 0,
                   var reputationScore: Int = 0,
                   var boughtMoon: Boolean = false) {
+
+    val hold = Hold(cargo, ship)
 
     fun traderSkill(): Int {
         val maxCrewTraderSkill: Int = crew.maxBy { it.trader }?.trader ?: 0
@@ -95,7 +97,7 @@ data class Player(val name: String,
     }
 
     fun currentWorth(): Int {
-        return currentShipPrice(false) + cargo.totalWorth() + finances.credits - finances.debt + if (boughtMoon) COSTMOON else 0
+        return currentShipPrice(false) + hold.totalWorth() + finances.credits - finances.debt + if (boughtMoon) COSTMOON else 0
     }
 
     private fun currentShipPrice(forInsurance: Boolean): Int {
