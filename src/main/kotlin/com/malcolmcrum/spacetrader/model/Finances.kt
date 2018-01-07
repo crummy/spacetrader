@@ -38,4 +38,8 @@ data class Finances(var credits: Int,
         credits += revenue
     }
 
+    fun tooMuchDebtToWarp(): Boolean {
+        return debt > 100000
+    }
+
 }

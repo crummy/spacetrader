@@ -3,79 +3,72 @@ package com.malcolmcrum.spacetrader.states
 import com.malcolmcrum.spacetrader.controllers.MarketController
 import com.malcolmcrum.spacetrader.model.*
 
-class OnPlanet(val system: SolarSystem, private val player: Player) : GameState {
-    // TODO: Should this be in GameManager?
-    init {
-        val market = MarketController(system.market, system, player.difficulty)
+class OnPlanet(val system: SolarSystem, val game: Game) : GameState {
+    private val finances = game.finances
+    private val difficulty = game.difficulty
+    private val ship = game.ship
+    private val market = MarketController(system.market, system, difficulty)
+    val shipyard = Shipyard(system)
+
+    init {    // TODO: Should this be in GameManager?
         market.updatePrices()
         market.updateAmounts()
         // Galaxy(systems).shuffleStatuses()
     }
 
-    val market = MarketController(system.market, system, player.difficulty)
-    val shipyard = Shipyard(system)
-
     fun repairShip(amount: Int) {
-        val newHullLeft = player.hullLeft + amount
-        if (newHullLeft > player.ship.hullStrength) {
+        val newHullStrength = ship.hullStrength + amount
+        if (newHullStrength > ship.type.hullStrength) {
             throw Exception("Adding $amount to hull leaves us with greater hull strength than our ship can take")
         }
-        val repairCost = amount * player.ship.repairCosts
-        if (! player.finances.canAfford(repairCost)) {
+        val repairCost = amount * ship.type.repairCosts
+        if (! finances.canAfford(repairCost)) {
             throw Exception("Cannot afford $repairCost of repairs")
         }
-        player.hullLeft = newHullLeft
-        player.finances.spend(repairCost)
+        ship.hullStrength = newHullStrength
+        finances.spend(repairCost)
     }
 
     fun refuelShip(amount: Int) {
-        val newFuel = player.fuelLeft + amount
-        if (newFuel > player.ship.fuelTanks) {
+        val newFuel = ship.fuel + amount
+        if (newFuel > ship.type.fuelTanks) {
             throw Exception("Adding $amount to fuel leaves us with more fuel than we can carry")
         }
-        val fuelCost = amount * player.ship.costOfFuel
-        if (! player.finances.canAfford(fuelCost)) {
+        val fuelCost = amount * ship.type.costOfFuel
+        if (! finances.canAfford(fuelCost)) {
             throw Exception("Cannot afford $fuelCost of fuel")
         }
-        player.fuelLeft = newFuel
+        ship.fuel = newFuel
     }
 
     fun buyEscapePod() {
-        if (player.hasEscapePod) {
+        if (game.hasEscapePod) {
             throw Exception("Player already has escape pod")
         }
         if (! shipyard.escapePodAvailable) {
             throw Exception("No escape pod available")
         }
         val escapePodCost = 2000
-        if (! player.finances.canAfford(escapePodCost)) {
+        if (! finances.canAfford(escapePodCost)) {
             throw Exception("Cannot afford $escapePodCost")
         }
-        player.hasEscapePod = true
+        game.hasEscapePod = true
     }
 
     // TODO: Share logic between the sellWeapon, sellGadget and sellShield
-    fun sellWeapon(type: Weapon) {
-        if (! player.weapons.contains(type)) {
-            throw Exception("Player doesn't have a $type to sell")
-        }
-        player.weapons.remove(type) // TODO: will this remove only one?
-        player.finances.deposit(type.sellPrice())
+    fun sell(type: Weapon) {
+        ship.remove(type) // TODO: will this remove only one?
+        finances.deposit(type.sellPrice())
     }
 
-    fun sellGadget(type: Gadget) {
-        if (! player.gadgets.contains(type)) {
-            throw Exception("Player doesn't have a $type to sell")
-        }
-        player.gadgets.remove(type) // TODO: will this remove only one?
-        player.finances.deposit(type.sellPrice())
+    fun sell(type: Gadget) {
+        ship.remove(type) // TODO: will this remove only one?
+        finances.deposit(type.sellPrice())
     }
 
-    fun sellShield(type: ShieldType) {
-        val shield = player.shields.find { it.type == type } ?: throw Exception("Player doesn't have a $type to sell")
-
-        player.shields.remove(shield)
-        player.finances.deposit(type.sellPrice())
+    fun sell(type: ShieldType) {
+        ship.remove(type)
+        finances.deposit(type.sellPrice())
     }
 
     // TODO: Share logic between the buyWeapon, buyGadget and buyShield
@@ -87,15 +80,12 @@ class OnPlanet(val system: SolarSystem, private val player: Player) : GameState 
             throw Exception("$type requires ${type.minTechLevel} but $system is at ${system.tech}")
         }
         val cost = type.basePrice
-        if (! player.finances.canAfford(cost)) {
+        if (! finances.canAfford(cost)) {
             throw Exception("Cannot afford $cost to buy $type")
         }
-        if (player.weapons.size > player.ship.weaponSlots) {
-            throw Exception("No slot on ship for weapon")
-        }
 
-        player.weapons.add(type)
-        player.finances.spend(cost)
+        ship.add(type)
+        finances.spend(cost)
     }
 
     fun buyGadget(type: Gadget) {
@@ -106,15 +96,12 @@ class OnPlanet(val system: SolarSystem, private val player: Player) : GameState 
             throw Exception("$type requires ${type.minTechLevel} but $system is at ${system.tech}")
         }
         val cost = type.basePrice
-        if (! player.finances.canAfford(cost)) {
+        if (! finances.canAfford(cost)) {
             throw Exception("Cannot afford $cost to buy $type")
         }
-        if (player.gadgets.size > player.ship.gadgetSlots) {
-            throw Exception("No slot on ship for gadget")
-        }
 
-        player.gadgets.add(type)
-        player.finances.spend(cost)
+        ship.add(type)
+        finances.spend(cost)
     }
 
     fun buyShield(type: ShieldType) {
@@ -125,15 +112,12 @@ class OnPlanet(val system: SolarSystem, private val player: Player) : GameState 
             throw Exception("$type requires ${type.minTechLevel} but $system is at ${system.tech}")
         }
         val cost = type.basePrice
-        if (! player.finances.canAfford(cost)) {
+        if (! finances.canAfford(cost)) {
             throw Exception("Cannot afford $cost to buy $type")
         }
-        if (player.shields.size > player.ship.shieldSlots) {
-            throw Exception("No slot on ship for shield")
-        }
 
-        player.shields.add(Shield(type, type.power))
-        player.finances.spend(cost)
+        ship.add(type)
+        finances.spend(cost)
     }
 
     fun buyShip(type: ShipType) {
@@ -141,33 +125,33 @@ class OnPlanet(val system: SolarSystem, private val player: Player) : GameState 
     }
 
     fun buyTradeItem(item: TradeItem, amount: Int) {
-        val buyPrice = market.getBuyPrice(item, player.traderSkill(), player.policeRecordScore)
+        val buyPrice = market.getBuyPrice(item, ship.traderSkill(), game.policeRecordScore)
         val cost = buyPrice * amount
-        if (! player.finances.canAfford(cost)) {
+        if (! finances.canAfford(cost)) {
             throw Exception("Cannot afford $cost of $item")
         }
-        if (amount > player.cargo.emptyBays()) {
+        if (amount > ship.hold.emptyBays()) {
             throw Exception("No room for $amount of $item")
         }
         market.remove(item, amount)
-        player.cargo.add(item, amount, buyPrice)
+        ship.hold.add(item, amount, buyPrice)
 
-        player.finances.spend(cost)
+        finances.spend(cost)
     }
 
     fun sellTradeItem(item: TradeItem, amount: Int) {
         // TODO: Ensure that this system is buying this item
-        if (player.cargo.count(item) < amount) {
+        if (ship.hold.count(item) < amount) {
             throw Exception("Cannot sell $amount of $item; player does not have enough")
         }
 
         market.add(item, amount)
 
-        player.cargo.remove(item, amount)
+        ship.hold.remove(item, amount)
 
-        val sellPrice = market.getSellPrice(item, player.policeRecordScore)
+        val sellPrice = market.getSellPrice(item, game.policeRecordScore)
         val revenue = sellPrice * amount
-        player.finances.deposit(revenue)
+        finances.deposit(revenue)
     }
 
     fun warp(destination: SolarSystem): GameState {
@@ -175,7 +159,7 @@ class OnPlanet(val system: SolarSystem, private val player: Player) : GameState 
 
         payCosts(destination)
 
-        player.rechargeShields()
+        ship.rechargeShields()
 
         val travelViaWormhole = system.hasWormholeTo(destination)
         val distance: Int
@@ -184,42 +168,42 @@ class OnPlanet(val system: SolarSystem, private val player: Player) : GameState 
             distance = 0
         } else {
             distance = system.distanceTo(destination)
-            player.fuelLeft -= distance // TODO: or min(distance, getFuel())?
+            ship.fuel -= distance // TODO: or min(distance, getFuel())?
         }
 
         // TODO: if !viaSingularity:
-        player.dayPasses()
+        game.dayPasses()
 
-        return Travel(player, destination).warp(distance)
+        return Travel(game, destination, distance).warp()
     }
 
     private fun payCosts(destination: SolarSystem) {
         // TODO: if wild, weapon check
-        if (player.tooMuchDebtToWarp()) {
-            throw Exception("Debt ${player.finances.debt} too great to warp")
+        if (finances.tooMuchDebtToWarp()) {
+            throw Exception("Debt ${finances.debt} too great to warp")
         }
-        val crewCosts = player.crewCost()
-        if (! player.finances.canAfford(crewCosts)) {
+        val crewCosts = ship.crewCost()
+        if (! finances.canAfford(crewCosts)) {
             throw Exception("Cannot afford to pay $crewCosts to mercenaries")
         }
-        val insuranceCost = player.getInsuranceCost()
-        if (!player.finances.canAfford(insuranceCost + crewCosts)) {
+        val insuranceCost = game.getInsuranceCost()
+        if (!finances.canAfford(insuranceCost + crewCosts)) {
             throw Exception("Cannot afford to pay $insuranceCost for insurance and $crewCosts to mercenaries")
         }
         val wormholeCost = wormholeCost(system, destination)
-        if (!player.finances.canAfford(insuranceCost + crewCosts + wormholeCost)) {
+        if (!finances.canAfford(insuranceCost + crewCosts + wormholeCost)) {
             throw Exception("Cannot afford to pay $wormholeCost for wormhole")
         }
         // TODO: skip costs if !viaSingularity
-        player.finances.spend(wormholeCost)
-        player.finances.spend(insuranceCost)
-        player.finances.spend(wormholeCost)
-        player.finances.payInterest()
+        finances.spend(wormholeCost)
+        finances.spend(insuranceCost)
+        finances.spend(wormholeCost)
+        finances.payInterest()
     }
 
     private fun wormholeCost(system: SolarSystem, destination: SolarSystem): Int {
         val travelViaWormhole = system.hasWormholeTo(destination)
-        return if (travelViaWormhole) player.ship.costOfFuel * 25 else 0
+        return if (travelViaWormhole) ship.type.costOfFuel * 25 else 0
     }
 
 }

@@ -66,9 +66,9 @@ class OnPlanetRenderer : StateRenderer {
                     val type = req.path("type")!!
                     val item = req.path("item")!!
                     when (type) {
-                        "weapon" -> onPlanet.sellWeapon(Weapon.valueOf(item))
-                        "shield" -> onPlanet.sellShield(ShieldType.valueOf(item))
-                        "gadget" -> onPlanet.sellGadget(Gadget.valueOf(item))
+                        "weapon" -> onPlanet.sell(Weapon.valueOf(item))
+                        "shield" -> onPlanet.sell(ShieldType.valueOf(item))
+                        "gadget" -> onPlanet.sell(Gadget.valueOf(item))
                         else -> throw Exception("Unrecognized type: $type")
                     }
                     Response(SEE_OTHER).header("location", "/game/${game.id}")
@@ -114,36 +114,36 @@ class OnPlanetRenderer : StateRenderer {
             body {
                 render(state.system, state.system)
                 table {
-                    headerRow("Status", game.player.name)
-                    row("Credits", game.player.finances.credits)
-                    row("Debt", game.player.finances.debt)
-                    row("Escape Pod?", game.player.hasEscapePod)
-                    row("Days", game.player.days)
-                    row("Reputation", Reputation.of(game.player.reputationScore))
-                    row("Police Record", PoliceRecord.of(game.player.policeRecordScore))
+                    headerRow("Status", game.ship.captain.name)
+                    row("Credits", game.finances.credits)
+                    row("Debt", game.finances.debt)
+                    row("Escape Pod?", game.hasEscapePod)
+                    row("Days", game.days)
+                    row("Reputation", Reputation.of(game.reputationScore))
+                    row("Police Record", PoliceRecord.of(game.policeRecordScore))
                 }
                 table {
-                    headerRow("Ship", game.player.ship.text)
-                    headerRow("Crew", "${game.player.crew.size}/${game.player.ship.crewQuarters}")
-                    game.player.crew.forEach {
+                    headerRow("Ship", game.ship.type.text)
+                    headerRow("Crew", "${game.ship.crew.size}/${game.ship.type.crewQuarters}")
+                    game.ship.crew.forEach {
                         row(it.name, "Fire")
                     }
-                    headerRow("Weapons", "${game.player.weapons.size}/${game.player.ship.weaponSlots}")
-                    game.player.weapons.forEach {
+                    headerRow("Weapons", "${game.ship.weapons.size}/${game.ship.type.weaponSlots}")
+                    game.ship.weapons.forEach {
                         row(it.name, "Sell")
                     }
-                    headerRow("Shields", "${game.player.shields.size}/${game.player.ship.shieldSlots}")
-                    game.player.shields.forEach {
+                    headerRow("Shields", "${game.ship.shields.size}/${game.ship.type.shieldSlots}")
+                    game.ship.shields.forEach {
                         row(it.type.name, "Sell")
                     }
-                    headerRow("Gadgets", "${game.player.gadgets.size}/${game.player.ship.gadgetSlots}")
-                    game.player.gadgets.forEach {
+                    headerRow("Gadgets", "${game.ship.gadgets.size}/${game.ship.type.gadgetSlots}")
+                    game.ship.gadgets.forEach {
                         row(it.name, "Sell")
                     }
-                    headerRow("Fuel Remaining", "${game.player.fuelLeft}/${game.player.ship.fuelTanks}")
-                    headerRow("Cargo Hold", "${game.player.cargo.fullBays()}/${game.player.ship.cargoBays}")
-                    headerRow("Insurance?", game.player.hasInsurance)
-                    headerRow("Escape pod?", game.player.hasEscapePod)
+                    headerRow("Fuel Remaining", "${game.ship.fuel}/${game.ship.type.fuelTanks}")
+                    headerRow("Cargo Hold", "${game.ship.hold.fullBays()}/${game.ship.type.cargoBays}")
+                    headerRow("Insurance?", game.hasInsurance)
+                    headerRow("Escape pod?", game.hasEscapePod)
                 }
                 table {
                     headerRow("Shipyard", "Price")
@@ -152,15 +152,15 @@ class OnPlanetRenderer : StateRenderer {
                             +"Fuel"
                         }
                         td {
-                            +"${game.player.fuelLeft}/${game.player.ship.fuelTanks}"
+                            +"${game.ship.fuel}/${game.ship.type.fuelTanks}"
                         }
                     }
                     tr {
                         td {
-                            +"${game.player.ship.costOfFuel}/tank"
+                            +"${game.ship.type.costOfFuel}/tank"
                         }
                         td {
-                            val refill = game.player.ship.fuelTanks - game.player.fuelLeft
+                            val refill = game.ship.type.fuelTanks - game.ship.fuel
                             buttonLink("Buy Full Tank", "/game/${game.id}/onPlanet/refuel/$refill")
                         }
                     }
@@ -169,15 +169,15 @@ class OnPlanetRenderer : StateRenderer {
                             +"Repair"
                         }
                         td {
-                            +"${game.player.hullLeft/game.player.ship.hullStrength*100}%"
+                            +"${game.ship.hullStrength/game.ship.type.hullStrength*100}%"
                         }
                     }
                     tr {
                         td {
-                            +"${game.player.ship.repairCosts}"
+                            +"${game.ship.type.repairCosts}"
                         }
                         td {
-                            val fullRepairs = game.player.hullLeft - game.player.ship.hullStrength
+                            val fullRepairs = game.ship.hullStrength - game.ship.type.hullStrength
                             buttonLink("Full Repairs", "/game/${game.id}/onPlanet/repair/$fullRepairs")
                         }
                     }
@@ -230,7 +230,7 @@ class OnPlanetRenderer : StateRenderer {
                             .forEach {
                                 tr {
                                     td {
-                                        val inRange = it.distanceTo(state.system) <= game.player.fuelLeft
+                                        val inRange = it.distanceTo(state.system) <= game.ship.fuel
                                         buttonLink(it.name, "/game/${game.id}/onPlanet/warp/${it.name}", inRange)
                                     }
                                     td {
@@ -271,9 +271,9 @@ class OnPlanetRenderer : StateRenderer {
                                 }
                                 td {
                                     id = "${item.name}UnitPrice"
-                                    +"${market.getBuyPrice(item, game.player.traderSkill(), game.player.policeRecordScore)} cr."
+                                    +"${market.getBuyPrice(item, game.ship.traderSkill(), game.policeRecordScore)} cr."
                                 }
-                                val canAfford = market.getBuyPrice(item, game.player.traderSkill(), game.player.policeRecordScore) / game.player.finances.credits
+                                val canAfford = market.getBuyPrice(item, game.ship.traderSkill(), game.policeRecordScore) / game.finances.credits
                                 td {
                                     textInput {
                                         id = "${item.name}BuyAmount"
@@ -291,7 +291,7 @@ class OnPlanetRenderer : StateRenderer {
                                         if (amount == 0) {
                                             disabled = true
                                         }
-                                        +"${Math.max(amount, canAfford) * market.getBuyPrice(item, game.player.traderSkill(), game.player.policeRecordScore)}"
+                                        +"${Math.max(amount, canAfford) * market.getBuyPrice(item, game.ship.traderSkill(), game.policeRecordScore)}"
                                     }
                                 }
                             }
@@ -321,7 +321,7 @@ class OnPlanetRenderer : StateRenderer {
                         }
                         TradeItem.values().forEach { item ->
                             tr {
-                                val amountInCargo = +game.player.cargo.count(item)
+                                val amountInCargo = +game.ship.hold.count(item)
                                 td {
                                     +item.text
                                 }
@@ -330,10 +330,10 @@ class OnPlanetRenderer : StateRenderer {
                                 }
                                 td {
                                     id = "${item.name}SellPrice"
-                                    val sellPrice = market.getSellPrice(item, game.player.policeRecordScore)
+                                    val sellPrice = market.getSellPrice(item, game.policeRecordScore)
                                     var text = "$sellPrice cr."
                                     if (amountInCargo > 0) {
-                                        val profit = sellPrice - game.player.cargo.purchasePrice(item)
+                                        val profit = sellPrice - game.ship.hold.purchasePrice(item)
                                         text += " ($profit)"
                                     }
                                     +text
@@ -355,7 +355,7 @@ class OnPlanetRenderer : StateRenderer {
                                         if (amountInCargo == 0) {
                                             disabled = true
                                         }
-                                        +"${amountInCargo * market.getSellPrice(item, game.player.policeRecordScore)}"
+                                        +"${amountInCargo * market.getSellPrice(item, game.policeRecordScore)}"
                                     }
                                 }
                             }

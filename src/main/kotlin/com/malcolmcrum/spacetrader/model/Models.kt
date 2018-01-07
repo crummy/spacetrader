@@ -162,6 +162,8 @@ enum class SystemSize(val text: String) {
     HUGE("Huge")
 }
 
+data class Shield(val type: ShieldType, var strength: Int = type.power)
+
 enum class ShieldType(val text: String,
                       val power: Int,
                       val basePrice: Int,

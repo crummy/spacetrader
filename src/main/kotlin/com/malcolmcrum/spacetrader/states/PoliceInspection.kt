@@ -1,7 +1,7 @@
 package com.malcolmcrum.spacetrader.states
 
 import com.malcolmcrum.spacetrader.model.Difficulty
-import com.malcolmcrum.spacetrader.model.Player
+import com.malcolmcrum.spacetrader.model.Game
 import com.malcolmcrum.spacetrader.model.PoliceRecord
 import com.malcolmcrum.spacetrader.model.TradeItem
 import com.malcolmcrum.spacetrader.nouns.Ship
@@ -10,8 +10,8 @@ import kotlin.reflect.KFunction0
 private val TRAFFICKING = -1
 private val FLEE_FROM_INSPECTION = -2
 
-class PoliceInspection(opponent: Ship, val player: Player) : Encounter(opponent) {
-    private val cargo = player.cargo
+class PoliceInspection(opponent: Ship, travel: Travel, val game: Game) : Encounter(opponent, travel) {
+    private val hold = game.ship.hold
 
     override fun description(): String {
         return "The police summon you to submit to an inspection."
@@ -22,33 +22,33 @@ class PoliceInspection(opponent: Ship, val player: Player) : Encounter(opponent)
     }
 
     fun submit(): GameState {
-        val firearms = cargo.count(TradeItem.FIREARMS)
-        val narcotics = cargo.count(TradeItem.NARCOTICS)
+        val firearms = hold.count(TradeItem.FIREARMS)
+        val narcotics = hold.count(TradeItem.NARCOTICS)
         if (firearms > 0 || narcotics > 0) {
-            cargo.remove(TradeItem.FIREARMS, firearms)
-            cargo.remove(TradeItem.NARCOTICS, narcotics)
+            hold.remove(TradeItem.FIREARMS, firearms)
+            hold.remove(TradeItem.NARCOTICS, narcotics)
 
-            var fine = player.currentWorth() / (Difficulty.IMPOSSIBLE.ordinal + 2 - player.difficulty.ordinal) * 10
+            var fine = game.currentWorth() / (Difficulty.IMPOSSIBLE.ordinal + 2 - game.difficulty.ordinal) * 10
             if (fine % 50 != 0) {
                 fine += (50 - (fine % 50))
             }
             fine = Math.max(100, Math.min(fine, 10000))
-            player.finances.withdraw(fine)
-            player.policeRecordScore += TRAFFICKING
+            game.finances.withdraw(fine)
+            game.policeRecordScore += TRAFFICKING
 
-            return LeaveEncounter("You have been fined $fine") // TODO fix text
+            return LeaveEncounter(opponent, travel, "You have been fined $fine") // TODO fix text
         } else {
             // TODO: check wildstatus, reactorstatus
-            player.policeRecordScore -= TRAFFICKING
-            return LeaveEncounter("NoIllegalGoodsAlert") // TODO fix text
+            game.policeRecordScore -= TRAFFICKING
+            return LeaveEncounter(opponent, travel,"NoIllegalGoodsAlert") // TODO fix text
         }
     }
 
     fun flee(): GameState {
-        if (player.policeRecordScore > PoliceRecord.DUBIOUS.score) {
-            player.policeRecordScore = PoliceRecord.DUBIOUS.score - if (player.difficulty < Difficulty.NORMAL) 0 else 1
+        if (game.policeRecordScore > PoliceRecord.DUBIOUS.score) {
+            game.policeRecordScore = PoliceRecord.DUBIOUS.score - if (game.difficulty < Difficulty.NORMAL) 0 else 1
         } else {
-            player.policeRecordScore += FLEE_FROM_INSPECTION
+            game.policeRecordScore += FLEE_FROM_INSPECTION
         }
         TODO() //return PoliceAttack()
     }

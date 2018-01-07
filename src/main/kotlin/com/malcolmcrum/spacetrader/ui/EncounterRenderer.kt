@@ -31,6 +31,7 @@ class EncounterRenderer: StateRenderer {
 
     override fun render(game: Game): String {
         val encounter = game.state as Encounter
+        val opponent = encounter.opponent
 
         return createHTML().html {
             head {
@@ -49,14 +50,14 @@ class EncounterRenderer: StateRenderer {
                     }
                     tr {
                         td {
-                            val hull = percent(game.player.hullLeft, game.player.ship.hullStrength)
+                            val hull = percent(game.ship.hullStrength, game.ship.type.hullStrength)
                             +"Hull at $hull"
                         }
                         td {
-                            if (game.player.shields.isEmpty()) {
+                            if (game.ship.shields.isEmpty()) {
                                 +"No shields"
                             } else {
-                                val shields = percent(game.player.shields.sumBy { it.strength }, game.player.shields.sumBy { it.type.power })
+                                val shields = percent(game.ship.shields.sumBy { it.strength }, game.ship.shields.sumBy { it.type.power })
                                 +"Shields at $shields"
                             }
                         }
@@ -70,14 +71,14 @@ class EncounterRenderer: StateRenderer {
                     }
                     tr {
                         td {
-                            val hull = percent(game.player.hullLeft, game.player.ship.hullStrength)
+                            val hull = percent(opponent.hullStrength, opponent.type.hullStrength)
                             +"Hull at $hull"
                         }
                         td {
-                            if (game.player.shields.isEmpty()) {
+                            if (opponent.shields.isEmpty()) {
                                 +"No shields"
                             } else {
-                                val shields = percent(game.player.shields.sumBy { it.strength }, game.player.shields.sumBy { it.type.power })
+                                val shields = percent(opponent.shields.sumBy { it.strength }, opponent.shields.sumBy { it.type.power })
                                 +"Shields at $shields"
                             }
                         }

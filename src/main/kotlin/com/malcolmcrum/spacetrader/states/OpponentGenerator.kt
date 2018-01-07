@@ -5,7 +5,10 @@ import com.malcolmcrum.spacetrader.nouns.Ship
 import com.malcolmcrum.spacetrader.nouns.pickRandom
 import com.malcolmcrum.spacetrader.nouns.random
 
-class OpponentGenerator(private val player: Player, private val destination: SolarSystem) {
+class OpponentGenerator(private val difficulty: Difficulty,
+                        private val currentWorth: Int,
+                        private val policeRecordScore: Int,
+                        private val destination: SolarSystem) {
 
     enum class BASE_TYPES {
         POLICE,
@@ -16,52 +19,59 @@ class OpponentGenerator(private val player: Player, private val destination: Sol
     // Police hunt you down harder if you are villainous or are transporting Jonathan Wild
     fun generatePolice(): Ship {
         var attempts = 1
-        if (player.policeRecordScore < PoliceRecord.VILLAIN.score) { // TODO: handle wild Status
+        if (policeRecordScore < PoliceRecord.VILLAIN.score) { // TODO: handle wild Status
             attempts = 3
-        } else if (player.policeRecordScore < PoliceRecord.PSYCHOPATH.score) {
+        } else if (policeRecordScore < PoliceRecord.PSYCHOPATH.score) {
             attempts = 5
         }
-        attempts = Math.max(1, attempts + player.difficulty.ordinal - Difficulty.NORMAL.ordinal)
+        attempts = Math.max(1, attempts + difficulty.ordinal - Difficulty.NORMAL.ordinal)
 
         val ship = pickShip(BASE_TYPES.POLICE, attempts)
-        attempts = Math.max( 1, (player.currentWorth() / 150000) + player.difficulty.ordinal - Difficulty.NORMAL.ordinal)
-        val gadgets = createGadgets(attempts, player.difficulty, ship.gadgetSlots)
+        attempts = Math.max( 1, (currentWorth / 150000) + difficulty.ordinal - Difficulty.NORMAL.ordinal)
+        val captain = createCaptain()
+        val gadgets = createGadgets(attempts, difficulty, ship.gadgetSlots)
         val cargoBays = ship.cargoBays + (if (gadgets.contains(Gadget.EXTRA_CARGO_BAYS)) 5 else 0)
         val cargo = createHold(BASE_TYPES.POLICE, cargoBays)
         val weapons = createWeapons(attempts, ship.weaponSlots)
-        val shields = createShields(attempts, player.difficulty, ship.shieldSlots)
+        val shields = createShields(attempts, difficulty, ship.shieldSlots)
         val hullStrength = createHullStrength(ship.hullStrength, !shields.isEmpty())
-        val crew = createCrew(player.difficulty, ship.crewQuarters)
-        return Ship(ship, gadgets, shields, weapons, crew, cargo, ship.fuelTanks, hullStrength)
+        val crew = createCrew(difficulty, ship.crewQuarters)
+        return Ship(ship, captain, gadgets, shields, weapons, crew, cargo, ship.fuelTanks, hullStrength)
+    }
+
+    private fun createCaptain(): CrewMember {
+        // TODO: handle wild or famous captain
+        return CrewMember("Captain")
     }
 
     // Pirates hunt you down harder if you are rich
     fun generatePirate(): Ship {
-        var attempts = 1 + (player.currentWorth() / 100000)
-        attempts = Math.max( 1, attempts + player.difficulty.ordinal - Difficulty.NORMAL.ordinal)
+        var attempts = 1 + (currentWorth / 100000)
+        attempts = Math.max( 1, attempts + difficulty.ordinal - Difficulty.NORMAL.ordinal)
         val ship = pickShip(BASE_TYPES.PIRATE, attempts)
-        attempts = Math.max( 1, (player.currentWorth() / 150000) + player.difficulty.ordinal - Difficulty.NORMAL.ordinal)
-        val gadgets = createGadgets(attempts, player.difficulty, ship.gadgetSlots)
+        val captain = createCaptain()
+        attempts = Math.max( 1, (currentWorth / 150000) + difficulty.ordinal - Difficulty.NORMAL.ordinal)
+        val gadgets = createGadgets(attempts, difficulty, ship.gadgetSlots)
         val cargoBays = ship.cargoBays + (if (gadgets.contains(Gadget.EXTRA_CARGO_BAYS)) 5 else 0)
         val hold = createHold(BASE_TYPES.PIRATE, cargoBays)
         val weapons = createWeapons(attempts, ship.weaponSlots)
-        val shields = createShields(attempts, player.difficulty, ship.shieldSlots)
+        val shields = createShields(attempts, difficulty, ship.shieldSlots)
         val hullStrength = createHullStrength(ship.hullStrength, !shields.isEmpty())
-        val crew = createCrew(player.difficulty, ship.crewQuarters)
+        val crew = createCrew(difficulty, ship.crewQuarters)
 
-        return Ship(ship, gadgets, shields, weapons, crew, hold, ship.fuelTanks, hullStrength)
+        return Ship(ship, captain, gadgets, shields, weapons, crew, hold, ship.fuelTanks, hullStrength)
     }
 
     fun generateTrader(): Ship {
         var attempts = 1
         val ship = pickShip(BASE_TYPES.TRADER, attempts)
-        attempts = Math.max( 1, (player.currentWorth() / 150000) + player.difficulty.ordinal - Difficulty.NORMAL.ordinal)
+        attempts = Math.max( 1, (currentWorth / 150000) + difficulty.ordinal - Difficulty.NORMAL.ordinal)
 
         TODO()
     }
 
     fun generateMantis(): Ship {
-        var attempts = 1 + player.difficulty.ordinal
+        var attempts = 1 + difficulty.ordinal
         val ship = ShipType.MANTIS
 
         TODO()
@@ -153,13 +163,13 @@ class OpponentGenerator(private val player: Player, private val destination: Sol
         val weaponSlots = when {
             maxWeapons == 0 -> 0
             maxWeapons == 1 -> 1
-            player.difficulty == Difficulty.IMPOSSIBLE -> maxWeapons
+            difficulty == Difficulty.IMPOSSIBLE -> maxWeapons
             else -> {
                 var d = (1..maxWeapons).random()
                 if (d < maxWeapons) {
-                    if (attempts > 4 && player.difficulty >= Difficulty.HARD) {
+                    if (attempts > 4 && difficulty >= Difficulty.HARD) {
                         ++d
-                    } else if (attempts > 3 || player.difficulty >= Difficulty.HARD) {
+                    } else if (attempts > 3 || difficulty >= Difficulty.HARD) {
                         d += (0..1).random()
                     }
                 }
@@ -187,7 +197,7 @@ class OpponentGenerator(private val player: Player, private val destination: Sol
         repeat(maxCargo) {
             val m: Int
             var sum: Int
-            if (player.difficulty >= Difficulty.NORMAL) {
+            if (difficulty >= Difficulty.NORMAL) {
                 m = (3 until (maxCargo - 5)).random()
                 sum = Math.min(m, 15)
             } else {
@@ -195,7 +205,7 @@ class OpponentGenerator(private val player: Player, private val destination: Sol
             }
             when (type) {
                 BASE_TYPES.POLICE -> sum = 1
-                BASE_TYPES.PIRATE -> if (player.difficulty < Difficulty.NORMAL) sum = (sum * 4) / 5 else sum /= player.difficulty.ordinal
+                BASE_TYPES.PIRATE -> if (difficulty < Difficulty.NORMAL) sum = (sum * 4) / 5 else sum /= difficulty.ordinal
             }
             sum = Math.max(sum, 1)
 
@@ -277,7 +287,7 @@ class OpponentGenerator(private val player: Player, private val destination: Sol
     }
 
     private fun pickShip(type: BASE_TYPES, attempts: Int): ShipType {
-        val k = Math.max(player.difficulty.ordinal - Difficulty.NORMAL.ordinal, 0)
+        val k = Math.max(difficulty.ordinal - Difficulty.NORMAL.ordinal, 0)
         var opponentType = if (type == BASE_TYPES.TRADER) 0 else 1
 
         repeat(attempts) {
