@@ -1,9 +1,9 @@
 package com.malcolmcrum.spacetrader.ui
 
 import com.malcolmcrum.spacetrader.controllers.MarketController
+import com.malcolmcrum.spacetrader.controllers.OnPlanetController
 import com.malcolmcrum.spacetrader.gameManager
 import com.malcolmcrum.spacetrader.model.*
-import com.malcolmcrum.spacetrader.states.OnPlanet
 import kotlinx.html.*
 import kotlinx.html.stream.createHTML
 import org.http4k.core.Method
@@ -23,7 +23,7 @@ class OnPlanetRenderer : StateRenderer {
                 "warp/{systemName}" bind Method.POST to { req ->
                     val gameId: GameId = req.path("gameId")!!
                     val game = gameManager.games[gameId]!!
-                    val onPlanet = game.state as OnPlanet
+                    val onPlanet = game.state as OnPlanetController
                     val systemName = req.path("systemName")!!
                     val destination = game.galaxy.getSystem(systemName)
                     game.state = onPlanet.warp(destination)
@@ -32,7 +32,7 @@ class OnPlanetRenderer : StateRenderer {
                 "repair/{amount}" bind Method.POST to { req ->
                     val gameId: GameId = req.path("gameId")!!
                     val game = gameManager.games[gameId]!!
-                    val onPlanet = game.state as OnPlanet
+                    val onPlanet = game.state as OnPlanetController
                     val amount = req.path("amount")!!
                     onPlanet.repairShip(amount.toInt())
                     Response(SEE_OTHER).header("location", "/game/${game.id}")
@@ -40,7 +40,7 @@ class OnPlanetRenderer : StateRenderer {
                 "refuel/{amount}" bind Method.POST to { req ->
                     val gameId: GameId = req.path("gameId")!!
                     val game = gameManager.games[gameId]!!
-                    val onPlanet = game.state as OnPlanet
+                    val onPlanet = game.state as OnPlanetController
                     val amount = req.path("amount")!!
                     onPlanet.refuelShip(amount.toInt())
                     Response(SEE_OTHER).header("location", "/game/${game.id}")
@@ -48,7 +48,7 @@ class OnPlanetRenderer : StateRenderer {
                 "buy/{type}/{item}" bind Method.POST to { req ->
                     val gameId: GameId = req.path("gameId")!!
                     val game = gameManager.games[gameId]!!
-                    val onPlanet = game.state as OnPlanet
+                    val onPlanet = game.state as OnPlanetController
                     val type = req.path("type")!!
                     val item = req.path("item")!!
                     when (type) {
@@ -62,7 +62,7 @@ class OnPlanetRenderer : StateRenderer {
                 "sell/{type}/{item}" bind Method.POST to { req ->
                     val gameId: GameId = req.path("gameId")!!
                     val game = gameManager.games[gameId]!!
-                    val onPlanet = game.state as OnPlanet
+                    val onPlanet = game.state as OnPlanetController
                     val type = req.path("type")!!
                     val item = req.path("item")!!
                     when (type) {
@@ -76,14 +76,14 @@ class OnPlanetRenderer : StateRenderer {
                 "buyEscapePod" bind Method.POST to { req ->
                     val gameId: GameId = req.path("gameId")!!
                     val game = gameManager.games[gameId]!!
-                    val onPlanet = game.state as OnPlanet
+                    val onPlanet = game.state as OnPlanetController
                     onPlanet.buyEscapePod()
                     Response(SEE_OTHER).header("location", "/game/${game.id}")
                 },
                 "market/buy" bind Method.POST to { req ->
                     val gameId: GameId = req.path("gameId")!!
                     val game = gameManager.games[gameId]!!
-                    val onPlanet = game.state as OnPlanet
+                    val onPlanet = game.state as OnPlanetController
                     val item = TradeItem.valueOf(req.form("item")!!)
                     val amount = req.form("${item}BuyAmount")!!.toInt()
                     onPlanet.buyTradeItem(item, amount)
@@ -92,7 +92,7 @@ class OnPlanetRenderer : StateRenderer {
                 "market/sell" bind Method.POST to { req ->
                     val gameId: GameId = req.path("gameId")!!
                     val game = gameManager.games[gameId]!!
-                    val onPlanet = game.state as OnPlanet
+                    val onPlanet = game.state as OnPlanetController
                     val item = TradeItem.valueOf(req.form("item")!!)
                     val amount = req.form("${item}SellAmount")!!.toInt()
                     onPlanet.sellTradeItem(item, amount)
@@ -101,7 +101,7 @@ class OnPlanetRenderer : StateRenderer {
     }
 
     override fun render(game: Game): String {
-        val state = game.state as OnPlanet
+        val state = game.state as OnPlanetController
         val market = MarketController(state.system.market, state.system, game.difficulty)
 
         return createHTML().html {
@@ -117,10 +117,10 @@ class OnPlanetRenderer : StateRenderer {
                     headerRow("Status", game.ship.captain.name)
                     row("Credits", game.finances.credits)
                     row("Debt", game.finances.debt)
-                    row("Escape Pod?", game.hasEscapePod)
+                    row("Escape Pod?", game.escapePod.present)
                     row("Days", game.days)
                     row("Reputation", Reputation.of(game.reputationScore))
-                    row("Police Record", PoliceRecord.of(game.policeRecordScore))
+                    row("Police Record", game.policeRecord.description())
                 }
                 table {
                     headerRow("Ship", game.ship.type.text)
@@ -142,8 +142,8 @@ class OnPlanetRenderer : StateRenderer {
                     }
                     headerRow("Fuel Remaining", "${game.ship.fuel}/${game.ship.type.fuelTanks}")
                     headerRow("Cargo Hold", "${game.ship.hold.fullBays()}/${game.ship.type.cargoBays}")
-                    headerRow("Insurance?", game.hasInsurance)
-                    headerRow("Escape pod?", game.hasEscapePod)
+                    headerRow("Insurance?", game.insurance.present)
+                    headerRow("Escape pod?", game.escapePod.present)
                 }
                 table {
                     headerRow("Shipyard", "Price")
@@ -271,9 +271,9 @@ class OnPlanetRenderer : StateRenderer {
                                 }
                                 td {
                                     id = "${item.name}UnitPrice"
-                                    +"${market.getBuyPrice(item, game.ship.traderSkill(), game.policeRecordScore)} cr."
+                                    +"${market.getBuyPrice(item, game.ship.traderSkill(), game.policeRecord)} cr."
                                 }
-                                val canAfford = market.getBuyPrice(item, game.ship.traderSkill(), game.policeRecordScore) / game.finances.credits
+                                val canAfford = market.getBuyPrice(item, game.ship.traderSkill(), game.policeRecord) / game.finances.credits
                                 td {
                                     textInput {
                                         id = "${item.name}BuyAmount"
@@ -291,7 +291,7 @@ class OnPlanetRenderer : StateRenderer {
                                         if (amount == 0) {
                                             disabled = true
                                         }
-                                        +"${Math.max(amount, canAfford) * market.getBuyPrice(item, game.ship.traderSkill(), game.policeRecordScore)}"
+                                        +"${Math.max(amount, canAfford) * market.getBuyPrice(item, game.ship.traderSkill(), game.policeRecord)}"
                                     }
                                 }
                             }
@@ -330,7 +330,7 @@ class OnPlanetRenderer : StateRenderer {
                                 }
                                 td {
                                     id = "${item.name}SellPrice"
-                                    val sellPrice = market.getSellPrice(item, game.policeRecordScore)
+                                    val sellPrice = market.getSellPrice(item, game.policeRecord)
                                     var text = "$sellPrice cr."
                                     if (amountInCargo > 0) {
                                         val profit = sellPrice - game.ship.hold.purchasePrice(item)
@@ -355,7 +355,7 @@ class OnPlanetRenderer : StateRenderer {
                                         if (amountInCargo == 0) {
                                             disabled = true
                                         }
-                                        +"${amountInCargo * market.getSellPrice(item, game.policeRecordScore)}"
+                                        +"${amountInCargo * market.getSellPrice(item, game.policeRecord)}"
                                     }
                                 }
                             }

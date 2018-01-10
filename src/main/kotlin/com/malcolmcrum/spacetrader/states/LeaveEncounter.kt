@@ -3,7 +3,7 @@ package com.malcolmcrum.spacetrader.states
 import com.malcolmcrum.spacetrader.nouns.Ship
 import kotlin.reflect.KFunction0
 
-class LeaveEncounter(opponent: Ship, travel: Travel, private val message: String) : Encounter(opponent, travel) {
+class LeaveEncounter(opponent: Ship, travel: GameState.Travel, private val message: String) : Encounter(opponent, travel) {
     override fun description(): String {
         return message
     }
@@ -13,7 +13,7 @@ class LeaveEncounter(opponent: Ship, travel: Travel, private val message: String
     }
 
     fun done(): GameState {
-        return travel.warp()
+        return travel
     }
 
 }

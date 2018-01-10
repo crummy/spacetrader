@@ -2,10 +2,14 @@ package com.malcolmcrum.spacetrader.controllers
 
 import com.malcolmcrum.spacetrader.model.*
 import com.malcolmcrum.spacetrader.nouns.random
+import kotlin.math.roundToInt
 
 val MAX_SKILL = 10 // TODO: move elsewhere
 
-class MarketController(private val market: Market, private val system: SolarSystem, private val difficulty: Difficulty) {
+class MarketController(private val market: Market,
+                       private val system: SolarSystem,
+                       private val difficulty: Difficulty) {
+
     fun updateAmounts() {
         when {
             market.countdown > getInitialCountdown(difficulty) -> market.countdown = getInitialCountdown(difficulty)
@@ -80,17 +84,13 @@ class MarketController(private val market: Market, private val system: SolarSyst
         market.amounts[item] = previousValue + increment
     }
 
-    fun getBuyPrice(item: TradeItem, tradeSkill: Int, policeRecordScore: Int): Int {
+    fun getBuyPrice(item: TradeItem, tradeSkill: Int, policeRecord: PoliceRecord): Int {
         if (isNotSold(item)) {
             return 0
         }
 
         val basePrice = market.basePrices[item]!!
-        var buyPrice = if (policeRecordScore <= PoliceRecord.DUBIOUS.score) {
-            (basePrice * 100) / 90
-        } else {
-            basePrice
-        }
+        var buyPrice = (basePrice * policeRecord.marketPriceModifier()).roundToInt()
 
         buyPrice = (buyPrice * (103 + (MAX_SKILL - tradeSkill)) / 100)
         return if (buyPrice <= basePrice) {
@@ -100,13 +100,9 @@ class MarketController(private val market: Market, private val system: SolarSyst
         }
     }
 
-    fun getSellPrice(item: TradeItem, policeRecordScore: Int): Int {
+    fun getSellPrice(item: TradeItem, policeRecord: PoliceRecord): Int {
         val basePrice = market.basePrices[item]!!
-        return if (policeRecordScore <= PoliceRecord.DUBIOUS.score) {
-            (basePrice * 90) / 100
-        } else {
-            basePrice
-        }
+        return (basePrice * policeRecord.marketPriceModifier()).roundToInt()
     }
 
     private fun standardPrice(item: TradeItem, size: SystemSize, tech: TechLevel, politics: Politics, specialResource: SpecialResource?): Int {

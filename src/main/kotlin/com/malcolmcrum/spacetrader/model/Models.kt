@@ -4,6 +4,7 @@ import com.malcolmcrum.spacetrader.controllers.MAX_SKILL
 import com.malcolmcrum.spacetrader.model.SpecialResource.*
 import com.malcolmcrum.spacetrader.model.SystemStatus.*
 import com.malcolmcrum.spacetrader.model.TradeItem.*
+import com.malcolmcrum.spacetrader.nouns.Ship
 import com.malcolmcrum.spacetrader.nouns.random
 
 val MAX_RANGE = 30
@@ -229,23 +230,92 @@ data class CrewMember(val name: String,
 
 }
 
-enum class PoliceRecord(val score: Int) {
-    PSYCHOPATH(-70),
-    VILLAIN(-30),
-    CRIMINAL(-10),
-    DUBIOUS(-5),
-    CLEAN(0),
-    LAWFUL(5),
-    TRUSTED(10),
-    HELPER(25),
-    HERO(75);
+data class EscapePod(var present: Boolean = false)
 
-    companion object {
-        fun of(score: Int): PoliceRecord {
-            return PoliceRecord.values()
-                    .filter { score >= it.score }
-                    .findLast { return it }!!
+data class Insurance(var present: Boolean = false, private var daysWithoutClaim: Int = 0) {
+    fun dayPasses() {
+        if (present) {
+            ++daysWithoutClaim
         }
+    }
+
+    fun getInsuranceCost(ship: Ship): Int {
+        val cost = (((ship.valueWithoutCargo(true) * 5) / 2000) * (100 - Math.min(daysWithoutClaim, 90)) / 100)
+        return Math.max(cost, 1)
+    }
+}
+
+data class PoliceRecord(var score: Int = 0) {
+    companion object {
+        const val PSYCHOPATH = -70
+        const val VILLAIN = -30
+        const val CRIMINAL = -10
+        const val DUBIOUS = -5
+        const val CLEAN = 0
+        const val LAWFUL = 5
+        const val TRUSTED = 10
+        const val HELPER = 25
+        const val HERO = 75
+    }
+
+    fun dayPasses(days: Int, difficulty: Difficulty) {
+        if (days % 3 == 0 && score > PoliceRecord.CLEAN) {
+            --score
+        }
+        if (score < PoliceRecord.DUBIOUS) {
+            if (difficulty <= Difficulty.NORMAL) {
+                score++
+            } else if (days % difficulty.ordinal == 0) {
+                score++
+            }
+        }
+    }
+
+    fun marketPriceModifier(): Double {
+        return if (score <= PoliceRecord.DUBIOUS) {
+            0.9
+        } else {
+            1.0
+        }
+    }
+
+    fun policeStrengthModifier(): Int {
+        return when {
+            score < PoliceRecord.PSYCHOPATH -> 3
+            score < PoliceRecord.VILLAIN -> 2
+            else -> 1
+        }
+    }
+
+    fun caughtTrafficking() {
+        --score
+    }
+
+    fun passedInspection() {
+        ++score
+    }
+
+    fun fledPolice(difficulty: Difficulty) {
+        if (score > PoliceRecord.DUBIOUS) {
+            score = PoliceRecord.DUBIOUS - if (difficulty < Difficulty.NORMAL) 0 else 1
+        } else {
+            score -= 2
+        }
+    }
+
+    fun policeGenerateAttempts(): Int {
+        var attempts = 1
+        // TODO: use `when`
+        if (score < PoliceRecord.VILLAIN) { // TODO: handle wild Status
+            attempts = 3
+        } else if (score < PoliceRecord.PSYCHOPATH) {
+            attempts = 5
+        }
+        return attempts
+    }
+
+    fun description(): String {
+        return "TODO"
     }
 }
 

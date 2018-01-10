@@ -1,22 +1,25 @@
 package com.malcolmcrum.spacetrader.states
 
-import com.malcolmcrum.spacetrader.model.Game
+import com.malcolmcrum.spacetrader.model.Difficulty
 import com.malcolmcrum.spacetrader.model.PoliceRecord
 import com.malcolmcrum.spacetrader.model.ShipType
-import com.malcolmcrum.spacetrader.model.SolarSystem
 import com.malcolmcrum.spacetrader.nouns.random
 
-class Travel(private val game: Game, private val destination: SolarSystem, clicks: Int) {
+class TravelController(private val travel: GameState.Travel,
+                       private val policeRecord: PoliceRecord,
+                       private val difficulty: Difficulty,
+                       private val type: ShipType,
+                       private val opponentGenerator: OpponentGenerator) {
+    private val destination = travel.destination
     private var raidedByPirates = false
-    private var clicksRemaining = clicks
 
     fun warp(): GameState {
-        assert(clicksRemaining >= 0)
-        if (clicksRemaining == 0) {
+        assert(travel.clicksLeft >= 0)
+        if (travel.clicksLeft == 0) {
             // TODO: handle post-Marie looting
             return arrival()
         }
-        --clicksRemaining
+        --travel.clicksLeft
 
         // TODO: handle going through rip
 
@@ -30,9 +33,9 @@ class Travel(private val game: Game, private val destination: SolarSystem, click
 
         // TODO: encounter mantis
 
-        var encounterTest = (0..(44 - 2 * game.difficulty.ordinal)).random()
+        var encounterTest = (0..(44 - 2 * difficulty.ordinal)).random()
 
-        if (game.ship.type == ShipType.FLEA) {
+        if (type == ShipType.FLEA) {
             encounterTest *= 2
         }
         if (encounterTest < pirateStrength() && !raidedByPirates) {
@@ -59,7 +62,7 @@ class Travel(private val game: Game, private val destination: SolarSystem, click
 
         // TODO: easter egg
 
-        return OnPlanet(destination, game)
+        return GameState.OnPlanet(destination)
     }
 
     private fun traderStrength(): Int {
@@ -71,25 +74,21 @@ class Travel(private val game: Game, private val destination: SolarSystem, click
     }
 
     private fun policeStrength(): Int {
-        return when {
-            game.policeRecordScore < PoliceRecord.PSYCHOPATH.score -> 3 * destination.politics.strengthPolice
-            game.policeRecordScore < PoliceRecord.VILLAIN.score -> 2 * destination.politics.strengthPolice
-            else -> destination.politics.strengthPolice
-        }
+        return destination.politics.strengthPolice * policeRecord.policeStrengthModifier()
     }
 
     private fun policeEncounter(): GameState {
-        val opponent = OpponentGenerator(game.difficulty, game.currentWorth(), game.policeRecordScore, destination).generatePolice()
-        return PoliceInspection(opponent, this, game)
+        val opponent = opponentGenerator.generatePolice()
+        return GameState.PoliceInspection(opponent, travel)
     }
 
     private fun pirateEncounter(): GameState {
-        val opponent = OpponentGenerator(game.difficulty, game.currentWorth(), game.policeRecordScore, destination).generatePirate()
+        val opponent = opponentGenerator.generatePirate()
         TODO()
     }
 
     private fun traderEncounter(): GameState {
-        val opponent = OpponentGenerator(game.difficulty, game.currentWorth(), game.policeRecordScore, destination).generateTrader()
+        val opponent = opponentGenerator.generateTrader()
         TODO()
     }
 }

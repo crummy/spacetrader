@@ -1,7 +1,5 @@
 package com.malcolmcrum.spacetrader
 
-import com.github.salomonbrys.kodein.Kodein
-import com.github.salomonbrys.kodein.with
 import com.malcolmcrum.spacetrader.model.Difficulty
 import com.malcolmcrum.spacetrader.model.GameId
 import com.malcolmcrum.spacetrader.ui.OnPlanetRenderer
@@ -25,16 +23,6 @@ import org.http4k.server.asServer
 import org.slf4j.LoggerFactory
 import java.time.Duration
 
-val kodein = Kodein {
-    constant("galaxyWidth") with 150
-    constant("galaxyHeight") with 110
-    constant("maxSolarSystems") with 120
-    constant("maxWormholes") with 6
-    constant("closeDistance") with 13
-    constant("minDistance") with 6
-    constant("maxCrewMembers") with 31
-}
-
 private val log = LoggerFactory.getLogger("MAIN")!!
 
 val gameManager = GameManager()
@@ -45,13 +33,13 @@ fun main(args: Array<String>) {
             rootPath bind GET to { req ->
                 val id: GameId = req.path("gameId")!!
                 val game = gameManager.games[id]!!
-                val renderer = rendererFor(game.state!!)
+                val renderer = rendererFor(game.state)
                 Response(SEE_OTHER).header("location", "/game/$id/${renderer.basePath()}")
             },
             "$rootPath/onPlanet" bind GET to { req ->
                 val id: GameId = req.path("gameId")!!
                 val game = gameManager.games[id]!!
-                val renderer = rendererFor(game.state!!)
+                val renderer = rendererFor(game.state)
                 Response(OK).body(renderer.render(game))
             },
             "$rootPath/${OnPlanetRenderer().basePath()}" bind OnPlanetRenderer().routes(),

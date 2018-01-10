@@ -3,7 +3,6 @@ package com.malcolmcrum.spacetrader.ui
 import com.malcolmcrum.spacetrader.model.Game
 import com.malcolmcrum.spacetrader.states.Encounter
 import com.malcolmcrum.spacetrader.states.GameState
-import com.malcolmcrum.spacetrader.states.OnPlanet
 import org.http4k.routing.RoutingHttpHandler
 
 interface StateRenderer {
@@ -13,7 +12,7 @@ interface StateRenderer {
 }
 
 fun rendererFor(state: GameState) = when (state) {
-    is OnPlanet -> OnPlanetRenderer()
+    is GameState.OnPlanet -> OnPlanetRenderer()
     is Encounter -> EncounterRenderer()
     else -> throw RuntimeException("Unrecognized state $state")
 }

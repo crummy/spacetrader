@@ -1,12 +1,18 @@
-package com.malcolmcrum.spacetrader.states
+package com.malcolmcrum.spacetrader.controllers
 
-import com.malcolmcrum.spacetrader.controllers.MarketController
 import com.malcolmcrum.spacetrader.model.*
+import com.malcolmcrum.spacetrader.nouns.Ship
+import com.malcolmcrum.spacetrader.states.GameState
+import com.malcolmcrum.spacetrader.states.Shipyard
 
-class OnPlanet(val system: SolarSystem, val game: Game) : GameState {
-    private val finances = game.finances
-    private val difficulty = game.difficulty
-    private val ship = game.ship
+class OnPlanetController(val system: SolarSystem,
+                         private val finances: Finances,
+                         difficulty: Difficulty,
+                         private val ship: Ship,
+                         private val escapePod: EscapePod,
+                         private val policeRecord: PoliceRecord,
+                         private val insurance: Insurance) : GameStateController {
+
     private val market = MarketController(system.market, system, difficulty)
     val shipyard = Shipyard(system)
 
@@ -42,7 +48,7 @@ class OnPlanet(val system: SolarSystem, val game: Game) : GameState {
     }
 
     fun buyEscapePod() {
-        if (game.hasEscapePod) {
+        if (escapePod.present) {
             throw Exception("Player already has escape pod")
         }
         if (! shipyard.escapePodAvailable) {
@@ -52,7 +58,7 @@ class OnPlanet(val system: SolarSystem, val game: Game) : GameState {
         if (! finances.canAfford(escapePodCost)) {
             throw Exception("Cannot afford $escapePodCost")
         }
-        game.hasEscapePod = true
+        escapePod.present = true
     }
 
     // TODO: Share logic between the sellWeapon, sellGadget and sellShield
@@ -125,7 +131,7 @@ class OnPlanet(val system: SolarSystem, val game: Game) : GameState {
     }
 
     fun buyTradeItem(item: TradeItem, amount: Int) {
-        val buyPrice = market.getBuyPrice(item, ship.traderSkill(), game.policeRecordScore)
+        val buyPrice = market.getBuyPrice(item, ship.traderSkill(), policeRecord)
         val cost = buyPrice * amount
         if (! finances.canAfford(cost)) {
             throw Exception("Cannot afford $cost of $item")
@@ -149,7 +155,7 @@ class OnPlanet(val system: SolarSystem, val game: Game) : GameState {
 
         ship.hold.remove(item, amount)
 
-        val sellPrice = market.getSellPrice(item, game.policeRecordScore)
+        val sellPrice = market.getSellPrice(item, policeRecord)
         val revenue = sellPrice * amount
         finances.deposit(revenue)
     }
@@ -172,9 +178,9 @@ class OnPlanet(val system: SolarSystem, val game: Game) : GameState {
         }
 
         // TODO: if !viaSingularity:
-        game.dayPasses()
+        //game.dayPasses()
 
-        return Travel(game, destination, distance).warp()
+        return GameState.Travel(destination, distance)
     }
 
     private fun payCosts(destination: SolarSystem) {
@@ -186,7 +192,7 @@ class OnPlanet(val system: SolarSystem, val game: Game) : GameState {
         if (! finances.canAfford(crewCosts)) {
             throw Exception("Cannot afford to pay $crewCosts to mercenaries")
         }
-        val insuranceCost = game.getInsuranceCost()
+        val insuranceCost = insurance.getInsuranceCost(ship)
         if (!finances.canAfford(insuranceCost + crewCosts)) {
             throw Exception("Cannot afford to pay $insuranceCost for insurance and $crewCosts to mercenaries")
         }

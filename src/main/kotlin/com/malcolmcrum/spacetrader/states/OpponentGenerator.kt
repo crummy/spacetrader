@@ -7,7 +7,7 @@ import com.malcolmcrum.spacetrader.nouns.random
 
 class OpponentGenerator(private val difficulty: Difficulty,
                         private val currentWorth: Int,
-                        private val policeRecordScore: Int,
+                        private val policeRecord: PoliceRecord,
                         private val destination: SolarSystem) {
 
     enum class BASE_TYPES {
@@ -18,13 +18,7 @@ class OpponentGenerator(private val difficulty: Difficulty,
 
     // Police hunt you down harder if you are villainous or are transporting Jonathan Wild
     fun generatePolice(): Ship {
-        var attempts = 1
-        if (policeRecordScore < PoliceRecord.VILLAIN.score) { // TODO: handle wild Status
-            attempts = 3
-        } else if (policeRecordScore < PoliceRecord.PSYCHOPATH.score) {
-            attempts = 5
-        }
-        attempts = Math.max(1, attempts + difficulty.ordinal - Difficulty.NORMAL.ordinal)
+        var attempts = Math.max(1, policeRecord.policeGenerateAttempts() + difficulty.ordinal - Difficulty.NORMAL.ordinal)
 
         val ship = pickShip(BASE_TYPES.POLICE, attempts)
         attempts = Math.max( 1, (currentWorth / 150000) + difficulty.ordinal - Difficulty.NORMAL.ordinal)

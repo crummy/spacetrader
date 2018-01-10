@@ -15,8 +15,8 @@ internal class MarketControllerTest {
         val market = Market()
         val controller = MarketController(market, noDrugsSystem, Difficulty.NORMAL)
 
-        val buyPrice = controller.getBuyPrice(TradeItem.NARCOTICS, 10, 0)
-        val sellPrice = controller.getSellPrice(TradeItem.NARCOTICS, 10)
+        val buyPrice = controller.getBuyPrice(TradeItem.NARCOTICS, 10, PoliceRecord())
+        val sellPrice = controller.getSellPrice(TradeItem.NARCOTICS, PoliceRecord())
         val amount = controller.getAmount(TradeItem.NARCOTICS)
 
         Assertions.assertEquals(0, buyPrice)
@@ -30,8 +30,8 @@ internal class MarketControllerTest {
         val market = Market()
         val controller = MarketController(market, noGunsSystem, Difficulty.NORMAL)
 
-        val buyPrice = controller.getBuyPrice(TradeItem.FIREARMS, 10, 0)
-        val sellPrice = controller.getSellPrice(TradeItem.FIREARMS, 10)
+        val buyPrice = controller.getBuyPrice(TradeItem.FIREARMS, 10, PoliceRecord())
+        val sellPrice = controller.getSellPrice(TradeItem.FIREARMS, PoliceRecord())
         val amount = controller.getAmount(TradeItem.FIREARMS)
 
         Assertions.assertEquals(0, buyPrice)
@@ -49,8 +49,8 @@ internal class MarketControllerTest {
         TradeItem.values().forEach { item ->
             assertTrue(market.amounts[item]!! >= 0)
             assertTrue(market.basePrices[item]!! >= 0)
-            assertTrue(controller.getBuyPrice(item, (0..MAX_SKILL).random(), (-100..100).random()) >= 0)
-            assertTrue(controller.getSellPrice(item, (-100..100).random()) >= 0)
+            assertTrue(controller.getBuyPrice(item, (0..MAX_SKILL).random(), PoliceRecord()) >= 0)
+            assertTrue(controller.getSellPrice(item, PoliceRecord()) >= 0)
         }
     }
 
@@ -61,8 +61,8 @@ internal class MarketControllerTest {
         controller.updatePrices()
 
         TradeItem.values().forEach { item ->
-            val buyPrice = controller.getBuyPrice(item, (0..MAX_SKILL).random(), (-100..100).random())
-            val sellPrice = controller.getSellPrice(item, (-100..100).random())
+            val buyPrice = controller.getBuyPrice(item, (0..MAX_SKILL).random(), PoliceRecord())
+            val sellPrice = controller.getSellPrice(item, PoliceRecord())
             assertTrue(buyPrice >= sellPrice)
         }
     }
