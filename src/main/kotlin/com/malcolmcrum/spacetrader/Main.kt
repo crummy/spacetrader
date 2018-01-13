@@ -32,15 +32,9 @@ fun main(args: Array<String>) {
     val app: HttpHandler = routes(
             rootPath bind GET to { req ->
                 val id: GameId = req.path("gameId")!!
-                val game = gameManager.games[id]!!
-                val renderer = rendererFor(game.state)
+                val controller = gameManager.getController(id)
+                val renderer = rendererFor(controller)
                 Response(SEE_OTHER).header("location", "/game/$id/${renderer.basePath()}")
-            },
-            "$rootPath/onPlanet" bind GET to { req ->
-                val id: GameId = req.path("gameId")!!
-                val game = gameManager.games[id]!!
-                val renderer = rendererFor(game.state)
-                Response(OK).body(renderer.render(game))
             },
             "$rootPath/${OnPlanetRenderer().basePath()}" bind OnPlanetRenderer().routes(),
             "/games" bind GET to {

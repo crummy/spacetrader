@@ -44,8 +44,7 @@ class GameManager {
         return id
     }
 
-    fun getController(gameId: GameId): GameStateController {
-        val game = games[gameId] ?: throw Exception("No game found for id $gameId")
+    fun getController(game: Game): GameStateController {
         val state = game.state
         return when(state) {
             is GameState.GameOver -> TODO()
@@ -54,12 +53,17 @@ class GameManager {
             is GameState.Travel -> {
                 val opponentGenerator = OpponentGenerator(game.difficulty, game.currentWorth(), game.policeRecord, state.destination)
                 game.state = TravelController(state, game.policeRecord, game.difficulty, game.ship.type, opponentGenerator).warp()
-                return getController(gameId)
+                return getController(game.id)
             }
             is GameState.PoliceInspection -> PoliceInspection(state.opponent, state.travel, game.finances, game.policeRecord, game.ship.hold, game.difficulty, game.currentWorth())
             is GameState.PoliceAttack -> TODO()
             is GameState.LeaveEncounter -> LeaveEncounter(state.opponent, state.travel, state.text)
         }
+    }
+
+    fun getController(gameId: GameId): GameStateController {
+        val game = games[gameId] ?: throw Exception("No game found for id $gameId")
+        return getController(game)
     }
 
     private fun createGameId(): GameId {

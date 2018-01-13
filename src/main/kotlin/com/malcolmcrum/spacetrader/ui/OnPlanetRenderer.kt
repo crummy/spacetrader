@@ -8,6 +8,7 @@ import kotlinx.html.*
 import kotlinx.html.stream.createHTML
 import org.http4k.core.Method
 import org.http4k.core.Response
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Status.Companion.SEE_OTHER
 import org.http4k.core.body.form
 import org.http4k.routing.RoutingHttpHandler
@@ -20,35 +21,37 @@ class OnPlanetRenderer : StateRenderer {
 
     override fun routes(): RoutingHttpHandler {
         return routes(
+                "" bind Method.GET to { req ->
+                    val id: GameId = req.path("gameId")!!
+                    val game = gameManager.games[id]!!
+                    Response(OK).body(render(game))
+                },
                 "warp/{systemName}" bind Method.POST to { req ->
                     val gameId: GameId = req.path("gameId")!!
                     val game = gameManager.games[gameId]!!
-                    val onPlanet = game.state as OnPlanetController
+                    val onPlanet = gameManager.getController(gameId) as OnPlanetController
                     val systemName = req.path("systemName")!!
-                    val destination = game.galaxy.getSystem(systemName)
+                    val destination = game.galaxy.getSystem(systemName) ?: throw Exception("No system found named $systemName")
                     game.state = onPlanet.warp(destination)
-                    Response(SEE_OTHER).header("location", "/game/${game.id}")
+                    Response(SEE_OTHER).header("location", "/game/$gameId")
                 },
                 "repair/{amount}" bind Method.POST to { req ->
                     val gameId: GameId = req.path("gameId")!!
-                    val game = gameManager.games[gameId]!!
-                    val onPlanet = game.state as OnPlanetController
+                    val onPlanet = gameManager.getController(gameId) as OnPlanetController
                     val amount = req.path("amount")!!
                     onPlanet.repairShip(amount.toInt())
-                    Response(SEE_OTHER).header("location", "/game/${game.id}")
+                    Response(SEE_OTHER).header("location", "/game/$gameId")
                 },
                 "refuel/{amount}" bind Method.POST to { req ->
                     val gameId: GameId = req.path("gameId")!!
-                    val game = gameManager.games[gameId]!!
-                    val onPlanet = game.state as OnPlanetController
+                    val onPlanet = gameManager.getController(gameId) as OnPlanetController
                     val amount = req.path("amount")!!
                     onPlanet.refuelShip(amount.toInt())
-                    Response(SEE_OTHER).header("location", "/game/${game.id}")
+                    Response(SEE_OTHER).header("location", "/game/$gameId")
                 },
                 "buy/{type}/{item}" bind Method.POST to { req ->
                     val gameId: GameId = req.path("gameId")!!
-                    val game = gameManager.games[gameId]!!
-                    val onPlanet = game.state as OnPlanetController
+                    val onPlanet = gameManager.getController(gameId) as OnPlanetController
                     val type = req.path("type")!!
                     val item = req.path("item")!!
                     when (type) {
@@ -57,12 +60,11 @@ class OnPlanetRenderer : StateRenderer {
                         "gadget" -> onPlanet.buyGadget(Gadget.valueOf(item))
                         else -> throw Exception("Unrecognized type: $type")
                     }
-                    Response(SEE_OTHER).header("location", "/game/${game.id}")
+                    Response(SEE_OTHER).header("location", "/game/$gameId")
                 },
                 "sell/{type}/{item}" bind Method.POST to { req ->
                     val gameId: GameId = req.path("gameId")!!
-                    val game = gameManager.games[gameId]!!
-                    val onPlanet = game.state as OnPlanetController
+                    val onPlanet = gameManager.getController(gameId) as OnPlanetController
                     val type = req.path("type")!!
                     val item = req.path("item")!!
                     when (type) {
@@ -71,37 +73,34 @@ class OnPlanetRenderer : StateRenderer {
                         "gadget" -> onPlanet.sell(Gadget.valueOf(item))
                         else -> throw Exception("Unrecognized type: $type")
                     }
-                    Response(SEE_OTHER).header("location", "/game/${game.id}")
+                    Response(SEE_OTHER).header("location", "/game/$gameId")
                 },
                 "buyEscapePod" bind Method.POST to { req ->
                     val gameId: GameId = req.path("gameId")!!
-                    val game = gameManager.games[gameId]!!
-                    val onPlanet = game.state as OnPlanetController
+                    val onPlanet = gameManager.getController(gameId) as OnPlanetController
                     onPlanet.buyEscapePod()
-                    Response(SEE_OTHER).header("location", "/game/${game.id}")
+                    Response(SEE_OTHER).header("location", "/game/$gameId")
                 },
                 "market/buy" bind Method.POST to { req ->
                     val gameId: GameId = req.path("gameId")!!
-                    val game = gameManager.games[gameId]!!
-                    val onPlanet = game.state as OnPlanetController
+                    val onPlanet = gameManager.getController(gameId) as OnPlanetController
                     val item = TradeItem.valueOf(req.form("item")!!)
                     val amount = req.form("${item}BuyAmount")!!.toInt()
                     onPlanet.buyTradeItem(item, amount)
-                    Response(SEE_OTHER).header("location", "/game/${game.id}")
+                    Response(SEE_OTHER).header("location", "/game/$gameId")
                 },
                 "market/sell" bind Method.POST to { req ->
                     val gameId: GameId = req.path("gameId")!!
-                    val game = gameManager.games[gameId]!!
-                    val onPlanet = game.state as OnPlanetController
+                    val onPlanet = gameManager.getController(gameId) as OnPlanetController
                     val item = TradeItem.valueOf(req.form("item")!!)
                     val amount = req.form("${item}SellAmount")!!.toInt()
                     onPlanet.sellTradeItem(item, amount)
-                    Response(SEE_OTHER).header("location", "/game/${game.id}")
+                    Response(SEE_OTHER).header("location", "/game/$gameId")
                 })
     }
 
     override fun render(game: Game): String {
-        val state = game.state as OnPlanetController
+        val state = gameManager.getController(game.id) as OnPlanetController
         val market = MarketController(state.system.market, state.system, game.difficulty)
 
         return createHTML().html {

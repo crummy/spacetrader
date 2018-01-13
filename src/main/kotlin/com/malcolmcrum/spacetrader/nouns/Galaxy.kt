@@ -21,7 +21,7 @@ class Galaxy(val systems: List<SolarSystem>, val startCountdown: Int, val diffic
         }
     }
 
-    fun getSystem(systemName: String): SolarSystem {
+    fun getSystem(systemName: String): SolarSystem? {
         val system = systems.filter { it.name == systemName }
         if (system.size != 1) {
             throw AssertionError("Expected to find a system named $systemName but ${system.size} systems found")
