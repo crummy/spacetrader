@@ -12,7 +12,7 @@ class LeaveEncounterController(opponent: Ship, travel: GameState.Travel, private
         return listOf(::done)
     }
 
-    fun done(): GameState {
+    override fun done(): GameState {
         return travel
     }
 

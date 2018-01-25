@@ -40,6 +40,9 @@ fun main(args: Array<String>) {
             "/games" bind GET to {
                 Response(OK).body(gameManager.games.toString())
             },
+            "/" bind GET to {
+                Response(SEE_OTHER).header("location", "/new")
+            },
             "/new" bind GET to {
                 Response(OK).body(newGame())
             },

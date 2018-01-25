@@ -23,8 +23,8 @@ class EncounterRenderer: StateRenderer {
                 "attack" bind Method.POST to { req ->
                     val gameId: GameId = req.path("gameId")!!
                     val game = gameManager.games[gameId]!!
-                    val encounter = game.state as EncounterController
-                    game.state = encounter.listActions().first { it.name == "attack" }.call()
+                    val encounter = gameManager.getController(game) as EncounterController
+                    game.state = encounter.attack()
                     Response(SEE_OTHER).header("location", "/game/${game.id}")
                 }
         )

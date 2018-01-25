@@ -20,7 +20,7 @@ class PoliceInspection(opponent: Ship,
         return listOf(::submit, ::flee, ::attack)
     }
 
-    fun submit(): GameState {
+    override fun submit(): GameState {
         val firearms = hold.count(TradeItem.FIREARMS)
         val narcotics = hold.count(TradeItem.NARCOTICS)
         if (firearms > 0 || narcotics > 0) {
@@ -43,13 +43,13 @@ class PoliceInspection(opponent: Ship,
         }
     }
 
-    fun flee(): GameState {
+    override fun flee(): GameState {
         policeRecord.fledPolice(difficulty)
 
         TODO() //return PoliceAttack()
     }
 
-    fun attack(): GameState {
+    override fun attack(): GameState {
         TODO()
     }
 
