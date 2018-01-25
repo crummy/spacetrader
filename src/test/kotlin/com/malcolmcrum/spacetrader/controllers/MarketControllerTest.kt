@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 internal class MarketControllerTest {
     @Test
     fun `verify no drugs sold`() {
-        val noDrugsSystem = SolarSystem("nodrugs", 0, 0, TechLevel.HI_TECH, Politics.FASCIST, null, SystemSize.HUGE, null)
+        val noDrugsSystem = SolarSystem("nodrugs", 0, 0, TechLevel.HI_TECH, Politics.FASCIST, SystemSize.HUGE, null, null)
         val market = Market()
         val controller = MarketController(market, noDrugsSystem, Difficulty.NORMAL)
 
@@ -26,7 +26,7 @@ internal class MarketControllerTest {
 
     @Test
     fun `verify no weapons sold`() {
-        val noGunsSystem = SolarSystem("noguns", 0, 0, TechLevel.HI_TECH, Politics.PACIFIST, null, SystemSize.HUGE, null)
+        val noGunsSystem = SolarSystem("noguns", 0, 0, TechLevel.HI_TECH, Politics.PACIFIST, SystemSize.HUGE, null, null)
         val market = Market()
         val controller = MarketController(market, noGunsSystem, Difficulty.NORMAL)
 
@@ -73,8 +73,8 @@ internal class MarketControllerTest {
                 0,
                 pickRandom(TechLevel.values()),
                 pickRandom(Politics.values()),
-                pickRandom(SpecialResource.values()),
                 pickRandom(SystemSize.values()),
+                pickRandom(SpecialResource.values()),
                 pickRandom(SystemStatus.values()))
     }
 }

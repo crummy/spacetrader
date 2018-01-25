@@ -4,6 +4,9 @@ import com.malcolmcrum.spacetrader.model.*
 import com.malcolmcrum.spacetrader.nouns.Ship
 import com.malcolmcrum.spacetrader.nouns.pickRandom
 import com.malcolmcrum.spacetrader.nouns.random
+import org.slf4j.LoggerFactory
+
+private val log = LoggerFactory.getLogger(OpponentGenerator::class.java)!!
 
 class OpponentGenerator(private val difficulty: Difficulty,
                         private val currentWorth: Int,
@@ -179,6 +182,7 @@ class OpponentGenerator(private val difficulty: Difficulty,
                     bestWeapon = anotherWeapon
                 }
             }
+            log.debug("After $attempts attempts, chose $bestWeapon")
             weapons.add(bestWeapon)
         }
 
@@ -249,19 +253,19 @@ class OpponentGenerator(private val difficulty: Difficulty,
         var sum = 0
         Gadget.values().forEach { gadget ->
             sum += gadget.chance
-            if (sum < chance) {
+            if (chance < sum) {
                 return gadget
             }
         }
         throw Exception("Couldn't find a gadget; chance: $chance")
     }
 
-    private fun randomWeapon(): Weapon {
+    fun randomWeapon(): Weapon {
         val chance = (0..100).random()
         var sum = 0
         Weapon.values().forEach { weapon ->
             sum += weapon.chance
-            if (sum < chance) {
+            if (chance < sum) {
                 return weapon
             }
         }
@@ -273,7 +277,7 @@ class OpponentGenerator(private val difficulty: Difficulty,
         var sum = 0
         ShieldType.values().forEach { shield ->
             sum += shield.chance
-            if (sum < chance) {
+            if (chance < sum) {
                 return shield
             }
         }

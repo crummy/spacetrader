@@ -19,6 +19,6 @@ internal class SolarSystemTest {
     }
 
     private fun system(x: Int, y: Int): SolarSystem {
-        return SolarSystem("test", x, y, TechLevel.HI_TECH, Politics.ANARCHY, null, SystemSize.HUGE, null)
+        return SolarSystem("test", x, y, TechLevel.HI_TECH, Politics.ANARCHY, SystemSize.HUGE, null, null)
     }
 }

@@ -66,7 +66,7 @@ class GalaxyController {
 
             val name = names[i]
 
-            val system = SolarSystem(name, x, y, tech, politics, specialResource, size, status)
+            val system = SolarSystem(name, x, y, tech, politics, size, specialResource, status)
             if (!wormholesPlaced) {
                 system.wormholeDestination = system
             }
