@@ -3,7 +3,8 @@ package com.malcolmcrum.spacetrader.ui
 import com.malcolmcrum.spacetrader.gameManager
 import com.malcolmcrum.spacetrader.model.Game
 import com.malcolmcrum.spacetrader.model.GameId
-import com.malcolmcrum.spacetrader.states.Encounter
+import com.malcolmcrum.spacetrader.states.EncounterController
+import com.malcolmcrum.spacetrader.states.EncounterState
 import kotlinx.html.*
 import kotlinx.html.stream.createHTML
 import org.http4k.core.Method
@@ -22,7 +23,7 @@ class EncounterRenderer: StateRenderer {
                 "attack" bind Method.POST to { req ->
                     val gameId: GameId = req.path("gameId")!!
                     val game = gameManager.games[gameId]!!
-                    val encounter = game.state as Encounter
+                    val encounter = game.state as EncounterController
                     game.state = encounter.listActions().first { it.name == "attack" }.call()
                     Response(SEE_OTHER).header("location", "/game/${game.id}")
                 }
@@ -30,8 +31,9 @@ class EncounterRenderer: StateRenderer {
     }
 
     override fun render(game: Game): String {
-        val encounter = game.state as Encounter
-        val opponent = encounter.opponent
+        val encounter = gameManager.getController(game) as EncounterController
+        val state = game.state as EncounterState
+        val opponent = state.opponent
 
         return createHTML().html {
             head {

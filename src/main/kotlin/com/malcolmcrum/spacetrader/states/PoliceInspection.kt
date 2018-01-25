@@ -10,7 +10,7 @@ class PoliceInspection(opponent: Ship,
                        private val policeRecord: PoliceRecord,
                        private val hold: Hold,
                        private val difficulty: Difficulty,
-                       private val currentWorth: Int) : Encounter(opponent, travel) {
+                       private val currentWorth: Int) : EncounterController(opponent, travel) {
 
     override fun description(): String {
         return "The police summon you to submit to an inspection."

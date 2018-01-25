@@ -57,7 +57,8 @@ class GameManager {
             }
             is GameState.PoliceInspection -> PoliceInspection(state.opponent, state.travel, game.finances, game.policeRecord, game.ship.hold, game.difficulty, game.currentWorth())
             is GameState.PoliceAttack -> TODO()
-            is GameState.LeaveEncounter -> LeaveEncounter(state.opponent, state.travel, state.text)
+            is GameState.LeaveEncounter -> LeaveEncounterController(state.opponent, state.travel, state.text)
+            is EncounterState -> throw Exception("Cannot be in abstract state");
         }
     }
 
