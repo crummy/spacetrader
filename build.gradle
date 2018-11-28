@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.2.10'
+    ext.kotlin_version = '1.3.0'
     ext.http4k_version = '3.2.3'
     ext.junit_version = '5.0.2'
     ext.kotlinx_html_version = '0.6.6'
@@ -42,10 +42,4 @@ dependencies {
     compile 'com.github.salomonbrys.kodein:kodein:4.1.0'
     testCompile("org.junit.jupiter:junit-jupiter-api:${junit_version}")
     testRuntime("org.junit.jupiter:junit-jupiter-engine:${junit_version}")
-}
-
-kotlin {
-    experimental {
-        coroutines "enable"
-    }
 }
