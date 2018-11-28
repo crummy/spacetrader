@@ -96,27 +96,18 @@ class TravelController(private val travel: GameState.Travel,
             opponent.isCloaked -> GameState.Travel(destination, travel.clicksLeft - 1)
             // If you terrify them, they may flee
             policeRecord.scaresTraders && traderFlees(opponent.type) -> GameState.TraderFlee(opponent, travel)
-            playerShip.hasFreeCargoBay && traderCanSellItems(opponent) -> GameState.TraderSell(opponent, travel)
-            traderCanBuyItems(playerShip) -> GameState.TraderBuy(opponent, travel)
+            playerShip.hasFreeCargoBay && canBuyItems(opponent) -> GameState.TraderSell(opponent, travel)
+            canBuyItems(playerShip) -> GameState.TraderBuy(opponent, travel)
+            else -> TODO()
         }
     }
 
     // Determine if ship has goods that can be traded.
     // Note the original claimed to take destination system into account but did not, I suspect this is a bug:
     // https://github.com/videogamepreservation/spacetrader/blob/64aec5d376679c0a9d1ca50f19af2951d33ea87c/Src/Cargo.c#L199
-    private fun traderCanSellItems(traderShip: Ship): Boolean {
+    private fun canBuyItems(traderShip: Ship): Boolean {
         return values().any { item ->
             val hasItem = traderShip.hold.count(item) > 0
-            val systemSellsItem = travel.destination.market.basePrices[item]!! > 0
-            // Criminals can only buy illegal goods. Noncriminals cannot buy illegal goods.
-            val allowedToBuy = policeRecord.mustBuyIllegalGoods == (item == FIREARMS || item == NARCOTICS)
-            return hasItem && systemSellsItem && allowedToBuy
-        }
-    }
-
-    private fun traderCanBuyItems(playerShip: Ship): Boolean {
-        return values().any { item ->
-            val hasItem = playerShip.hold.count(item) > 0
             val systemSellsItem = travel.destination.market.basePrices[item]!! > 0
             // Criminals can only buy illegal goods. Noncriminals cannot buy illegal goods.
             val allowedToBuy = policeRecord.mustBuyIllegalGoods == (item == FIREARMS || item == NARCOTICS)

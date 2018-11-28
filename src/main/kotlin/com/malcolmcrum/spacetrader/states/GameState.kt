@@ -11,6 +11,8 @@ sealed class GameState {
     data class PoliceAttack(private val opp: Ship, private val t: Travel) : EncounterState(opp, t)
     data class TraderIgnore(private val opp: Ship, private val t: Travel) : EncounterState(opp, t)
     data class TraderFlee(private val opp: Ship, private val t: Travel) : EncounterState(opp, t)
+    data class TraderSell(private val opp: Ship, private val t: Travel) : EncounterState(opp, t)
+    data class TraderBuy(private val opp: Ship, private val t: Travel) : EncounterState(opp, t)
     data class LeaveEncounter(private val opp: Ship, private val t: Travel, val text: String) : EncounterState(opp, t)
     data class StartGame(val startingSystem: SolarSystem) : GameState()
 }
