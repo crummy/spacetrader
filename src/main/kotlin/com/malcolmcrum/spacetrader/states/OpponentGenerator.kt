@@ -59,12 +59,22 @@ class OpponentGenerator(private val difficulty: Difficulty,
         return Ship(ship, captain, gadgets, shields, weapons, crew, hold, ship.fuelTanks, hullStrength)
     }
 
+    // TODO unduplicate code
     fun generateTrader(): Ship {
         var attempts = 1
         val ship = pickShip(BASE_TYPES.TRADER, attempts)
         attempts = Math.max( 1, (currentWorth / 150000) + difficulty.ordinal - Difficulty.NORMAL.ordinal)
 
-        TODO()
+        val captain = createCaptain()
+        val gadgets = createGadgets(attempts, difficulty, ship.gadgetSlots)
+        val cargoBays = ship.cargoBays + (if (gadgets.contains(Gadget.EXTRA_CARGO_BAYS)) 5 else 0)
+        val hold = createHold(BASE_TYPES.TRADER, cargoBays)
+        val weapons = createWeapons(attempts, ship.weaponSlots)
+        val shields = createShields(attempts, difficulty, ship.shieldSlots)
+        val hullStrength = createHullStrength(ship.hullStrength, !shields.isEmpty())
+        val crew = createCrew(difficulty, ship.crewQuarters)
+
+        return Ship(ship, captain, gadgets, shields, weapons, crew, hold, ship.fuelTanks, hullStrength)
     }
 
     fun generateMantis(): Ship {

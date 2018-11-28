@@ -9,6 +9,8 @@ sealed class GameState {
     data class Travel(val destination: SolarSystem, var clicksLeft: Int) : GameState()
     data class PoliceInspection(private val opp: Ship, private val t: Travel) : EncounterState(opp, t)
     data class PoliceAttack(private val opp: Ship, private val t: Travel) : EncounterState(opp, t)
+    data class TraderIgnore(private val opp: Ship, private val t: Travel) : EncounterState(opp, t)
+    data class TraderFlee(private val opp: Ship, private val t: Travel) : EncounterState(opp, t)
     data class LeaveEncounter(private val opp: Ship, private val t: Travel, val text: String) : EncounterState(opp, t)
     data class StartGame(val startingSystem: SolarSystem) : GameState()
 }

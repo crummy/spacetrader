@@ -246,6 +246,7 @@ data class Insurance(var present: Boolean = false, private var daysWithoutClaim:
 }
 
 data class PoliceRecord(var score: Int = 0) {
+
     companion object {
         const val PSYCHOPATH = -70
         const val VILLAIN = -30
@@ -257,6 +258,9 @@ data class PoliceRecord(var score: Int = 0) {
         const val HELPER = 25
         const val HERO = 75
     }
+
+    val scaresTraders = score <= CRIMINAL
+    val mustBuyIllegalGoods = score < DUBIOUS
 
     fun dayPasses(days: Int, difficulty: Difficulty) {
         if (days % 3 == 0 && score > PoliceRecord.CLEAN) {
@@ -317,6 +321,7 @@ data class PoliceRecord(var score: Int = 0) {
     fun description(): String {
         return "TODO"
     }
+
 }
 
 enum class Reputation(val score: Int) {

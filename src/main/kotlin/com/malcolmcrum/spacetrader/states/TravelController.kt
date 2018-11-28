@@ -1,14 +1,15 @@
 package com.malcolmcrum.spacetrader.states
 
-import com.malcolmcrum.spacetrader.model.Difficulty
-import com.malcolmcrum.spacetrader.model.PoliceRecord
-import com.malcolmcrum.spacetrader.model.ShipType
+import com.malcolmcrum.spacetrader.model.*
+import com.malcolmcrum.spacetrader.model.TradeItem.*
+import com.malcolmcrum.spacetrader.nouns.Ship
 import com.malcolmcrum.spacetrader.nouns.random
 
 class TravelController(private val travel: GameState.Travel,
                        private val policeRecord: PoliceRecord,
+                       private val reputation: Int,
                        private val difficulty: Difficulty,
-                       private val type: ShipType,
+                       private val playerShip: Ship,
                        private val opponentGenerator: OpponentGenerator) {
     private val destination = travel.destination
     private var raidedByPirates = false
@@ -35,7 +36,7 @@ class TravelController(private val travel: GameState.Travel,
 
         var encounterTest = (0..(44 - 2 * difficulty.ordinal)).random()
 
-        if (type == ShipType.FLEA) {
+        if (playerShip.type == ShipType.FLEA) {
             encounterTest *= 2
         }
         if (encounterTest < pirateStrength() && !raidedByPirates) {
@@ -89,6 +90,41 @@ class TravelController(private val travel: GameState.Travel,
 
     private fun traderEncounter(): GameState {
         val opponent = opponentGenerator.generateTrader()
-        TODO()
+        return when {
+            playerShip.isCloaked -> GameState.TraderIgnore(opponent, travel)
+            // If trader is cloaked, they never attempt to contact player https://github.com/videogamepreservation/spacetrader/blob/64aec5d376679c0a9d1ca50f19af2951d33ea87c/Src/Traveler.c#L2075
+            opponent.isCloaked -> GameState.Travel(destination, travel.clicksLeft - 1)
+            // If you terrify them, they may flee
+            policeRecord.scaresTraders && traderFlees(opponent.type) -> GameState.TraderFlee(opponent, travel)
+            playerShip.hasFreeCargoBay && traderCanSellItems(opponent) -> GameState.TraderSell(opponent, travel)
+            traderCanBuyItems(playerShip) -> GameState.TraderBuy(opponent, travel)
+        }
+    }
+
+    // Determine if ship has goods that can be traded.
+    // Note the original claimed to take destination system into account but did not, I suspect this is a bug:
+    // https://github.com/videogamepreservation/spacetrader/blob/64aec5d376679c0a9d1ca50f19af2951d33ea87c/Src/Cargo.c#L199
+    private fun traderCanSellItems(traderShip: Ship): Boolean {
+        return values().any { item ->
+            val hasItem = traderShip.hold.count(item) > 0
+            val systemSellsItem = travel.destination.market.basePrices[item]!! > 0
+            // Criminals can only buy illegal goods. Noncriminals cannot buy illegal goods.
+            val allowedToBuy = policeRecord.mustBuyIllegalGoods == (item == FIREARMS || item == NARCOTICS)
+            return hasItem && systemSellsItem && allowedToBuy
+        }
+    }
+
+    private fun traderCanBuyItems(playerShip: Ship): Boolean {
+        return values().any { item ->
+            val hasItem = playerShip.hold.count(item) > 0
+            val systemSellsItem = travel.destination.market.basePrices[item]!! > 0
+            // Criminals can only buy illegal goods. Noncriminals cannot buy illegal goods.
+            val allowedToBuy = policeRecord.mustBuyIllegalGoods == (item == FIREARMS || item == NARCOTICS)
+            return hasItem && systemSellsItem && allowedToBuy
+        }
+    }
+
+    private fun traderFlees(traderShip: ShipType): Boolean {
+        return (0..Reputation.ELITE.score).random() <= (reputation * 10) / (1 + traderShip.ordinal)
     }
 }

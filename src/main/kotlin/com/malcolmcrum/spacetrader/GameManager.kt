@@ -52,7 +52,7 @@ class GameManager {
             is GameState.OnPlanet -> OnPlanetController(state.system, game.finances, game.difficulty, game.ship, game.escapePod, game.policeRecord, game.insurance)
             is GameState.Travel -> {
                 val opponentGenerator = OpponentGenerator(game.difficulty, game.currentWorth(), game.policeRecord, state.destination)
-                game.state = TravelController(state, game.policeRecord, game.difficulty, game.ship.type, opponentGenerator).warp()
+                game.state = TravelController(state, game.policeRecord, game.reputationScore, game.difficulty, game.ship, opponentGenerator).warp()
                 return getController(game.id)
             }
             is GameState.PoliceInspection -> PoliceInspection(state.opponent, state.travel, game.finances, game.policeRecord, game.ship.hold, game.difficulty, game.currentWorth())

@@ -14,6 +14,8 @@ data class Ship(val type: ShipType,
                 var tribbles: Int = 0) {
 
     val hold = Hold(cargo, type)
+    val isCloaked: Boolean = gadgets.contains(Gadget.CLOAKING)
+    val hasFreeCargoBay: Boolean = hold.emptyBays() > 0
 
     fun traderSkill(): Int {
         return crew.plus(captain).maxBy { it.trader }?.trader!!

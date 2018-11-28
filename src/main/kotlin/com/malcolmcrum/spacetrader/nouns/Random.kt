@@ -4,7 +4,11 @@ import java.util.*
 
 private val RNG = Random()
 
-fun ClosedRange<Int>.random() = RNG.nextInt(endInclusive - start) + start
+fun ClosedRange<Int>.random(): Int {
+    val bound = endInclusive - start
+    assert(bound > 0) { "Bound must be positive but was given $bound" }
+    return RNG.nextInt(bound) + start
+}
 
 fun randomSkillLevel(): Int {
     return 1 + (0..5).random() + (0..6).random()
